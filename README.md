@@ -10,22 +10,30 @@ This project is the successor of jQuery History, it aims to:
 - Support for traditional anchors
 - Support as many javascript frameworks as possible via adapters.
 
-Currently working in:
+Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton
+
+## Adapters
+
+### Supported
+
+- jQuery
+- Prototype
+
+### Unsupported
+
+- Dojo
+- MooTools
+
+## Browsers
+
+### Supported
 
 - Chrome 8
 - Opera 10, 11
 - Safari 5
 - Firefox 4 Beta 9
 
-Still needs testing in:
+### Yet to Test
 
 - IE 6,7,8,9
 - Firefox 3
-
-Still needs doing:
-
-- Mootools Adapter
-- Dojo Adapter
-- Documentation
-
-Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton

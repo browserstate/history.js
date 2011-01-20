@@ -97,22 +97,6 @@
 		};
 
 		/**
-		 * History.currentState
-		 * The current State that we exist in.
-		 */
-		History.currentState = null;
-
-		/**
-		 * History.getState()
-		 * Get an object containing the data, title and url of the current state
-		 * @return object {data,title,url}
-		 */
-		History.getState = function(){
-			if(debug)console.info('History.getState',this,arguments);
-			return History.currentState;
-		};
-
-		/**
 		 * History.getStateObject(data,title,url)
 		 * Creates a object based on the data, title and url state params
 		 * @param object data
@@ -151,6 +135,22 @@
 		};
 
 		/**
+		 * History.currentState
+		 * The current State that we exist in.
+		 */
+		History.currentState = History.getStateObject({},document.title,document.location.href);
+
+		/**
+		 * History.getState()
+		 * Get an object containing the data, title and url of the current state
+		 * @return object {data,title,url}
+		 */
+		History.getState = function(){
+			if(debug)console.info('History.getState',this,arguments);
+			return History.currentState;
+		};
+
+		/**
 		 * Refresh the Current State
 		 */
 		History.Adapter.bind(window,'popstate',function(event,extra){
@@ -160,6 +160,7 @@
 			var data = {};
 			if ( (event||false) && (event.state||false) ) data = event.state;
 			else if ( (event||false) && (event.originalEvent||false) && (event.originalEvent.state||false) ) data = event.originalEvent.state;
+			else if ( (event||false) && (event.memo||false) && (event.memo.state||false) ) data = event.memo.state;
 			else if ( (extra||false) && (extra.state||false) ) data = extra.state;
 
 			// Fetch

@@ -30,7 +30,8 @@
 		});
 
 		// Handle State Functionality
-		$(window).bind('popstate',function(event,extra){
+		// We use History.Adapter.bind here, instead of $(window).bind as we may be running a History.js Adapter that isn't jQuery
+		History.Adapter.bind(window,'popstate',function(event,extra){
 			if(debug)console.info('Demo.popstate',this,arguments);
 
 			// Prepare

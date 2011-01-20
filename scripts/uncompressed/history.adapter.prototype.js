@@ -1,7 +1,7 @@
-// History.js jQuery Adapter
+// History.js Prototype Adapter
 // New-BSD License, Copyright 2011 Benjamin Arthur Lupton <contact@balupton.com>
 
-(function($,window,undefined){
+(function(Prototype,window,undefined){
 
 	// --------------------------------------------------------------------------
 	// Initialise
@@ -25,12 +25,13 @@
 		 */
 		getBrowserFlag: function(){
 			var
-				flags = ['msie','webkit','mozilla','opera'],
+				flags_out = ['msie','webkit','webkit','mozilla','opera'],
+				flags_in = ['IE','Opera','WebKit','MobileSafari','Gecko'],
 				result = null;
 
-			$.each(flags,function(i,flag){
-				if ( $.browser[flag]||false ) {
-					result = flag;
+			flags_in.each(function(i,flag){
+				if ( Prototype.Browser[flag]||false ) {
+					result = flags_out[i];
 					return false;
 				}
 			});
@@ -44,7 +45,7 @@
 		 */
 		getBrowserMajorVersion: function(){
 			var
-				version = $.browser.version,
+				version = parseInt(navigator.userAgent.substring(navigator.userAgent.indexOf("MSIE")+5)),
 				result = parseInt(version,10);
 
 			return result;
@@ -58,7 +59,9 @@
 		 * @return element
 		 */
 		bind: function(el,event,callback){
-			return $(el).bind(event,callback);
+			event = 'widget:'+event;
+			console.log('bind:',el,event,callback);
+			return Element.observe(el,event,callback);
 		},
 
 		/**
@@ -69,7 +72,9 @@
 		 * @return element
 		 */
 		trigger: function(el,event,data){
-			return $(el).trigger(event,data);
+			event = 'widget:'+event;
+			console.log('trigger:',el,event,data);
+			return Element.fire(el,event,data);
 		}
 	};
 
@@ -79,4 +84,4 @@
 		History.init();
 	}
 
-})(jQuery,window);
+})(Prototype,window);
