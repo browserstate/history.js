@@ -172,6 +172,48 @@
 			return true;
 		});
 
+		/**
+		 * History.pushStateAndTrigger(data,title,url)
+		 * Add a new State to the history object, become it, and trigger onpopstate
+		 * @param object data
+		 * @param string title
+		 * @param string url
+		 * @return true
+		 */
+		History.pushStateAndTrigger = function(data,title,url){
+			// Push the State
+			History.pushState(data,title,url);
+
+			// Fire HTML5 Event
+			History.Adapter.trigger(window,'popstate',{
+				'state': data
+			});
+
+			// Return true
+			return true;
+		}
+
+		/**
+		 * History.replaceStateAndTrigger(data,title,url)
+		 * Replace the State and trigger onpopstate
+		 * @param object data
+		 * @param string title
+		 * @param string url
+		 * @return true
+		 */
+		History.replaceStateAndTrigger = function(data,title,url){
+			// Push the State
+			History.replaceState(data,title,url);
+
+			// Fire HTML5 Event
+			History.Adapter.trigger(window,'popstate',{
+				'state': data
+			});
+
+			// Return true
+			return true;
+		}
+
 		// ----------------------------------------------------------------------
 		// HTML4 HashChange Support
 
@@ -223,6 +265,7 @@
 
 							// Create a history entry in the iframe
 							iframe.contentWindow.document.open();
+							iframe.title = document.title;
 							iframe.contentWindow.document.close();
 
 							// Update the iframe's hash
@@ -321,7 +364,6 @@
 				}
 
 				// Push the new HTML5 State
-				console.log(newState);
 				History.pushState(newState.data,newState.title,newState.url);
 
 				// Return true
@@ -409,7 +451,8 @@
 				// Fetch the State Object
 				var
 					State = History.getStateObject(data,title,url),
-					StateHash = History.getStateHash(data,title,url);
+					StateHash = History.getStateHash(data,title,url),
+					Hash = escape(StateHash);
 
 				// Fire HTML5 Event
 				History.Adapter.trigger(window,'popstate',{
@@ -420,7 +463,9 @@
 				History.currentState = State;
 
 				// Update HTML4 Hash
-				History.setHash(escape(StateHash));
+				if ( History.getHash() !== Hash ) {
+					History.setHash(Hash);
+				}
 
 				// Return true
 				return true;
@@ -453,17 +498,9 @@
 		else {
 			History.pushState = function(data,title,url){
 				history.pushState.apply(history,arguments);
-				// Fire HTML5 Event
-				History.Adapter.trigger(window,'popstate',{
-					'state': data
-				});
 			}
 			History.replaceState = function(data,title,url){
 				history.replaceState.apply(history,arguments);
-				// Fire HTML5 Event
-				History.Adapter.trigger(window,'popstate',{
-					'state': data
-				});
 			}
 			History.go = function(){
 				history.go.apply(history,arguments);

@@ -22,7 +22,7 @@
 				};
 
 			// Update State
-			History.pushState(data, title, href);
+			History.pushStateAndTrigger(data, title, href);
 
 			// Prevent link follow through
 			event.preventDefault();
