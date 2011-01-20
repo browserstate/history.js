@@ -12,6 +12,30 @@ This project is the successor of jQuery History, it aims to:
 
 Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton
 
+## Usage
+
+	(function(window,undefined){
+
+		var History = window.History;
+
+		History.Adapter.bind(window,'popstate',functon(){
+			var State = History.getState();
+			console.log(State.data, State.title, State.url);
+		});
+
+		History.pushState({state:1}, "State 1", "?state=1");
+		History.pushState({state:2}, "State 2", "?state=2");
+		History.replaceState({state:3}, "State 3", "?state=3");
+		History.back(); // logs {state:1}, "State 1", "?state=1"
+		History.back(); // logs {}, "Home Page", "?"
+		History.go(2);  // logs {state:3}, "State 3", "?state=3"
+
+		History.pushStateAndTrigger({state:1}, "State 1", "?state=1");  		// logs {state:1}, "State 1", "?state=1"
+		History.pushStateAndTrigger({state:2}, "State 2", "?state=2");  		// logs {state:2}, "State 2", "?state=2"
+		History.replaceStateAndTrigger({state:3}, "State 3", "?state=3");		// logs {state:3}, "State 3", "?state=3"
+
+	})(window);
+
 ## Adapters
 
 ### Supported
