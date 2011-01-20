@@ -16,7 +16,10 @@
 				$this = $(this),
 				title = $this.attr('title') || $this.text(),
 				href = $this.attr('href'),
-				data = {title:title,href:href};
+				data = {
+					'title': title,
+					'href': href
+				};
 
 			// Update State
 			History.pushState(data, title, href);
@@ -34,8 +37,6 @@
 			var
 				state = History.getState(),
 				data = state.data;
-
-			console.debug(state,data);
 
 			// Check for initial popstate
 			if ( typeof data === 'undefined' ) {

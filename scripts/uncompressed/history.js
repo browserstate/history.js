@@ -153,10 +153,17 @@
 		/**
 		 * Refresh the Current State
 		 */
-		History.Adapter.bind(window,'popstate',function(event){
+		History.Adapter.bind(window,'popstate',function(event,extra){
 			if(debug)console.info('History.popstate',this,arguments);
-			// Prepare
-			var State = History.getStateObject(event.state,document.title,document.location.href);
+
+			// Extract
+			var data = {};
+			if ( (event||false) && (event.state||false) ) data = event.state;
+			else if ( (event||false) && (event.originalEvent||false) && (event.originalEvent.state||false) ) data = event.originalEvent.state;
+			else if ( (extra||false) && (extra.state||false) ) data = extra.state;
+
+			// Fetch
+			var State = History.getStateObject(data,document.title,document.location.href);
 
 			// Update
 			History.currentState = State;
@@ -223,7 +230,7 @@
 							lastIframeHash = iframeHash = documentHash;
 
 							// Trigger Hashchange Event
-							History.Adapter.trigger('window','hashchange'); // initHashChangeEvent
+							History.Adapter.trigger(window,'hashchange'); // initHashChangeEvent
 						}
 
 						// The iFrame Hash has changed (back button caused)
@@ -250,8 +257,7 @@
 					// Define the checker function
 					checkerFunction = function(){
 						// Prepare
-						var
-							documentHash = History.getHash();
+						var documentHash = History.getHash();
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -259,7 +265,7 @@
 							lastDocumentHash = documentHash;
 
 							// Trigger Hashchange Event
-							History.Adapter.trigger('window','hashchange'); // initHashChangeEvent
+							History.Adapter.trigger(window,'hashchange'); // initHashChangeEvent
 						}
 
 						// Return true
@@ -445,11 +451,19 @@
 
 		}
 		else {
-			History.pushState = function(){
+			History.pushState = function(data,title,url){
 				history.pushState.apply(history,arguments);
+				// Fire HTML5 Event
+				History.Adapter.trigger(window,'popstate',{
+					'state': data
+				});
 			}
-			History.replaceState = function(){
+			History.replaceState = function(data,title,url){
 				history.replaceState.apply(history,arguments);
+				// Fire HTML5 Event
+				History.Adapter.trigger(window,'popstate',{
+					'state': data
+				});
 			}
 			History.go = function(){
 				history.go.apply(history,arguments);
