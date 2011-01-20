@@ -7,7 +7,7 @@ This project is the successor of jQuery History, it aims to:
 - Provide a backwards compatible experience for Browsers which do not support HTML5's State Management
 - Provide a backwards campatible experience for Browsers which do not support HTML4's OnHashChange
 - Follow the original API's as much as possible
-- Support for traditional anchors
+- Support for traditional anchors *- yet to complete*
 - Support as many javascript frameworks as possible via adapters.
 
 Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton
@@ -61,3 +61,7 @@ Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton
 
 - IE 6,7,8,9
 - Firefox 3
+
+## Issues
+
+- Appears that the title param is not actually supported by the browsers. Will need to confirm.

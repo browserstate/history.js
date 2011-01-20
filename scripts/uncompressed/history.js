@@ -506,6 +506,12 @@
 			History.go = function(){
 				history.go.apply(history,arguments);
 			}
+			History.back = function(){
+				history.back.apply(history,arguments);
+			}
+			History.forward = function(){
+				history.forward.apply(history,arguments);
+			}
 		}
 
 	}; // init
