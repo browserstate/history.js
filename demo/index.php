@@ -24,9 +24,9 @@ $page_path = dirname(__FILE__).DIRECTORY_SEPARATOR.'/pages/'.$page.'.php';
 <body>
 	<script type="text/javascript" src="scripts/jquery.js"></script>
 	<script type="text/javascript">jQuery.noConflict()</script>
-	<script type="text/javascript" src="scripts/prototype.js"></script>
+	<script type="text/javascript" src="scripts/mootools.js"></script>
 	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
-	<script type="text/javascript" src="../scripts/uncompressed/history.adapter.prototype.js"></script>
+	<script type="text/javascript" src="../scripts/uncompressed/history.adapter.mootools.js"></script>
 	<script type="text/javascript" src="scripts/demo.js"></script>
 
 	<div id="wrap">

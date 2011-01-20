@@ -42,11 +42,11 @@ Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton
 
 - jQuery
 - Prototype
+- MooTools
 
 ### Unsupported
 
 - Dojo
-- MooTools
 
 ## Browsers
 
