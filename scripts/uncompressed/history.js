@@ -40,8 +40,8 @@
 		/**
 		 * History.setHash(hash)
 		 * Sets the document hash
-		 * @param string hash
-		 * @return string
+		 * @param {string} hash
+		 * @return {string}
 		 */
 		History.setHash = function(hash){
 			if(debug)console.info('History.setHash',this,arguments);
@@ -52,7 +52,7 @@
 		/**
 		 * History.getHash()
 		 * Gets the current document hash
-		 * @return string
+		 * @return {string}
 		 */
 		History.getHash = function(){
 			if(debug)console.info('History.getHash',this,arguments);
@@ -63,8 +63,8 @@
 		/**
 		 * History.extractHash(url)
 		 * Extracts the Hash from a URL
-		 * @param string url
-		 * @return string url
+		 * @param {string} url
+		 * @return {string} url
 		 */
 		History.extractHash = function(url){
 			if(debug)console.info('History.extractHash',this,arguments);
@@ -81,8 +81,8 @@
 		/**
 		 * History.extractUrl(url)
 		 * Extracts the Url from a URL (removes the hash)
-		 * @param string url
-		 * @return string url
+		 * @param {string} url
+		 * @return {string} url
 		 */
 		History.extractUrl = function(url){
 			if(debug)console.info('History.extractUrl',this,arguments);
@@ -99,10 +99,10 @@
 		/**
 		 * History.getStateObject(data,title,url)
 		 * Creates a object based on the data, title and url state params
-		 * @param object data
-		 * @param string title
-		 * @param string url
-		 * @return object
+		 * @param {object} data
+		 * @param {string} title
+		 * @param {string} url
+		 * @return {object}
 		 */
 		History.getStateObject = function(data,title,url){
 			if(debug)console.info('History.getStateObject',this,arguments);
@@ -120,10 +120,10 @@
 		/**
 		 * History.getStateHash(data,title,url)
 		 * Creates a Hash for the State Object
-		 * @param object data
-		 * @param string title
-		 * @param string url
-		 * @return string
+		 * @param {object} data
+		 * @param {string} title
+		 * @param {string} url
+		 * @return {string}
 		 */
 		History.getStateHash = function(data,title,url){
 			if(debug)console.info('History.getStateHash',this,arguments);
@@ -143,7 +143,7 @@
 		/**
 		 * History.getState()
 		 * Get an object containing the data, title and url of the current state
-		 * @return object {data,title,url}
+		 * @return {object} {data,title,url}
 		 */
 		History.getState = function(){
 			if(debug)console.info('History.getState',this,arguments);
@@ -176,10 +176,10 @@
 		/**
 		 * History.pushStateAndTrigger(data,title,url)
 		 * Add a new State to the history object, become it, and trigger onpopstate
-		 * @param object data
-		 * @param string title
-		 * @param string url
-		 * @return true
+		 * @param {object} data
+		 * @param {string} title
+		 * @param {string} url
+		 * @return {true}
 		 */
 		History.pushStateAndTrigger = function(data,title,url){
 			// Push the State
@@ -197,10 +197,10 @@
 		/**
 		 * History.replaceStateAndTrigger(data,title,url)
 		 * Replace the State and trigger onpopstate
-		 * @param object data
-		 * @param string title
-		 * @param string url
-		 * @return true
+		 * @param {object} data
+		 * @param {string} title
+		 * @param {string} url
+		 * @return {true}
 		 */
 		History.replaceStateAndTrigger = function(data,title,url){
 			// Push the State
@@ -380,10 +380,10 @@
 			/**
 			 * History.discardState(data,title,url)
 			 * Discards the state by ignoring it through History
-			 * @param object data
-			 * @param string title
-			 * @param string url
-			 * @return true
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {true}
 			 */
 			History.discardState = function(data,title,url){
 				if(debug)console.info('History.discardState',this,arguments);
@@ -400,10 +400,10 @@
 			/**
 			 * History.discardState(data,title,url)
 			 * Checks to see if the state is discarded
-			 * @param object data
-			 * @param string title
-			 * @param string url
-			 * @return bool
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {bool}
 			 */
 			History.discardedState = function(data,title,url){
 				if(debug)console.info('History.discardedState',this,arguments);
@@ -420,10 +420,10 @@
 			/**
 			 * History.recycleState(data,title,url)
 			 * Allows a discarded state to be used again
-			 * @param object data
-			 * @param string title
-			 * @param string url
-			 * @return true
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {true}
 			 */
 			History.recycleState = function(data,title,url){
 				if(debug)console.info('History.recycleState',this,arguments);
@@ -439,10 +439,10 @@
 			/**
 			 * History.pushState(data,title,url)
 			 * Add a new State to the history object and become it
-			 * @param object data
-			 * @param string title
-			 * @param string url
-			 * @return true
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {true}
 			 */
 			History.pushState = function(data,title,url){
 				if(debug)console.info('History.pushState',this,arguments);
@@ -475,10 +475,10 @@
 			/**
 			 * History.replaceState(data,title,url)
 			 * Replaces the current State with the new State
-			 * @param object data
-			 * @param string title
-			 * @param string url
-			 * @return true
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {true}
 			 */
 			History.replaceState = function(state,title,url){
 				if(debug)console.info('History.replaceState',this,arguments);

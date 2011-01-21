@@ -5,12 +5,12 @@ This project is the successor of jQuery History, it aims to:
 
 - Support HTML5's State Management
 - Provide a backwards compatible experience for Browsers which do not support HTML5's State Management
-- Provide a backwards campatible experience for Browsers which do not support HTML4's OnHashChange
+- Provide a backwards compatible experience for Browsers which do not support HTML4's OnHashChange
 - Follow the original API's as much as possible
 - Support for traditional anchors *- yet to complete*
 - Support as many javascript frameworks as possible via adapters.
 
-Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton
+Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton <contact@balupton.com>
 
 ## Usage
 
@@ -35,6 +35,10 @@ Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton
 		History.replaceStateAndTrigger({state:3}, "State 3", "?state=3");		// logs {state:3}, "State 3", "?state=3"
 
 	})(window);
+
+## Explanation
+
+We create the new namespace `window.History` instead of extending the exiting namespace `window.history` (capitalisation), as each framework handles the events a little bit so we cannot guarantee full compatibility with the original spec. This is shown in the above code by using `History.getState().data` instead of `event.state`, which is actually more powerful as we have access to that state's title and url as well. As such, extending the inbuilt `window.history` would cause discrepancies.
 
 ## Adapters
 
