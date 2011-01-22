@@ -25,9 +25,9 @@ $adapter = 'jquery';
 </head>
 <body>
 	<script type="text/javascript">
-		if ( typeof JSON === "undefined" ) {
+		if ( typeof JSON === 'undefined' ) {
 			var
-				url = './scripts/json2.min.js',
+				url = '../scripts/uncompressed/json2.js',
 				scriptEl = document.createElement('script');
 			scriptEl.type = 'text/javascript';
 			scriptEl.src = url;
