@@ -131,7 +131,7 @@
 				// Test for Base Page
 				if ( url.length === 0 || url.substring(0,1) === '?' ) {
 					// Fetch Base Page
-					var basePage = document.location.href.replace(/#.*/,'');
+					var basePage = document.location.href.replace(/[#\?].*/,'');
 
 					// Adjust Page
 					url = basePage+url;
@@ -162,7 +162,7 @@
 						// Test for Base URL
 						if ( url.substring(0,1) === '.' ) {
 							// Prepare for Base URL
-							var baseUrl = document.location.href.replace(/#.*/,'').replace(/[^\/]+$/,'');
+							var baseUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,'');
 							if ( baseUrl[baseUrl.length-1] !== '/' ) baseUrl += '/';
 
 							// Adjust for Base URL
