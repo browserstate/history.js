@@ -6,9 +6,12 @@
 	// --------------------------------------------------------------------------
 	// Initialise
 
+	// History Object
+	window.History = window.History||{};
+
 	// Localise Globals
 	var
-		History = window.History||{},
+		History = window.History,
 		history = window.history;
 
 	// Check Existence of Adapter

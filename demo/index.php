@@ -12,6 +12,8 @@ if ( !in_array($page, $pages) ) throw new Exception('Hacker!');
 # Page Path
 $page_path = dirname(__FILE__).DIRECTORY_SEPARATOR.'/pages/'.$page.'.php';
 
+# Adapter
+$adapter = 'jquery';
 
 ?><!DOCTYPE HTML>
 <html>
@@ -34,8 +36,21 @@ $page_path = dirname(__FILE__).DIRECTORY_SEPARATOR.'/pages/'.$page.'.php';
 	</script>
 	<script type="text/javascript" src="./scripts/jquery.js"></script>
 	<script type="text/javascript">jQuery.noConflict()</script>
+
+	<? switch ( $adapter ) :
+		case 'jquery': ?>
+			<script type="text/javascript" src="../scripts/uncompressed/history.adapter.jquery.js"></script>
+			<? break;
+
+		case 'dojo':
+		case 'prototype':
+		case 'mootools': ?>
+			<script type="text/javascript" src="./scripts/<?=$adapter?>.js"></script>
+			<script type="text/javascript" src="../scripts/uncompressed/history.adapter.<?=$adapter?>.js"></script>
+			<? break;
+	endswitch; ?>
+
 	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
-	<script type="text/javascript" src="../scripts/uncompressed/history.adapter.jquery.js"></script>
 	<script type="text/javascript" src="./scripts/demo.js"></script>
 
 	<div id="wrap">

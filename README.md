@@ -53,21 +53,14 @@ We create the new namespace `window.History` instead of extending the exiting na
 - Prototype
 - MooTools
 
-### Unsupported
-
-- Dojo
 
 ## Browsers
 
-### Supported
+### Tested In
 
 - Chrome 8
-- Opera 10, 11
+- Opera 10,11
 - Safari 5
 - Firefox 4 Beta 9
-- IE 6
 - Firefox 3
-
-### Yet to Test
-
-- IE 7,8,9
+- IE 6,7,8

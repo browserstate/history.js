@@ -6,9 +6,12 @@
 	// --------------------------------------------------------------------------
 	// Initialise
 
+	// History Object
+	window.History = window.History||{};
+
 	// Localise Globals
 	var
-		History = window.History||{},
+		History = window.History,
 		history = window.history;
 
 	// Check Existence of History.js
@@ -41,7 +44,7 @@
 				History.log.apply(History,arguments);
 			}
 		}
-		History.debug.enable = true;
+		//History.debug.enable = true;
 
 		/**
 		 * History.log(message,...)
@@ -682,8 +685,5 @@
 		// Adapter loaded faster than History.js, fire init.
 		History.init();
 	}
-
-	// Apply History
-	window.History = History;
 
 })(window);

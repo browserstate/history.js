@@ -6,6 +6,9 @@
 	// --------------------------------------------------------------------------
 	// Initialise
 
+	// History Object
+	window.History = window.History||{};
+
 	// Localise Globals
 	var
 		History = window.History||{},
