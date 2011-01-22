@@ -22,22 +22,31 @@ $page_path = dirname(__FILE__).DIRECTORY_SEPARATOR.'/pages/'.$page.'.php';
 	</title>
 </head>
 <body>
-	<script type="text/javascript" src="scripts/jquery.js"></script>
+	<script type="text/javascript">
+		if ( typeof JSON === "undefined" ) {
+			var
+				url = './scripts/json2.min.js',
+				scriptEl = document.createElement('script');
+			scriptEl.type = 'text/javascript';
+			scriptEl.src = url;
+			document.body.appendChild(scriptEl);
+		}
+	</script>
+	<script type="text/javascript" src="./scripts/jquery.js"></script>
 	<script type="text/javascript">jQuery.noConflict()</script>
-	<script type="text/javascript" src="scripts/mootools.js"></script>
 	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
-	<script type="text/javascript" src="../scripts/uncompressed/history.adapter.mootools.js"></script>
-	<script type="text/javascript" src="scripts/demo.js"></script>
+	<script type="text/javascript" src="../scripts/uncompressed/history.adapter.jquery.js"></script>
+	<script type="text/javascript" src="./scripts/demo.js"></script>
 
 	<div id="wrap">
-		<ul id="menu" data-ajaxy-menu="page">
+		<ul id="menu">
 			<? foreach ( $pages as $page ) : ?>
 				<li>
 					<a href="?page=<?=$page?>"><?=ucwords($page)?></a>
 				</li>
 			<? endforeach; ?>
 		</ul>
-		<div id="content" data-ajaxy-element="page">
+		<div id="content">
 			<? require_once($page_path) ?>
 		</div>
 	</div>

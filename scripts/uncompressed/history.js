@@ -9,8 +9,7 @@
 	// Localise Globals
 	var
 		History = window.History||{},
-		history = window.history,
-		debug = true;
+		history = window.history;
 
 	// Check Existence of History.js
 	if ( typeof History.emulated !== 'undefined' ) {
@@ -19,7 +18,6 @@
 
 	// Initialise
 	History.init = function(){
-		if(debug)console.info('History.init',this,arguments);
 
 		/**
 		 * History.emulated
@@ -34,6 +32,34 @@
 			)
 		};
 
+		/**
+		 * History.debug(message,...)
+		 * Logs the passed arguments if debug enabled
+		 */
+		History.debug = function(){
+			if ( (History.debug.enable||false) ) {
+				History.log.apply(History,arguments);
+			}
+		}
+		History.debug.enable = true;
+
+		/**
+		 * History.log(message,...)
+		 * Logs the passed arguments
+		 */
+		History.log = function(){
+			if ( typeof console === 'undefined' ) {
+				var message = arguments[0];
+				for ( var i=1,n=arguments.length; i<n; ++i ) {
+					message += "\n\n"+arguments[i];
+				}
+				alert(message);
+			}
+			else {
+				console.log.apply(console,[arguments]);
+			}
+		}
+
 		// ----------------------------------------------------------------------
 		// General Helper Functions
 
@@ -44,8 +70,8 @@
 		 * @return {string}
 		 */
 		History.setHash = function(hash){
-			if(debug)console.info('History.setHash',this,arguments);
-			document.location.hash = hash;
+			History.debug('History.setHash',this,arguments,hash);
+			document.location.hash = History.normalizeHash(hash);
 			return hash;
 		};
 
@@ -55,23 +81,30 @@
 		 * @return {string}
 		 */
 		History.getHash = function(){
-			if(debug)console.info('History.getHash',this,arguments);
-			var hash = History.extractHash(document.location.hash);
+			var hash = History.normalizeHash(document.location.hash);
 			return hash;
 		};
 
 		/**
-		 * History.extractHash(url)
+		 * History.normalizeHash()
+		 * Normalise a hash across browsers
+		 * @return {string}
+		 */
+		History.normalizeHash = function(hash){
+			var result = hash.replace(/[^#]*#/,'').replace(/#.*/, '');
+			return result;
+		};
+
+		/**
+		 * History.extractHashFromUrl(url)
 		 * Extracts the Hash from a URL
 		 * @param {string} url
 		 * @return {string} url
 		 */
-		History.extractHash = function(url){
-			if(debug)console.info('History.extractHash',this,arguments);
+		History.extractHashFromUrl = function(url){
 			// Extract the hash
 			var hash = String(url)
-				.replace(/^[^#]*#/, '')	/* strip anything before the first anchor (including the # symbol) */
-				.replace(/^#+|#+$/, '') /* strip anything after the anchor (the second anchor) (including the # symbol) */
+				.replace(/([^#]*)#?([^#]*)#?(.*)/, '$2')
 				;
 
 			// Return hash
@@ -79,21 +112,81 @@
 		};
 
 		/**
-		 * History.extractUrl(url)
-		 * Extracts the Url from a URL (removes the hash)
+		 * History.expandUrl(url)
+		 * Ensures that we have an absolute URL and not a relative URL
 		 * @param {string} url
 		 * @return {string} url
 		 */
-		History.extractUrl = function(url){
-			if(debug)console.info('History.extractUrl',this,arguments);
+		History.expandUrl = function(url){
+			// Remove Anchor
+			url = url.replace(/#.*/,'');
 
-			// Extract the url
-			var justTheUrl = String(url)
-				.replace(/^#+|#+$/, '') /* strip anything after the anchor (including the # symbol) */
-				;
+			// Test for Full URL
+			if ( /[a-z]+\:\/\//.test(url) ) {
+				// We have a Full URL
+			}
 
-			// Return hash
-			return justTheUrl;
+			// Relative URL
+			else {
+				// Test for Base Page
+				if ( url.length === 0 || url.substring(0,1) === '?' ) {
+					// Fetch Base Page
+					var basePage = document.location.href.replace(/#.*/,'');
+
+					// Adjust Page
+					url = basePage+url;
+				}
+
+				// No Base Page
+				else {
+
+					// Prepare for Base Element
+					var
+						baseElements = document.getElementsByTagName('base'),
+						baseElement = null,
+						baseHref = '';
+
+					// Test for Base Element
+					if ( baseElements.length === 1 ) {
+						// Prepare for Base Element
+						baseElement = baseElements[0];
+						baseHref = baseElement.href;
+						if ( baseHref[baseHref.length-1] !== '/' ) baseHref += '/';
+
+						// Adjust for Base Element
+						url = baseHref+url.replace(/^\//,'');
+					}
+
+					// No Base Element
+					else {
+						// Test for Base URL
+						if ( url.substring(0,1) === '.' ) {
+							// Prepare for Base URL
+							var baseUrl = document.location.href.replace(/#.*/,'').replace(/[^\/]+$/,'');
+							if ( baseUrl[baseUrl.length-1] !== '/' ) baseUrl += '/';
+
+							// Adjust for Base URL
+							url = baseUrl + url;
+						}
+
+						// No Base URL
+						else {
+							// Prepare for Base Domain
+							var baseDomain = document.location.protocol+'//'+(document.location.hostname||document.location.host);
+							if ( document.location.port||false ) {
+								baseDomain += ':'+document.location.port;
+							}
+							baseDomain += '/';
+
+							// Adjust for Base Domain
+							url = baseDomain+url.replace(/^\//,'');
+						}
+					}
+				}
+			}
+
+			// Return url
+			return url;
 		};
 
 		/**
@@ -105,7 +198,6 @@
 		 * @return {object}
 		 */
 		History.getStateObject = function(data,title,url){
-			if(debug)console.info('History.getStateObject',this,arguments);
 			// Hashify
 			var State = {
 				"data": data,
@@ -126,7 +218,6 @@
 		 * @return {string}
 		 */
 		History.getStateHash = function(data,title,url){
-			if(debug)console.info('History.getStateHash',this,arguments);
 			// Hashify
 			var StateHash = JSON.stringify(History.getStateObject(data,title,url));
 
@@ -146,32 +237,8 @@
 		 * @return {object} {data,title,url}
 		 */
 		History.getState = function(){
-			if(debug)console.info('History.getState',this,arguments);
 			return History.currentState;
 		};
-
-		/**
-		 * Refresh the Current State
-		 */
-		History.Adapter.bind(window,'popstate',function(event,extra){
-			if(debug)console.info('History.popstate',this,arguments);
-
-			// Extract
-			var data = {};
-			if ( (event||false) && (event.state||false) ) data = event.state;
-			else if ( (event||false) && (event.originalEvent||false) && (event.originalEvent.state||false) ) data = event.originalEvent.state;
-			else if ( (event||false) && (event.memo||false) && (event.memo.state||false) ) data = event.memo.state;
-			else if ( (extra||false) && (extra.state||false) ) data = extra.state;
-
-			// Fetch
-			var State = History.getStateObject(data,document.title,document.location.href);
-
-			// Update
-			History.currentState = State;
-
-			// Return true
-			return true;
-		});
 
 		/**
 		 * History.pushStateAndTrigger(data,title,url)
@@ -218,6 +285,10 @@
 		// ----------------------------------------------------------------------
 		// HTML4 HashChange Support
 
+		History.debug("browser version:", History.Adapter.getBrowserMajorVersion());
+		History.debug("browser flag:", History.Adapter.getBrowserFlag());
+		History.debug("emulate hashchange:", History.emulated.hashChange );
+
 		if ( History.emulated.hashChange ) {
 			/*
 			 * We must emulate the HTML4 HashChange Support by manually checking for hash changes
@@ -232,16 +303,17 @@
 					// IE6 and IE7
 					// We need to use an iframe to emulate the back and forward buttons
 
-					// Insert a iFrame
+					// Create iFrame
 					var
 						iframeId = 'historyjs-iframe',
-						iframeHTML = '<iframe id="'+iframeId+'" style="display: none;"></iframe>';
-					document.body.open();
-					document.body.innerHTML += iframeHTML;
-					document.body.close();
+						iframe = document.createElement('iframe');
 
-					// Fetch the iFrame Element
-					var iframe = document.getElementById('iframe');
+					// Adjust iFarme
+					iframe.setAttribute('id', iframeId);
+					iframe.style.display = 'none';
+
+					// Append iFrame
+					document.body.appendChild(iframe);
 
 					// Create initial history entry
 					iframe.contentWindow.document.open();
@@ -257,7 +329,7 @@
 						// Fetch
 						var
 							documentHash = History.getHash(),
-							iframeHash = History.extractHash(History.$iframe.contentWindow.document.location.hash);
+							iframeHash = History.normalizeHash(iframe.contentWindow.document.location.hash);
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -265,20 +337,27 @@
 							lastDocumentHash = documentHash;
 
 							// Create a history entry in the iframe
-							iframe.contentWindow.document.open();
-							iframe.title = document.title;
-							iframe.contentWindow.document.close();
+							History.debug('hashchange.checker: iframe hash check', iframeHash, documentHash);
+							if ( iframeHash !== documentHash ) {
+								History.debug('hashchange.checker: iframe hash change', iframeHash, documentHash);
+								iframe.contentWindow.document.open();
+								iframe.contentWindow.document.close();
 
-							// Update the iframe's hash
-							iframe.contentWindow.document.location.hash = documentHash;
-							lastIframeHash = iframeHash = documentHash;
+								// Update the iframe's hash
+								iframe.contentWindow.document.location.hash = documentHash;
+
+								// Equalise
+								lastIframeHash = iframeHash = documentHash;
+							}
 
 							// Trigger Hashchange Event
-							History.Adapter.trigger(window,'hashchange'); // initHashChangeEvent
+							History.Adapter.trigger(window,'hashchange');
 						}
 
 						// The iFrame Hash has changed (back button caused)
 						else if ( iframeHash !== lastIframeHash ) {
+							History.debug('hashchange.checker: iframe hash out of sync', iframeHash, documentHash);
+
 							// Equalise
 							lastIframeHash = iframeHash;
 
@@ -309,7 +388,7 @@
 							lastDocumentHash = documentHash;
 
 							// Trigger Hashchange Event
-							History.Adapter.trigger(window,'hashchange'); // initHashChangeEvent
+							History.Adapter.trigger(window,'hashchange')
 						}
 
 						// Return true
@@ -318,14 +397,14 @@
 				}
 
 				// Apply the checker function
-				setInterval(checker, 200);
+				setInterval(checkerFunction, 200);
 
 				// Return true
 				return true;
 
-			}); // closure
+			})(); // closure
 
-		} // if
+		}
 
 		// ----------------------------------------------------------------------
 		// HTML5 State Support
@@ -338,38 +417,59 @@
 			/**
 			 * Trigger HTML5's window.onpopstate via HTML4 HashChange Support
 			 */
-			History.Adapter.bind(window,'hashchange',function(event){
-				if(debug)console.info('History.hashchange',this,arguments);
+			var hashchangeHandler = function(event){
+				History.debug('History.hashchange',this,arguments);
 				// Prepare
 				var
-					newURL = event.newURL||document.location;
+					newURL = (event && event.newURL) || document.location;
 
-				// Fetch the new and old States
+				// Fetch the new State
 				var
-					newStateHash = unescape(History.extractHash(newURL)),
-					newState = JSON.parse(newStateHash),
+					newStateHash = unescape(History.extractHashFromUrl(newURL)),
+					newState = null;
+
+				// Check the Hash
+				if ( !newStateHash ) {
+					History.debug('History.hashchange: state hash doesn\'t exist',newStateHash);
+					return false;
+				}
+
+				// Parse the new State's JSON
+				try {
+					newState = JSON.parse(newStateHash);
+				} catch ( Exception ) {
+					History.debug('History.hashchange: JSON Parse Error',Exception);
+					return false;
+				}
+
+				// Fetch the old State
+				var
 					oldState = History.getState(),
 					oldStateHash = History.getStateHash(oldState.data, oldState.title, oldState.url);
 
 				// Check if we are the same state
 				if ( newStateHash === oldStateHash ) {
 					// There has been no change (just the page's hash has finally propagated)
+					History.debug('History.hashchange: no change');
 					return false;
 				}
 
 				// Check if we are DiscardedState
 				if ( History.discardedState(newState) ) {
 					// Ignore this state as it has been discarded and go back to the state before it
+					History.debug('History.hashchange: discarded');
 					history.go(-1);
 					return false;
 				}
 
 				// Push the new HTML5 State
+				History.debug('History.hashchange: success hashchange');
 				History.pushState(newState.data,newState.title,newState.url);
 
 				// Return true
 				return true;
-			});
+			};
+			History.Adapter.bind(window,'hashchange',hashchangeHandler);
 
 			/**
 			 * History.ignoredStates
@@ -386,7 +486,7 @@
 			 * @return {true}
 			 */
 			History.discardState = function(data,title,url){
-				if(debug)console.info('History.discardState',this,arguments);
+				History.debug('History.discardState',this,arguments);
 				// Prepare
 				var StateHash = History.getStateHash(data,title,url);
 
@@ -406,7 +506,6 @@
 			 * @return {bool}
 			 */
 			History.discardedState = function(data,title,url){
-				if(debug)console.info('History.discardedState',this,arguments);
 				// Prepare
 				var StateHash = History.getStateHash(data,title,url);
 
@@ -426,7 +525,7 @@
 			 * @return {true}
 			 */
 			History.recycleState = function(data,title,url){
-				if(debug)console.info('History.recycleState',this,arguments);
+				History.debug('History.recycleState',this,arguments);
 				// Remove from DiscardedStates
 				if ( History.discardedState(data,title,url) ) {
 					delete History.discardedStates[StateHash];
@@ -445,7 +544,14 @@
 			 * @return {true}
 			 */
 			History.pushState = function(data,title,url){
-				if(debug)console.info('History.pushState',this,arguments);
+				History.debug('History.pushState',this,arguments);
+				// Expand the URL
+				url = History.expandUrl(url);
+
+				// Adjust Data
+				data.url = url;
+				data.title = title;
+
 				// Recycle the State
 				History.recycleState(data,title,url);
 
@@ -453,18 +559,25 @@
 				var
 					State = History.getStateObject(data,title,url),
 					StateHash = History.getStateHash(data,title,url),
-					Hash = escape(StateHash);
+					Hash = escape(StateHash),
+					oldHash = History.getHash();
+
+				// Force update of the title
+				if ( State.title ) {
+					document.title = State.title
+				}
+
+				// Update HTML5 State
+				History.currentState = State;
 
 				// Fire HTML5 Event
 				History.Adapter.trigger(window,'popstate',{
 					'state': State.data
 				});
 
-				// Update HTML5 State
-				History.currentState = State;
-
 				// Update HTML4 Hash
-				if ( History.getHash() !== Hash ) {
+				if ( oldHash !== Hash && escape(oldHash) !== Hash ) {
+					History.debug('History.pushState: update hash', Hash, oldHash);
 					History.setHash(Hash);
 				}
 
@@ -481,7 +594,7 @@
 			 * @return {true}
 			 */
 			History.replaceState = function(state,title,url){
-				if(debug)console.info('History.replaceState',this,arguments);
+				History.debug('History.replaceState',this,arguments);
 				// Get Current State
 				var State = History.getState();
 
@@ -495,13 +608,61 @@
 				return true;
 			};
 
+			/**
+			 * Ensure that for non emulated hashchange that we still handle the initial state
+			 */
+			if ( !History.emulated.hashChange && (document.location.hash && document.location.hash !== '#') ) {
+				History.Adapter.onDomLoad(function(){
+					hashchangeHandler();
+				});
+			}
 		}
 		else {
+			/**
+			 * Refresh the Current State
+			 */
+			History.Adapter.bind(window,'popstate',function(event,extra){
+				History.debug('History.popstate',this,arguments);
+
+				// Extract
+				var
+					url = History.expandUrl(document.location.href),
+					title = document.title,
+					data = {};
+
+				// Adjust Data
+				if ( (event||false) && (event.state||false) ) data = event.state;
+				else if ( (event||false) && (event.originalEvent||false) && (event.originalEvent.state||false) ) data = event.originalEvent.state;
+				else if ( (event||false) && (event.memo||false) && (event.memo.state||false) ) data = event.memo.state;
+				else if ( (extra||false) && (extra.state||false) ) data = extra.state;
+
+				// Adjust Title
+				title = data.title||title;
+
+				// Create
+				var State = History.getStateObject(data,title,url);
+
+				// Force update of the title
+				if ( State.title ) {
+					document.title = State.title
+				}
+
+				// Update HTML5 State
+				History.currentState = State;
+
+				// Return true
+				return true;
+			});
+
 			History.pushState = function(data,title,url){
-				history.pushState.apply(history,arguments);
+				data.url = url;
+				data.title = title;
+				history.pushState.apply(history,[data,title,url]);
 			}
 			History.replaceState = function(data,title,url){
-				history.replaceState.apply(history,arguments);
+				data.url = url;
+				data.title = title;
+				history.replaceState.apply(history,[data,title,url]);
 			}
 			History.go = function(){
 				history.go.apply(history,arguments);

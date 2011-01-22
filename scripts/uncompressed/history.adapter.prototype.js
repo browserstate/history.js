@@ -41,7 +41,7 @@
 
 		/**
 		 * History.Adapter.getBrowserMajorVersion()
-		 * @return integer
+		 * @return {integer}
 		 */
 		getBrowserMajorVersion: function(){
 			var
@@ -53,10 +53,10 @@
 
 		/**
 		 * History.Adapter.bind(el,event,callback)
-		 * @param element
-		 * @param string event
-		 * @param function callback
-		 * @return element
+		 * @param {element} el
+		 * @param {string} event
+		 * @param {Function} callback
+		 * @return {element}
 		 */
 		bind: function(el,event,callback){
 			event = 'widget:'+event;
@@ -66,15 +66,24 @@
 
 		/**
 		 * History.Adapter.trigger(el,event,data)
-		 * @param element
-		 * @param string event
-		 * @param object data
-		 * @return element
+		 * @param {element} el
+		 * @param {string} event
+		 * @param {object} data
+		 * @return {element}
 		 */
 		trigger: function(el,event,data){
 			event = 'widget:'+event;
 			console.log('trigger:',el,event,data);
 			return Element.fire(el,event,data);
+		},
+
+		/**
+		 * History.Adapter.trigger(el,event,data)
+		 * @param {Function} callback
+		 * @return {true}
+		 */
+		onDomLoad: function(callback) {
+			Event.observe(window, 'load', callback);
 		}
 	};
 

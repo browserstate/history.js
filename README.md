@@ -40,6 +40,11 @@ Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton <conta
 
 We create the new namespace `window.History` instead of extending the exiting namespace `window.history` (capitalisation), as each framework handles the events a little bit so we cannot guarantee full compatibility with the original spec. This is shown in the above code by using `History.getState().data` instead of `event.state`, which is actually more powerful as we have access to that state's title and url as well. As such, extending the inbuilt `window.history` would cause discrepancies.
 
+## Extra Support
+
+- State data will always contain `data.title` and `data.url`
+- State titles will always be applied to the document.title
+
 ## Adapters
 
 ### Supported
@@ -60,12 +65,9 @@ We create the new namespace `window.History` instead of extending the exiting na
 - Opera 10, 11
 - Safari 5
 - Firefox 4 Beta 9
+- IE 6
+- Firefox 3
 
 ### Yet to Test
 
-- IE 6,7,8,9
-- Firefox 3
-
-## Issues
-
-- Appears that the title param is not actually supported by the browsers. Will need to confirm.
+- IE 7,8,9
