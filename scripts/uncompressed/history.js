@@ -69,7 +69,6 @@
 		 * @return {integer}
 		 * @license Public Domain
 		 * @author Benjamin Lupton <contact@balupton.com>
-		 * @author Cowboy <https://gist.github.com/542301>
 		 * @author James Padolsey <https://gist.github.com/527683>
 		 */
 		_History.getInternetExplorerMajorVersion = function(){
@@ -77,15 +76,15 @@
 					(typeof _History.getInternetExplorerMajorVersion.cached !== 'undefined')
 				?	_History.getInternetExplorerMajorVersion.cached
 				:	(function(){
-						with ( document.createElement('b') ) {
-							id = 4;
-							while(
-								innerHTML = '<!--[if gt IE ' + ++id + ']>1<![endif]-->',
-								innerHTML > 0
-							);
-							var ie = id > 5 ? +id : 0
-						}
-						return ie;
+						var undef,
+								v = 3,
+								div = document.createElement('div'),
+								all = div.getElementsByTagName('i');
+						while (
+								div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
+								all[0]
+						);
+						return v > 4 ? v : undef;
 					})()
 				;
 		};
@@ -490,6 +489,12 @@
 		_History.statesByHash = {};
 
 		/**
+		 * _History.storedStates
+		 * Store the states in an array
+		 */
+		_History.storedStates = [];
+
+		/**
 		 * _History.getStateByUrl
 		 * Get a state by it's url
 		 * @param {string} stateUrl
@@ -533,9 +538,66 @@
 
 			// Store the State
 			_History.statesByUrl[newState.url] = _History.statesByHash[newStateHash] = newState;
+			_History.storedStates.push(newState);
 
 			// Return true
 			return true;
+		};
+
+		/**
+		 * _History.getStateByIndex()
+		 * Gets a state by the index
+		 * @param {integer} index
+		 * @return {Object}
+		 */
+		_History.getStateByIndex = function(index){
+			// Prepare
+			var State = null;
+
+			// Handle
+			if ( typeof index === 'undefined' ) {
+				// Get the last inserted
+				_History.storedStates(_History.storedStates.length-1);
+			}
+			else if ( index < 0 ) {
+				// Get from the end
+				_History.storedStates(_History.storedStates-index);
+			}
+			else {
+				// Get from the beginning
+				_History.storedStates(index);
+			}
+
+			// Return State
+			return State;
+		};
+
+		/**
+		 * _History.getHashByIndex()
+		 * Gets a hash by the index
+		 * @param {integer} index
+		 * @return {Object}
+		 */
+		_History.getHashByIndex = function(index){
+			// Prepare
+			var hash = null;
+
+			// Handle
+			if ( typeof index === 'undefined' ) {
+				// Get the last inserted
+				_History.storedStates(_History.storedStates.length-1);
+			}
+			else if ( index < 0 ) {
+				// Get from the end
+				_History.storedStates(_History.storedStates-index);
+			}
+			else {
+				// Get from the beginning
+				_History.storedStates(index);
+			}
+
+			// Return State
+			return State;
 		};
 
 		/**
@@ -599,8 +661,8 @@
 				History.debug('History.hashchange',this,arguments);
 				// Prepare
 				var
-					currentUrl						= (event && event.newURL) || document.location;
-					currentHash						= unescape(History.extractHashFromUrl(newUrl)),
+					currentUrl						= (event && event.newURL) || document.location.href;
+					currentHash						= unescape(History.extractHashFromUrl(currentUrl)),
 					currentState					= null,
 					currentStateHash			= null,
 					currentStateHashExits	= null;
@@ -612,25 +674,37 @@
 				try {
 					currentState = JSON.parse(currentHash);
 				} catch ( Exception ) {
-					currentState = History.createStateObject({},document.title,newUrl);
+					currentState = History.createStateObject({},document.title,currentUrl);
 				}
 
 				// Create the state Hash
 				currentStateHash = History.createStateHash(currentState);
 
-				// Store the State
-				History.storeState(currentState);
+				/* Check if we are the same state
+				if ( currentStateHash === _History.stateHashes[_History.stateHashes.length-2] ) {
+					// There has been no change (just the page's hash has finally propagated)
+					History.log('History.hashchange: no change');
+					return false;
+				}// */
 
 				// Check if we are DiscardedState
-				if ( _History.discardedState(newState.data,newState.title,newState.url) ) {
+				if ( _History.discardedState(currentState.data,currentState.title,currentState.url) ) {
 					// Ignore this state as it has been discarded and go back to the state before it
 					History.log('History.hashchange: discarded',
-						newStateHash,
+						'currentStateHash',
+						currentStateHash,
+						'oldStateHash',
+						oldStateHash,
+						'-1',
 						_History.stateHashes[_History.stateHashes.length-1],
+						'-2',
 						_History.stateHashes[_History.stateHashes.length-2],
-						_History.stateHashes[_History.stateHashes.length-3]
+						'-3',
+						_History.stateHashes[_History.stateHashes.length-3],
+						'-4',
+						_History.stateHashes[_History.stateHashes.length-4]
 					);
-					if ( _History.stateHashes[_History.stateHashes.length-3] === newStateHash ) {
+					if ( _History.stateHashes[_History.stateHashes.length-3] === currentStateHash ) {
 						// We are going backwards
 						History.log('History.hashchange: go backwards');
 						History.back();
@@ -642,16 +716,12 @@
 					return false;
 				}
 
-				// Check if we are the same state
-				if ( newStateHash === _History.stateHashes[_History.stateHashes.length-2] ) {
-					// There has been no change (just the page's hash has finally propagated)
-					History.log('History.hashchange: no change');
-					return false;
-				}
+				// Store the State
+				_History.storeState(currentState);
 
 				// Push the new HTML5 State
 				History.debug('History.hashchange: success hashchange');
-				History.pushState(newState.data,newState.title,newState.url);
+				History.pushState(currentState.data,currentState.title,currentState.url);
 
 				// Return true
 				return true;
