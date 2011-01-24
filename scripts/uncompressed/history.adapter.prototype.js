@@ -23,38 +23,6 @@
 	History.Adapter = {
 
 		/**
-		 * History.Adapter.getBrowserFlag()
-		 * @return [msie,webkit,mozilla,opera]
-		 */
-		getBrowserFlag: function(){
-			var
-				flags_out = ['msie','webkit','webkit','mozilla','opera'],
-				flags_in = ['IE','Opera','WebKit','MobileSafari','Gecko'],
-				result = null;
-
-			flags_in.each(function(i,flag){
-				if ( Prototype.Browser[flag]||false ) {
-					result = flags_out[i];
-					return false;
-				}
-			});
-
-			return result;
-		},
-
-		/**
-		 * History.Adapter.getBrowserMajorVersion()
-		 * @return {integer}
-		 */
-		getBrowserMajorVersion: function(){
-			var
-				version = parseInt(navigator.userAgent.substring(navigator.userAgent.indexOf("MSIE")+5)),
-				result = parseInt(version,10);
-
-			return result;
-		},
-
-		/**
 		 * History.Adapter.bind(el,event,callback)
 		 * @param {element} el
 		 * @param {string} event

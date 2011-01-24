@@ -102,6 +102,14 @@ We create the new namespace `window.History` instead of extending the exiting na
 - IE 6,7,8
 
 
+## Notes on Compatibility
+
+- ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back` / `History.forward` call (determined by the direction the user is traversing their history).
+	- As such, History.js does not support `History.go` (instead only `History.back` and `History.forward`) as otherwise we cannot accurately detect the direction the user is traversing their history.
+- History.js fixes a bug in Google Chrome where traversing back through the history to the home page does not return the correct state data.
+- Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
+	- As such it is outside History.js's scope to detect traditional anchors. Instead this must be done in your `onpopstate` handler. We do provide the `History.isTraditionalAnchor(State.url)` function for your convenience.
+
 ## Todo
 
 - Support traditional anchors

@@ -23,37 +23,6 @@
 	History.Adapter = {
 
 		/**
-		 * History.Adapter.getBrowserFlag()
-		 * @return [msie,webkit,mozilla,opera]
-		 */
-		getBrowserFlag: function(){
-			var
-				flags = ['msie','webkit','mozilla','opera'],
-				result = null;
-
-			$.each(flags,function(i,flag){
-				if ( $.browser[flag]||false ) {
-					result = flag;
-					return false;
-				}
-			});
-
-			return result;
-		},
-
-		/**
-		 * History.Adapter.getBrowserMajorVersion()
-		 * @return {integer}
-		 */
-		getBrowserMajorVersion: function(){
-			var
-				version = $.browser.version,
-				result = parseInt(version,10);
-
-			return result;
-		},
-
-		/**
 		 * History.Adapter.bind(el,event,callback)
 		 * @param {element} el
 		 * @param {string} event

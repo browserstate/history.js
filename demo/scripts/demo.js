@@ -16,7 +16,7 @@
 				data = {};
 
 			// Update State
-			History.pushStateAndTrigger(data, title, href);
+			History.pushState(data, title, href);
 
 			// Prevent link follow through
 			event.preventDefault();
