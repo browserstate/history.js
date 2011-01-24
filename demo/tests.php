@@ -183,8 +183,6 @@ $adapter = 'jquery';
 					History.back();
 				});
 
-				return;
-
 				addTest(function(){
 					// Test 8 / State 0 (1 -> 0)
 					// Fails in Google Chrome (has state 1's data, instead of no data)
@@ -217,8 +215,6 @@ $adapter = 'jquery';
 					// Test 13 / State 1 (3 -> 2 -> 1)
 					History.back();
 				});
-
-				return;
 
 				addTest(function(){
 					// Test 14 / State 5 (1 -> 5)
