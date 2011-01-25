@@ -28,6 +28,21 @@
 		// Debug Helpers
 
 		/**
+		 * History.options
+		 * Configurable options
+		 */
+		History.options = {
+			/**
+			 * History.options.hashChangeCheckerDelay
+			 * How long should the interval be before hashchange checks
+			 */
+			hashChangeCheckerDelay: 100
+		};
+
+		// ----------------------------------------------------------------------
+		// Debug Helpers
+
+		/**
 		 * History.debug(message,...)
 		 * Logs the passed arguments if debug enabled
 		 */
@@ -431,7 +446,7 @@
 				}
 
 				// Apply the checker function
-				setInterval(_History.checkerFunction, 200);
+				setInterval(_History.checkerFunction, History.options.hashChangeCheckerDelay);
 
 				// Return true
 				return true;
