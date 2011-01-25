@@ -40,10 +40,6 @@ $adapter = 'jquery';
 
 	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
 
-	<!--[if IE]>
-		<textarea id="log" style="width:100%;height:500px"></textarea>
-	<![endif]-->
-
 	<script type="text/javascript">
 
 		(function(window,undefined){
@@ -95,12 +91,12 @@ $adapter = 'jquery';
 			};
 
 			var
-				testsOrder = [0,1,2,3,4,3,1,0,1,3,4,3,1,5,1],
+				testsOrder = [0,1,2,3,4,3,1,0,1,3,4,3,1,0],
 				currentTest = 0,
 				passedTests = 0,
 				failedTests = 0;
 
-			History.Adapter.bind(window,'popstate',function(){
+			History.Adapter.bind(window,'statechange',function(){
 				var
 					state = testsOrder[currentTest],
 					expectedState = History.expandState(States[state]),
@@ -148,7 +144,7 @@ $adapter = 'jquery';
 			var addedTests = 0;
 			var addTest = function(test){
 				++addedTests;
-				setTimeout(test, addedTests*1000);
+				setTimeout(test, addedTests*History.options.hashChangeCheckerDelay*15);
 			};
 
 			History.Adapter.onDomLoad(function(){
@@ -217,12 +213,18 @@ $adapter = 'jquery';
 				});
 
 				addTest(function(){
-					// Test 14 / State 5 (1 -> 5)
+					// No Change
 					History.setHash('log');
 				});
 
 				addTest(function(){
-					// Test 15 / State 1 (5 -> 1)
+					// Traverse Back (#log -> 1)
+					// No change, is not logged
+					History.back();
+				});
+
+				addTest(function(){
+					// Test 14 / State 0 (1 -> 0)
 					History.back();
 				});
 
@@ -235,5 +237,13 @@ $adapter = 'jquery';
 		})(window);
 
 	</script>
-</body>
-</html>
+
+	<textarea id="log" style="width:100%;height:500px"></textarea>
+	<button onclick="javascript:History.back()">back</button>
+	<button onclick="javascript:History.forward()">forward</button>
+	<button onclick="javascript:alert(document.location.hash)">get hash</button>
+	<button onclick="javascript:History.setHash('log')">set hash</button>
+	<button onclick="javascript:alert(document.location.href)">get location</button>
+
+
+</body></html>
