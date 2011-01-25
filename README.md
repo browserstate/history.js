@@ -15,10 +15,10 @@ Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton <conta
 
 	(function(window,undefined){
 
-		var History = window.History;
+		var History = window.History; // note: we are using a capital H instead of a lower h
 
-		History.Adapter.bind(window,'popstate',functon(){
-			var State = History.getState();
+		History.Adapter.bind(window,'statechange',functon(){ // note: We are using statechange instead of popstate
+			var State = History.getState(); // note: we are using History.getState() instead of event.state
 			console.log(State.data, State.title, State.url);
 		});
 
@@ -108,11 +108,13 @@ We create the new namespace `window.History` instead of extending the exiting na
 	- As such, History.js does not support `History.go` (instead only `History.back` and `History.forward`) as otherwise we cannot accurately detect the direction the user is traversing their history.
 - History.js fixes a bug in Google Chrome where traversing back through the history to the home page does not return the correct state data.
 - Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
-	- As such it is outside History.js's scope to detect traditional anchors. Instead this must be done in your `onpopstate` handler. We do provide the `History.isTraditionalAnchor(State.url)` function for your convenience.
+	- As such, to ensure correct compatability between HTML5 and HTML4 browsers, we now have two new events:
+		- onstatechange: this is the same as onpopstate except does not fire for traditional anchors
+		- onanchorchange: this is the same as onhashchange but only fires for traditional anchors and not HTML5 states
+	- To fetch the anchor/hash, you may use `History.getHash()`.
 
 ## Todo
 
-- Support traditional anchors
 - Degradation of the HTML5 States perhaps could be more graceful. Will need to:
 	- Evaluate the behaviour of the `data` stored in states with HTML5. Discover if it persists once the page is closed then re-opened.
 		- If it persists: use cookies
