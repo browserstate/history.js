@@ -27,7 +27,7 @@
 
 	// Handle State Functionality
 	// We use History.Adapter.bind here, instead of $(window).bind as we may be running a History.js Adapter that isn't jQuery
-	History.Adapter.bind(window,'popstate',function(event,extra){
+	History.Adapter.bind(window,'statechange',function(event,extra){
 		// Prepare
 		var
 			state = History.getState(),
