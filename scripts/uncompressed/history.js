@@ -51,7 +51,7 @@
 				History.log.apply(History,arguments);
 			}
 		};
-		History.debug.enable = true;
+		History.debug.enable = false;
 
 		/**
 		 * History.log(message,...)
