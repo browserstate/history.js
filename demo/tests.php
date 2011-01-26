@@ -1,7 +1,7 @@
 <?
 
 # Adapter
-$adapter = 'mootools';
+$adapter = 'jquery';
 
 ?><!DOCTYPE HTML>
 <html>
@@ -90,7 +90,21 @@ $adapter = 'mootools';
 				passedTests = 0,
 				failedTests = 0;
 
+			History.Adapter.bind(window,'anchorchange',function(){
+				History.log('Tests.anchorchange', this, arguments);
+			});
+
+			History.Adapter.bind(window,'hashchange',function(){
+				History.log('Tests.hashchange', this, arguments);
+			});
+
+			History.Adapter.bind(window,'popstate',function(){
+				History.log('Tests.popstate', this, arguments);
+			});
+
 			History.Adapter.bind(window,'statechange',function(){
+				History.log('Tests.statechange', this, arguments);
+
 				var
 					state = testsOrder[currentTest],
 					expectedState = History.expandState(States[state]),

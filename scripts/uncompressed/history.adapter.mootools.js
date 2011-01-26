@@ -19,6 +19,9 @@
 		throw new Error('History.js Adapter has already been emulated...');
 	}
 
+	// Make MooTools aware of History.js Events
+	Object.append(Element.NativeEvents, {'popstate': 2, 'hashchange': 2});
+
 	// Add the Adapter
 	History.Adapter = {
 

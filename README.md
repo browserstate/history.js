@@ -1,4 +1,4 @@
-Welcome to History.js [v1.2.0 - 25th January 2011]
+Welcome to History.js (v1.2.0 - 25th January 2011)
 ==================
 
 This project is the successor of jQuery History, it aims to:
@@ -104,7 +104,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 - Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
 	- As such, to ensure correct compatability between HTML5 and HTML4 browsers, we now have two new events:
 		- onstatechange: this is the same as onpopstate except does not fire for traditional anchors
-		- onanchorchange: this is the same as onhashchange but only fires for traditional anchors and not HTML5 states
+		- onanchorchange: this is the same as onhashchange but only fires for traditional anchors and not states
 	- To fetch the anchor/hash, you may use `History.getHash()`.
 
 

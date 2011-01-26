@@ -1122,15 +1122,20 @@
 				// Prepare
 				event = event||{};
 				if ( typeof event.state === 'undefined' ) {
+					// jQuery
 					if ( typeof event.originalEvent !== 'undefined' && typeof event.originalEvent.state !== 'undefined' ) {
 						event.state = event.originalEvent.state;
+					}
+					// MooTools
+					else if ( typeof event.event !== 'undefined' && typeof event.event.state !== 'undefined' ) {
+						event.state = event.event.state;
 					}
 				}
 
 				// Fetch Data
 				if ( event.state === null ) {
 					// Vanilla: State has no data (new state, not pushed)
-					stateData = event.originalEvent.state;
+					stateData = event.state;
 				}
 				else if ( typeof event.state !== 'undefined' ) {
 					// Vanilla: Back/forward button was used
@@ -1148,12 +1153,12 @@
 							stateData = oldState.data;
 						}
 						else {
-							stateData = event.originalEvent.state;
+							stateData = event.state;
 						}
 					}
 					else {
 						// Use the way that should work
-						stateData = event.originalEvent.state;
+						stateData = event.state;
 					}
 				}
 				else {
