@@ -1,39 +1,39 @@
-Welcome to History.js
+Welcome to History.js [v1.2.0 - 25th January 2011]
 ==================
 
 This project is the successor of jQuery History, it aims to:
 
 - Support HTML5's State Management
-- Provide a backwards compatible experience for Browsers which do not support HTML5's State Management *- including continued support replaceState, and data storage*
+- Provide a backwards compatible experience for Browsers which do not support HTML5's State Management *- including continued support `replaceState`, and state data storage*
 - Provide a backwards compatible experience for Browsers which do not support HTML4's OnHashChange *- including continued support for traditional anchors*
-- Follow the original API's as much as possible
-- Support as many javascript frameworks as possible via adapters.
+- Provide a forwards compatible experience for HTML4 States in HTML5 Browsers *- so urls that contain states in hashes (a HTML4 State) will still work in HTML5 browsers*
+- Follow the original API's as much as possible *- support attaching data and title properties to states and both the `pushState` and `replaceState` methods in all browsers*
+- Support as many javascript frameworks as possible via adapters *- especially jQuery, MooTools and Prototype*
 
-Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton <contact@balupton.com>
+Licensed under the [New BSD License](http://creativecommons.org/licenses/BSD/)
+Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
+
 
 ## Usage
 
 	(function(window,undefined){
 
-		var History = window.History; // note: we are using a capital H instead of a lower h
+		var History = window.History; // Note: We are using a capital H instead of a lower h
 
-		History.Adapter.bind(window,'statechange',functon(){ // note: We are using statechange instead of popstate
-			var State = History.getState(); // note: we are using History.getState() instead of event.state
-			console.log(State.data, State.title, State.url);
+		History.Adapter.bind(window,'statechange',functon(){ // Note: We are using statechange instead of popstate
+			var State = History.getState(); // Note: We are using History.getState() instead of event.state
+			History.log(State.data, State.title, State.url);
 		});
 
-		History.pushState({state:1}, "State 1", "?state=1");
-		History.pushState({state:2}, "State 2", "?state=2");
-		History.replaceState({state:3}, "State 3", "?state=3");
-		History.back(); // logs {state:1}, "State 1", "?state=1"
-		History.back(); // logs {}, "Home Page", "?"
-		History.go(2);  // logs {state:3}, "State 3", "?state=3"
-
-		History.pushStateAndTrigger({state:1}, "State 1", "?state=1");  		// logs {state:1}, "State 1", "?state=1"
-		History.pushStateAndTrigger({state:2}, "State 2", "?state=2");  		// logs {state:2}, "State 2", "?state=2"
-		History.replaceStateAndTrigger({state:3}, "State 3", "?state=3");		// logs {state:3}, "State 3", "?state=3"
+		History.pushState({state:1}, "State 1", "?state=1");			// logs {state:1}, "State 1", "?state=1"
+		History.pushState({state:2}, "State 2", "?state=2");			// logs {state:2}, "State 2", "?state=2"
+		History.replaceState({state:3}, "State 3", "?state=3");		// logs {state:2}, "State 3", "?state=3"
+		History.back();																						// logs {state:1}, "State 1", "?state=1"
+		History.back();																						// logs {}, "Home Page", "?"
+		History.go(2);																						// logs {state:3}, "State 3", "?state=3"
 
 	})(window);
+
 
 ## Installation
 
@@ -71,15 +71,6 @@ Licensed under the New BSD License, Copyright 2011 Benjamin Arthur Lupton <conta
 		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.min.js"></script>
 
 
-## Explanation
-
-We create the new namespace `window.History` instead of extending the exiting namespace `window.history` (capitalisation), as each framework handles the events a little bit so we cannot guarantee full compatibility with the original spec. This is shown in the above code by using `History.getState().data` instead of `event.state`, which is actually more powerful as we have access to that state's title and url as well. As such, extending the inbuilt `window.history` would cause discrepancies.
-
-## Extra Support
-
-- State data will always contain `data.title` and `data.url`
-- State titles will always be applied to the document.title
-
 ## Adapters
 
 ### Supported
@@ -89,6 +80,7 @@ We create the new namespace `window.History` instead of extending the exiting na
 - MooTools
 
 > If your favourite framework is not included? Then just write an adapter for it, and send it to us :-) Easy peasy.
+
 
 ## Browsers
 
@@ -104,8 +96,10 @@ We create the new namespace `window.History` instead of extending the exiting na
 
 ## Notes on Compatibility
 
-- ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back` / `History.forward` call (determined by the direction the user is traversing their history).
-	- As such, History.js does not support `History.go` (instead only `History.back` and `History.forward`) as otherwise we cannot accurately detect the direction the user is traversing their history.
+- State data will always contain the State's title and url at: `data.title` and `data.url`
+- State titles will always be applied to the document.title
+- ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call.
+	- As such, there is no `History.go(index)` method as we cannot ensure compatibility between HTML5 and HTML4 browsers due to discarded states.
 - History.js fixes a bug in Google Chrome where traversing back through the history to the home page does not return the correct state data.
 - Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
 	- As such, to ensure correct compatability between HTML5 and HTML4 browsers, we now have two new events:
@@ -113,12 +107,41 @@ We create the new namespace `window.History` instead of extending the exiting na
 		- onanchorchange: this is the same as onhashchange but only fires for traditional anchors and not HTML5 states
 	- To fetch the anchor/hash, you may use `History.getHash()`.
 
-## Todo
 
-- Degradation of the HTML5 States perhaps could be more graceful. Will need to:
-	- Evaluate the behaviour of the `data` stored in states with HTML5. Discover if it persists once the page is closed then re-opened.
-		- If it persists: use cookies
-		- If it doesn't then we don't need to do url serialisation (current solutions).
-	- Alternatively, we could support url serialisation for both HTML5 and HTML4 browsers to ensure the state of the page always persists in it's full entirety.
-		- HTML5 could have `data` and `title` passed as querystring.
-	- Will need to decide on best way forward, feedback welcome! contact@balupton.com
+## Changelog
+
+- v1.3.0 - Upcoming (Expected 1st Week February 2011)
+	- Support for cleaner HTML4 States
+
+- v1.2.0 - 25th of January 2011
+	- Support for HTML4 States in HTML5 Browsers (added test)
+	- Updates of Documentation
+
+- v1.1.0 - 24th January 2011
+	- Developed a series of automated test cases
+	- Fixed issue with traditional anchors
+	- Fixed issue with differing replaceState functionality in HTML4 Browsers
+	- Fixed issue with Google Chrome artefacts being carried over to the initial state
+	- Provided `onstatechange` and `onanchorchange` events
+
+- v1.0.0 - 22nd January 2011
+	- Supported `History.pushState` and `History.replaceState` degradation
+	- Supported jQuery, MooTools and Prototype Frameworks
+
+
+## Todo for Upcoming Releases
+
+- Degradation of the HTML5 States could perhaps be cleaner (have the anchor as only a URL with a UID, instead of the serialised state). Will need to:
+	- Evaluate if the `State.data` is kept in HTML5 browsers if the page is:
+		- Closed and re-opened.
+		- Navigated to a 3rd party website, then returned.
+	- Under both circumstances of:
+		- The initial opening
+		- Traversing the history
+	- This then leads to:
+		- If the data persists, then we can either:
+			- Use the existing URL Serialisation
+			- Use `document.cookie` to store the states indexed by UIDs, and give the hash a UID.
+		- If the data doesn't persist, then we can either:
+			- Use the existing URL Serialisation
+			- Use a local data structure to store the states indexed by UIDs, and give the hash a UID.

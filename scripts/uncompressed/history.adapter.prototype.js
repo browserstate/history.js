@@ -31,21 +31,18 @@
 		 */
 		bind: function(el,event,callback){
 			event = 'widget:'+event;
-			console.log('bind:',el,event,callback);
 			return Element.observe(el,event,callback);
 		},
 
 		/**
-		 * History.Adapter.trigger(el,event,data)
+		 * History.Adapter.trigger(el,event)
 		 * @param {element} el
 		 * @param {string} event
-		 * @param {object} data
 		 * @return {element}
 		 */
-		trigger: function(el,event,data){
+		trigger: function(el,event){
 			event = 'widget:'+event;
-			console.log('trigger:',el,event,data);
-			return Element.fire(el,event,data);
+			return Element.fire(el,event);
 		},
 
 		/**

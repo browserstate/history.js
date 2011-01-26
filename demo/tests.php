@@ -1,7 +1,7 @@
 <?
 
 # Adapter
-$adapter = 'jquery';
+$adapter = 'mootools';
 
 ?><!DOCTYPE HTML>
 <html>
@@ -19,18 +19,12 @@ $adapter = 'jquery';
 				scriptEl = document.createElement('script');
 			scriptEl.type = 'text/javascript';
 			scriptEl.src = url;
-			document.body.appendChild(scriptEl);
+			document.body.appendChild(scriptEl,document.body.firstChild);
 		}
 	</script>
-	<script type="text/javascript" src="./scripts/jquery.js"></script>
-	<script type="text/javascript">jQuery.noConflict()</script>
 
 	<? switch ( $adapter ) :
-		case 'jquery': ?>
-			<script type="text/javascript" src="../scripts/uncompressed/history.adapter.jquery.js"></script>
-			<? break;
-
-		case 'dojo':
+		case 'jquery':
 		case 'prototype':
 		case 'mootools': ?>
 			<script type="text/javascript" src="./scripts/<?=$adapter?>.js"></script>
@@ -151,7 +145,7 @@ $adapter = 'jquery';
 
 				addTest(function(){
 					// Test 2 / State 1
-					History.pushState(States[1].data,States[1].title,States[1].url);
+					History.setHash(History.createStateHash(History.expandState(States[1])));
 				});
 
 				addTest(function(){

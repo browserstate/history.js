@@ -35,19 +35,18 @@
 		},
 
 		/**
-		 * History.Adapter.trigger(el,event,data)
+		 * History.Adapter.trigger(el,event)
 		 * @param {element} el
 		 * @param {string} event
-		 * @param {object} data
 		 * @return {element}
 		 */
-		trigger: function(el,event,data){
+		trigger: function(el,event){
 			var El = typeof el === 'string' ? document.id(el) : el;
-			return El.fireEvent(event,data||{});
+			return El.fireEvent(event);
 		},
 
 		/**
-		 * History.Adapter.trigger(el,event,data)
+		 * History.Adapter.trigger(el,event)
 		 * @param {Function} callback
 		 * @return {true}
 		 */

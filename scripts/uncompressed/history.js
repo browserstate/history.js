@@ -847,7 +847,7 @@
 							lastDocumentHash = documentHash;
 
 							// Trigger Hashchange Event
-							History.Adapter.trigger(window,'hashchange')
+							History.Adapter.trigger(window,'hashchange');
 						}
 
 						// Return true
@@ -1091,11 +1091,24 @@
 			_History.onPopState = function(event){
 				History.debug('_History.onPopState',this,arguments);
 
-				// Check
-				var anchor = History.getHash();
-				if ( anchor ) {
-					History.Adapter.trigger(window,'anchorchange');
-					return;
+				// Check for a Hash, and handle apporiatly
+				var currentHash	= unescape(History.getHash());
+				if ( currentHash ) {
+					try {
+						var currentHashState = JSON.parse(currentHash);
+						// We were able to parse it, it must be a State!
+						// Let's forward to replaceState
+						History.log('_History.onPopState: state anchor', currentHash, currentHashState);
+						History.replaceState(currentHashState.data, currentHashState.tite, currentHashState.url);
+					}
+					catch ( Exception ) {
+						// Traditional Anchor
+						History.log('_History.onPopState: traditional anchor', currentHash);
+						History.Adapter.trigger(window,'anchorchange');
+					}
+
+					// We don't care for hashes
+					return false;
 				}
 
 				// Prepare
@@ -1173,8 +1186,8 @@
 					return false;
 				}
 
-				if ( false )
-				History.log(
+				// Log
+				History.debug(
 					'_History.onPopState',
 					'newState:', newState,
 					'oldState:', _History.getStateByUrl(History.expandUrl(document.location.href)),
