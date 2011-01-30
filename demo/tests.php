@@ -179,12 +179,8 @@ $adapter = 'jquery';
 
 				addTest(function(){
 					// Test 6 / State 1 (4 -> 3)
-					History.back();
-				});
-
-				addTest(function(){
 					// Test 7 / State 1 (3 -> 2 -> 1)
-					History.back();
+					History.go(-2);
 				});
 
 				addTest(function(){
@@ -197,12 +193,8 @@ $adapter = 'jquery';
 
 				addTest(function(){
 					// Test 9 / State 1 (0 -> 1)
-					History.forward();
-				});
-
-				addTest(function(){
 					// Test 10 / State 3 (1 -> 2 -> 3)
-					History.forward();
+					History.go(2);
 				});
 
 				addTest(function(){

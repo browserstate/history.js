@@ -1,4 +1,4 @@
-Welcome to History.js (v1.2.0 - 25th January 2011)
+Welcome to History.js (v1.2.1 - 30th January 2011)
 ==================
 
 This project is the successor of jQuery History, it aims to:
@@ -16,23 +16,24 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Usage
 
-	(function(window,undefined){
+  (function(window,undefined){
 
-		var History = window.History; // Note: We are using a capital H instead of a lower h
+    var History = window.History; // Note: We are using a capital H instead of a lower h
 
-		History.Adapter.bind(window,'statechange',functon(){ // Note: We are using statechange instead of popstate
-			var State = History.getState(); // Note: We are using History.getState() instead of event.state
-			History.log(State.data, State.title, State.url);
-		});
+    History.Adapter.bind(window,'statechange',functon(){ // Note: We are using statechange instead of popstate
+      var State = History.getState(); // Note: We are using History.getState() instead of event.state
+      History.log(State.data, State.title, State.url);
+    });
 
-		History.pushState({state:1}, "State 1", "?state=1");			// logs {state:1}, "State 1", "?state=1"
-		History.pushState({state:2}, "State 2", "?state=2");			// logs {state:2}, "State 2", "?state=2"
-		History.replaceState({state:3}, "State 3", "?state=3");		// logs {state:2}, "State 3", "?state=3"
-		History.back();																						// logs {state:1}, "State 1", "?state=1"
-		History.back();																						// logs {}, "Home Page", "?"
-		History.go(2);																						// logs {state:3}, "State 3", "?state=3"
+    History.pushState({state:1}, "State 1", "?state=1");      // logs {state:1}, "State 1", "?state=1"
+    History.pushState({state:2}, "State 2", "?state=2");      // logs {state:2}, "State 2", "?state=2"
+    History.replaceState({state:3}, "State 3", "?state=3");   // logs {state:2}, "State 3", "?state=3"
+    History.back();                                           // logs {state:1}, "State 1", "?state=1"
+    History.back();                                           // logs {}, "Home Page", "?"
+    History.forward();                                        // logs {state:1}, "State 1", "?state=1"
+    History.forward();                                        // logs {state:3}, "State 3", "?state=3"
 
-	})(window);
+  })(window);
 
 
 ## Installation
@@ -99,7 +100,6 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 - State data will always contain the State's title and url at: `data.title` and `data.url`
 - State titles will always be applied to the document.title
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call.
-	- As such, there is no `History.go(index)` method as we cannot ensure compatibility between HTML5 and HTML4 browsers due to discarded states.
 - History.js fixes a bug in Google Chrome where traversing back through the history to the home page does not return the correct state data.
 - Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
 	- As such, to ensure correct compatability between HTML5 and HTML4 browsers, we now have two new events:
@@ -113,7 +113,11 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 - v1.3.0 - Upcoming (Expected 1st Week February 2011)
 	- Support for cleaner HTML4 States
 
-- v1.2.0 - 25th of January 2011
+- v1.2.1 - 30th January 2011
+	- Fixed History.log always being called - [reported by dlee](https://github.com/balupton/History.js/issues/#issue/2)
+	- Re-Added `History.go(index)` support
+
+- v1.2.0 - 25th January 2011
 	- Support for HTML4 States in HTML5 Browsers (added test)
 	- Updates of Documentation
 

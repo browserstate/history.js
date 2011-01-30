@@ -1,7 +1,7 @@
 <?
 
 # Define our Pages
-$pages = array('welcome','form','cool');
+$pages = array(1,2,3);
 
 # Page Get
 $page = empty($_GET['page']) ? $pages[0] : $_GET['page'];

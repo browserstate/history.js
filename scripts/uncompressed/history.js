@@ -890,7 +890,7 @@
 				// Check if we are the same state
 				if ( _History.isLastHash(currentHash) ) {
 					// There has been no change (just the page's hash has finally propagated)
-					History.log('_History.onHashChange: no change');
+					History.debug('_History.onHashChange: no change');
 					return false;
 				}
 
@@ -903,7 +903,7 @@
 					currentState = JSON.parse(currentHash);
 				} catch ( Exception ) {
 					// Traditional Anchor Hash
-					History.log('_History.onHashChange: traditional anchor');
+					History.debug('_History.onHashChange: traditional anchor');
 					History.Adapter.trigger('anchorchange');
 					return false;
 				}
@@ -911,7 +911,7 @@
 				// Check if we are the same state
 				if ( _History.isLastState(currentState) ) {
 					// There has been no change (just the page's hash has finally propagated)
-					History.log('_History.onHashChange: no change');
+					History.debug('_History.onHashChange: no change');
 					return false;
 				}
 
@@ -919,7 +919,7 @@
 				currentStateHash = History.createStateHash(currentState);
 
 				if ( true )
-				History.log('_History.onHashChange: ',
+				History.debug('_History.onHashChange: ',
 					'currentStateHash',
 					currentStateHash,
 					'Hash -1',
@@ -941,15 +941,15 @@
 				// Check if we are DiscardedState
 				var discardObject = _History.discardedState(currentState);
 				if ( discardObject ) {
-					History.log('forwardState:',History.createStateHash(discardObject.forwardState),'backState:',History.createStateHash(discardObject.backState));
+					History.debug('forwardState:',History.createStateHash(discardObject.forwardState),'backState:',History.createStateHash(discardObject.backState));
 					// Ignore this state as it has been discarded and go back to the state before it
 					if ( _History.getHashByIndex(-2) === History.createStateHash(discardObject.forwardState) ) {
 						// We are going backwards
-						History.log('_History.onHashChange: go backwards');
+						History.debug('_History.onHashChange: go backwards');
 						History.back();
 					} else {
 						// We are going forwards
-						History.log('_History.onHashChange: go forwards');
+						History.debug('_History.onHashChange: go forwards');
 						History.forward();
 					}
 					return false;
@@ -979,7 +979,6 @@
 				// Check the State
 				if ( History.extractHashFromUrl(url) ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
-					return false;
 				}
 
 				// Fetch the State Object
@@ -1001,7 +1000,7 @@
 					document.title = newState.title
 				}
 
-				History.log(
+				History.debug(
 					'History.pushState: details',
 					'newStateHash:', newStateHash,
 					'oldStateHash:', oldStateHash,
@@ -1010,13 +1009,13 @@
 
 				// Check if we are the same State
 				if ( newStateHash === oldStateHash ) {
-					History.log('History.pushState: no change');
+					History.debug('History.pushState: no change');
 					return false;
 				}
 
 				// Update HTML4 Hash
 				if ( newStateHash !== html4Hash ) {
-					History.log('History.pushState: update hash');
+					History.debug('History.pushState: update hash');
 					History.setHash(escape(newStateHash));
 					return false;
 				}
@@ -1025,7 +1024,7 @@
 				_History.saveState(newState);
 
 				// Fire HTML5 Event
-				History.log('History.pushState: trigger popstate');
+				History.debug('History.pushState: trigger popstate');
 				History.Adapter.trigger(window,'statechange');
 
 				// Return true
@@ -1042,11 +1041,10 @@
 			 * @return {true}
 			 */
 			History.replaceState = function(data,title,url){
-				History.log('History.replaceState',this,arguments);
+				History.debug('History.replaceState',this,arguments);
 				// Check the State
 				if ( History.extractHashFromUrl(url) ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
-					return false;
 				}
 
 				// Fetch the State Objects
@@ -1070,12 +1068,12 @@
 			 **/
 			if ( !document.location.hash || document.location.hash === '#' ) {
 				History.Adapter.onDomLoad(function(){
-					History.log('hash1');
+					History.debug('hash1');
 					var currentState = History.createStateObject({},'',document.location.href);
 					History.pushState(currentState.data,currentState.title,currentState.url);
 				});
 			} else if ( !History.emulated.hashChange ) {
-				History.log('hash2');
+				History.debug('hash2');
 				History.Adapter.onDomLoad(function(){
 					_History.onHashChange();
 				});
@@ -1098,12 +1096,12 @@
 						var currentHashState = JSON.parse(currentHash);
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
-						History.log('_History.onPopState: state anchor', currentHash, currentHashState);
+						History.debug('_History.onPopState: state anchor', currentHash, currentHashState);
 						History.replaceState(currentHashState.data, currentHashState.tite, currentHashState.url);
 					}
 					catch ( Exception ) {
 						// Traditional Anchor
-						History.log('_History.onPopState: traditional anchor', currentHash);
+						History.debug('_History.onPopState: traditional anchor', currentHash);
 						History.Adapter.trigger(window,'anchorchange');
 					}
 
@@ -1140,26 +1138,22 @@
 				else if ( typeof event.state !== 'undefined' ) {
 					// Vanilla: Back/forward button was used
 
-					// Do we need to use the Chrome Fix
-					if ( true ) {
-						// Using Chrome Fix
-						var
-							newStateUrl = History.expandUrl(document.location.href),
-							oldState = _History.getStateByUrl(newStateUrl),
-							duplicateExists = _History.urlDuplicateExists(newStateUrl);
+					// Using Chrome Fix
+					var
+						newStateUrl = History.expandUrl(document.location.href),
+						oldState = _History.getStateByUrl(newStateUrl),
+						duplicateExists = _History.urlDuplicateExists(newStateUrl);
 
-						// Does oldState Exist?
-						if ( typeof oldState !== 'undefined' && !duplicateExists ) {
-							stateData = oldState.data;
-						}
-						else {
-							stateData = event.state;
-						}
+					// Does oldState Exist?
+					if ( typeof oldState !== 'undefined' && !duplicateExists ) {
+						stateData = oldState.data;
 					}
 					else {
-						// Use the way that should work
 						stateData = event.state;
 					}
+
+					// Use the way that should work
+					// stateData = event.state;
 				}
 				else {
 					// Vanilla: A new state was pushed, and popstate was called manually
@@ -1187,7 +1181,7 @@
 				// Check if we are the same state
 				if ( _History.isLastState(newState) ) {
 					// There has been no change (just the page's hash has finally propagated)
-					History.log('_History.onPopState: no change');
+					History.debug('_History.onPopState: no change');
 					return false;
 				}
 
@@ -1229,7 +1223,6 @@
 				// Check the State
 				if ( History.extractHashFromUrl(url) ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
-					return false;
 				}
 
 				// Create the newState
@@ -1261,7 +1254,6 @@
 				// Check the State
 				if ( History.extractHashFromUrl(url) ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
-					return false;
 				}
 
 				// Create the newState
@@ -1308,7 +1300,7 @@
 
 			// Go back
 			return history.go(-1);
-		}
+		};
 
 		History.forward = function(){
 			History.debug('History.forward: called');
@@ -1332,7 +1324,37 @@
 
 			// Go forward
 			return history.go(1);
-		}
+		};
+
+		History.go = function(index){
+			History.debug('History.go: called with index ['+index+']');
+
+			// Handle
+			if ( index > 0 ) {
+				// Forward
+				for ( var i=0; i<index; ++i ) {
+					setTimeout(
+						History.forward,
+						History.options.hashChangeCheckerDelay*4*i
+					);
+				}
+			}
+			else if ( index < 0 ) {
+				// Backward
+				for ( var i=0; i>index; --i ) {
+					setTimeout(
+						History.back,
+						History.options.hashChangeCheckerDelay*4*(i*-1)
+					);
+				}
+			}
+			else {
+				throw new Error('History.go: History.go requires a positive or negative integer passed.');
+			}
+
+			// Return true
+			return true;
+		};
 
 	}; // init
 
