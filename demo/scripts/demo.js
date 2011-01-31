@@ -13,7 +13,9 @@
 				$this = $(this),
 				title = $this.attr('title') || $this.text(),
 				href = $this.attr('href'),
-				data = {};
+				data = {
+					state: title
+				};
 
 			// Update State
 			History.pushState(data, title, href);

@@ -1,4 +1,4 @@
-Welcome to History.js (v1.2.1 - 30th January 2011)
+Welcome to History.js (v1.3.0 - January 31 2011)
 ==================
 
 This project is the successor of jQuery History, it aims to:
@@ -97,7 +97,8 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 ## Notes on Compatibility
 
 - State data will always contain the State's title and url at: `data.title` and `data.url`
-- State titles will always be applied to the document.title
+- State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality.
+- State titles will always be applied to the document.title if set.
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call.
 - History.js fixes a bug in Google Chrome where traversing back through the history to the home page does not return the correct state data.
 - Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
@@ -112,39 +113,27 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 - v1.3.0 - Upcoming (Expected 1st Week February 2011)
 	- Support for cleaner HTML4 States
 
-- v1.2.1 - 30th January 2011
+- v1.2.1 - January 30 2011
 	- Fixed History.log always being called - [reported by dlee](https://github.com/balupton/History.js/issues/#issue/2)
 	- Re-Added `History.go(index)` support
 
-- v1.2.0 - 25th January 2011
+- v1.2.0 - January 25 2011
 	- Support for HTML4 States in HTML5 Browsers (added test)
 	- Updates of Documentation
 
-- v1.1.0 - 24th January 2011
+- v1.1.0 - January 24 2011
 	- Developed a series of automated test cases
 	- Fixed issue with traditional anchors
 	- Fixed issue with differing replaceState functionality in HTML4 Browsers
 	- Fixed issue with Google Chrome artefacts being carried over to the initial state
 	- Provided `onstatechange` and `onanchorchange` events
 
-- v1.0.0 - 22nd January 2011
+- v1.0.0 - January 22 2011
 	- Supported `History.pushState` and `History.replaceState` degradation
 	- Supported jQuery, MooTools and Prototype Frameworks
 
 
 ## Todo for Upcoming Releases
 
-- Degradation of the HTML5 States could perhaps be cleaner (have the anchor as only a URL with a UID, instead of the serialised state). Will need to:
-	- Evaluate if the `State.data` is kept in HTML5 browsers if the page is:
-		- Closed and re-opened.
-		- Navigated to a 3rd party website, then returned.
-	- Under both circumstances of:
-		- The initial opening
-		- Traversing the history
-	- This then leads to:
-		- If the data persists, then we can either:
-			- Use the existing URL Serialisation
-			- Use `document.cookie` to store the states indexed by UIDs, and give the hash a UID.
-		- If the data doesn't persist, then we can either:
-			- Use the existing URL Serialisation
-			- Use a local data structure to store the states indexed by UIDs, and give the hash a UID.
+- Add a proper demo
+- Add a compilation test to ensure `.debug = false` and no `History.log` calls exist.

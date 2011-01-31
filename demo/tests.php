@@ -34,6 +34,16 @@ $adapter = 'jquery';
 
 	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
 
+	<textarea id="log" style="width:100%;height:500px"></textarea>
+	<button onclick="javascript:History.back()">back</button>
+	<button onclick="javascript:History.forward()">forward</button>
+	<button onclick="javascript:alert(document.location.hash)">get hash</button>
+	<button onclick="javascript:History.setHash(prompt())">set hash</button>
+	<button onclick="javascript:alert(document.location.href)">get location</button>
+	<p>Tests Passed: <span id="tests-passed"></span></p>
+	<p>Tests Failed: <span id="tests-failed"></span></p>
+	<p>Tests Completed: <span id="tests-completed"></span>/<span id="tests-total"></span></p>
+
 	<script type="text/javascript">
 
 		(function(window,undefined){
@@ -63,10 +73,6 @@ $adapter = 'jquery';
 				},
 				// Three
 				3: {
-					'data': {
-						'state': 3
-					},
-					'title': 'State 3',
 					'url': '?state=3'
 				},
 				// Four
@@ -86,9 +92,22 @@ $adapter = 'jquery';
 
 			var
 				testsOrder = [0,1,2,3,4,3,1,0,1,3,4,3,1,0],
+				totalTests = testsOrder.length,
 				currentTest = 0,
 				passedTests = 0,
-				failedTests = 0;
+				failedTests = 0,
+				testsCompleted = function(){
+					if ( currentTest === testsOrder.length ) {
+						History.log('Test suite has finished: '+currentTest+'/'+testsOrder.length+' tests were run');
+					}
+					else if ( currentTest < testsOrder.length ) {
+						History.log('Test suite has finished: '+currentTest+'/'+testsOrder.length+' tests were run: '+(testsOrder.length-currentTest)+' tests were missed');
+					}
+					else if ( currentTest > testsOrder.length ) {
+						History.log('Test suite has finished: '+currentTest+'/'+testsOrder.length+' tests were run: '+(currentTest-testsOrder.length)+' tests were unexpected');
+					}
+					History.log('Results: '+passedTests+' passed, '+failedTests+' failed');
+				};
 
 			History.Adapter.bind(window,'anchorchange',function(){
 				History.log('Tests.anchorchange', this, arguments);
@@ -112,11 +131,13 @@ $adapter = 'jquery';
 					expectedStateStr = JSON.stringify(expectedState),
 					actualStateStr = JSON.stringify(actualState);
 
+				++currentTest;
+
 				if ( expectedStateStr === actualStateStr ) {
 					// test passed
 					++passedTests;
 					History.log(
-						'Test '+(currentTest+1)+' / State '+state+' passed.',
+						'Test '+(currentTest)+' / State '+state+' passed.',
 						{'expected':expectedState,'actual':actualState},
 						'expected',expectedStateStr,'actual',actualStateStr,
 						'location',document.location.href
@@ -126,40 +147,41 @@ $adapter = 'jquery';
 					// test failed
 					++failedTests;
 					History.log(
-						'Test '+(currentTest+1)+' / State '+state+' FAILED.',
+						'Test '+(currentTest)+' / State '+state+' FAILED.',
 						{'expected':expectedState,'actual':actualState},
 						'expected',expectedStateStr,'actual',actualStateStr,
 						'location',document.location.href
 					);
 				}
 
-				++currentTest;
-			});
+				var
+					$testsPassed = document.getElementById('tests-passed')
+					$testsFailed = document.getElementById('tests-failed'),
+					$testsCompleted = document.getElementById('tests-completed'),
+					$testsTotal = document.getElementById('tests-total');
+				$testsTotal.innerHTML = totalTests;
+				$testsPassed.innerHTML = (passedTests);
+				$testsFailed.innerHTML = (failedTests);
+				$testsCompleted.innerHTML = (currentTest);
 
-			var testsCompleted = function(){
-				if ( currentTest === testsOrder.length ) {
-					History.log('Test suite has finished: '+currentTest+'/'+testsOrder.length+' tests were run');
-				}
-				else if ( currentTest < testsOrder.length ) {
-					History.log('Test suite has finished: '+currentTest+'/'+testsOrder.length+' tests were run: '+(testsOrder.length-currentTest)+' tests were missed');
-				}
-				else if ( currentTest > testsOrder.length ) {
-					History.log('Test suite has finished: '+currentTest+'/'+testsOrder.length+' tests were run: '+(currentTest-testsOrder.length)+' tests were unexpected');
-				}
-				History.log('Results: '+passedTests+' passed, '+failedTests+' failed');
-			}
+			});
 
 			var addedTests = 0;
 			var addTest = function(test){
 				++addedTests;
-				setTimeout(test, addedTests*History.options.hashChangeCheckerDelay*15);
+				setTimeout(function(){
+					if ( failedTests ) {
+						return false;
+					}
+					test()
+				}, addedTests*History.options.hashChangeCheckerDelay*80);
 			};
 
 			History.Adapter.onDomLoad(function(){
 
 				addTest(function(){
 					// Test 2 / State 1
-					History.setHash(History.createStateHash(History.expandState(States[1])));
+					History.setHash(History.contractState(History.expandState(States[1])));
 				});
 
 				addTest(function(){
@@ -223,6 +245,7 @@ $adapter = 'jquery';
 					History.back();
 				});
 
+
 				addTest(function(){
 					// Test 14 / State 0 (1 -> 0)
 					History.back();
@@ -237,13 +260,5 @@ $adapter = 'jquery';
 		})(window);
 
 	</script>
-
-	<textarea id="log" style="width:100%;height:500px"></textarea>
-	<button onclick="javascript:History.back()">back</button>
-	<button onclick="javascript:History.forward()">forward</button>
-	<button onclick="javascript:alert(document.location.hash)">get hash</button>
-	<button onclick="javascript:History.setHash('log')">set hash</button>
-	<button onclick="javascript:alert(document.location.href)">get location</button>
-
 
 </body></html>

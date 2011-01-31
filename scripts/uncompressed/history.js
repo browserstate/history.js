@@ -139,6 +139,41 @@
 			)
 		};
 
+		/**
+		 * _History.isEmptyObject(obj)
+		 * Checks to see if the Object is Empty
+		 * @param {Object} obj
+		 * @return {boolean}
+		 */
+		_History.isEmptyObject = function(obj) {
+			for ( var key in obj ) {
+				if ( !this.hasOwnProperty(key) ) {
+					continue;
+				}
+				return false;
+			}
+			return true;
+		};
+
+		/**
+		 * _History.cloneObject(obj)
+		 * Clones a object
+		 * @param {Object} obj
+		 * @return {Object}
+		 */
+		_History.cloneObject = function(obj) {
+			var hash,newObj;
+			if ( obj ) {
+				hash = JSON.stringify(obj);
+				newObj = JSON.parse(hash);
+			}
+			else {
+				newObj = {};
+			}
+			return newObj;
+		};
+
+
 		// ----------------------------------------------------------------------
 		// Hash Helpers
 
@@ -149,9 +184,16 @@
 		 * @return {string}
 		 */
 		History.setHash = function(hash){
-			var normalizedHash = History.normalizeHash(hash);
-			History.debug('History.setHash',this,arguments,'hash:',hash,'normalizedHash:',normalizedHash);
-			document.location.hash = normalizedHash;
+			// Prepare
+			var adjustedHash = _History.escapeHash(hash);
+
+			// Log hash
+			History.debug('History.setHash',this,arguments,'hash:',hash,'adjustedHash:',adjustedHash,'oldHash:',document.location.hash);
+
+			// Apply hash
+			document.location.hash = adjustedHash;
+
+			// Return hash
 			return hash;
 		};
 
@@ -161,17 +203,53 @@
 		 * @return {string}
 		 */
 		History.getHash = function(){
-			var hash = History.normalizeHash(document.location.hash);
+			var hash = _History.unescapeHash(document.location.hash);
 			return hash;
 		};
 
 		/**
-		 * History.normalizeHash()
+		 * _History.escape()
+		 * Normalise and Escape a Hash
+		 * @return {string}
+		 */
+		_History.escapeHash = function(hash){
+			var result = _History.normalizeHash(hash);
+
+			// Escape hash
+			if ( /[^a-zA-Z0-9\/\-\_\%\.]/.test(result) ) {
+				result = escape(result);
+			}
+
+			// Return result
+			return result;
+		};
+
+		/**
+		 * _History.unescapeHash()
+		 * Normalise and Unescape a Hash
+		 * @return {string}
+		 */
+		_History.unescapeHash = function(hash){
+			var result = _History.normalizeHash(hash);
+
+			// Unescape hash
+			if ( /[\%]/.test(result) ) {
+				result = unescape(result);
+			}
+
+			// Return result
+			return result;
+		};
+
+		/**
+		 * _History.normalizeHash()
 		 * Normalise a hash across browsers
 		 * @return {string}
 		 */
-		History.normalizeHash = function(hash){
+		_History.normalizeHash = function(hash){
 			var result = hash.replace(/[^#]*#/,'').replace(/#.*/, '');
+
+			// Return result
 			return result;
 		};
 
@@ -186,6 +264,9 @@
 			var hash = String(url)
 				.replace(/([^#]*)#?([^#]*)#?(.*)/, '$2')
 				;
+
+			// Unescape hash
+			hash = _History.unescapeHash(hash);
 
 			// Return hash
 			return hash;
@@ -210,14 +291,38 @@
 		// State Object Helpers
 
 		/**
+		 * History.contractUrl(url)
+		 * Ensures that we have a relative URL and not a absolute URL
+		 * @param {string} url
+		 * @return {string} url
+		 */
+		History.contractUrl = function(url){
+			// Prepare
+			url = History.expandUrl(url);
+
+			// Prepare for Base Domain
+			var baseDomain = document.location.protocol+'//'+(document.location.hostname||document.location.host);
+			if ( document.location.port||false ) {
+				baseDomain += ':'+document.location.port;
+			}
+			baseDomain += '/';
+
+			// Adjust for Base Domain
+			url = url.replace(baseDomain,'/');
+
+			// Return url
+			return url;
+		};
+
+		/**
 		 * History.expandUrl(url)
 		 * Ensures that we have an absolute URL and not a relative URL
 		 * @param {string} url
 		 * @return {string} url
 		 */
 		History.expandUrl = function(url){
-			// Remove Anchor
-			// url = url.replace(/#.*/,'');
+			// Prepare
+			url = url||'';
 
 			// Test for Full URL
 			if ( /[a-z]+\:\/\//.test(url) ) {
@@ -303,7 +408,7 @@
 			newState.data.title = newState.data.title||newState.title;
 			newState.data.url = newState.data.url||newState.url;
 			return newState;
-		}
+		};
 
 		/**
 		 * History.createStateObject(data,title,url)
@@ -329,18 +434,129 @@
 		};
 
 		/**
-		 * History.createStateHash(State)
-		 * Creates a Hash for the State Object
-		 * @param {object} State
-		 * @return {string}
+		 * History.expandHash(hash)
+		 * Expands a Hash into a StateHash if applicable
+		 * @param {string} hash
+		 * @return {Object|null} State
 		 */
-		History.createStateHash = function(State){
-			// Hashify
-			var StateHash = JSON.stringify(State);
+		History.expandHash = function(hash){
+			// Prepare
+			var State = null;
+
+			// JSON
+			try {
+				State = JSON.parse(hash);
+			}
+			catch ( Exception ) {
+				var
+					parts = /(.*)\/uid=([0-9]+)$/.exec(hash),
+					url = parts ? (parts[1]||hash) : hash,
+					uid = parts ? String(parts[2]||'') : '';
+
+				if ( uid ) {
+					State = _History.getStateByUid(uid)||null;
+				}
+
+				if ( !State && /\//.test(hash) ) {
+					// Is a URL
+					var expandedUrl = History.expandUrl(hash);
+					State = History.createStateObject(null,null,expandedUrl);
+				}
+				else {
+					// Non State Hash
+					// do nothing
+				}
+			}
+
+			// Expand
+			State = State ? History.expandState(State) : null;
+
+			// Return State
+			return State;
+		};
+
+		/**
+		 * History.contractState(State)
+		 * Creates a Hash for the State Object
+		 * @param {object} passedState
+		 * @return {string} hash
+		 */
+		History.contractState = function(passedState){
+			// Check
+			if ( !passedState ) {
+				return null;
+			}
+
+			// Prepare
+			var
+				hash = null,
+				State = _History.cloneObject(passedState);
+
+			// Ensure State
+			if ( State ) {
+				// Clean
+				State.data = State.data||{};
+				delete State.data.title;
+				delete State.data.url;
+
+				// Handle
+				if ( _History.isEmptyObject(State) && !State.title ) {
+					hash = History.contractUrl(State.url);
+				}
+				else {
+					// Serialised Hash
+					hash = JSON.stringify(State);
+
+					// Has it been associated with a UID?
+					var uid;
+					if ( typeof _History.hashesToUids[hash] !== 'undefined' ) {
+						uid = _History.hashesToUids[hash];
+					}
+					else {
+						while ( true ) {
+							uid = String(Math.floor(Math.random()*1000));
+							if ( typeof _History.uidsToStates[uid] === 'undefined' ) {
+								break;
+							}
+						}
+					}
+
+					// Associate UID with Hash
+					_History.hashesToUids[hash] = uid;
+					_History.uidsToStates[uid] = State;
+
+					// Simplified Hash
+					hash = History.contractUrl(State.url)+'/uid='+uid;
+				}
+			}
 
 			// Return hash
-			return StateHash;
+			return hash;
 		};
+
+		/**
+		 * _History.uidsToStates
+		 * UIDs to States
+		 */
+		_History.uidsToStates = {};
+
+		/**
+		 * _History.hashesToUids
+		 * Serialised States to UIDs
+		 */
+		_History.hashesToUids = {};
+
+		/**
+		 * _History.getStateByUid(uid)
+		 * Get a state by it's UID
+		 * @param {string} uid
+		 */
+		_History.getStateByUid = function(uid){
+			uid = String(uid);
+			var State = _History.uidsToStates[uid]||undefined;
+			return State;
+		};
+
 
 		// ----------------------------------------------------------------------
 		// State Logging
@@ -384,7 +600,7 @@
 		 * @return {string} hash
 		 */
 		History.getStateHash = function(){
-			return History.createStateHash(History.getState());
+			return History.contractState(History.getState());
 		};
 
 		/**
@@ -416,13 +632,13 @@
 		_History.storeState = function(newState){
 			// Prepare
 			var
-				newStateHash = History.createStateHash(newState),
+				newStateHash = History.contractState(newState),
 				oldState = _History.getStateByUrl(newState.url);
 
 			// Check for Conflict
 			if ( typeof oldState !== 'undefined' ) {
 				// Compare Hashes
-				var oldStateHash = History.createStateHash(oldState);
+				var oldStateHash = History.contractState(oldState);
 				if ( oldStateHash !== newStateHash ) {
 					// We have a conflict
 					_History.duplicateStateUrls[newState.url] = true;
@@ -445,11 +661,11 @@
 		_History.isLastState = function(newState){
 			// Prepare
 			var
-				newStateHash = History.createStateHash(newState),
+				newStateHash = History.contractState(newState),
 				oldStateHash = History.getStateHash();
 
 			// Check
-			var isLast = newStateHash === oldStateHash;
+			var isLast = _History.savedStates.length && newStateHash === oldStateHash;
 
 			// Return isLast
 			return isLast;
@@ -639,7 +855,7 @@
 		_History.discardState = function(discardedState,forwardState,backState){
 			History.debug('History.discardState',this,arguments);
 			// Prepare
-			var discardedStateHash = History.createStateHash(discardedState);
+			var discardedStateHash = History.contractState(discardedState);
 
 			// Create Discard Object
 			var discardObject = {
@@ -685,7 +901,7 @@
 		 */
 		_History.discardedState = function(State){
 			// Prepare
-			var StateHash = History.createStateHash(State);
+			var StateHash = History.contractState(State);
 
 			// Check
 			var discarded = _History.discardedStates[StateHash]||false;
@@ -719,7 +935,7 @@
 		_History.recycleState = function(State){
 			History.debug('History.recycleState',this,arguments);
 			// Prepare
-			var StateHash = History.createStateHash(State);
+			var StateHash = History.contractState(State);
 
 			// Remove from DiscardedStates
 			if ( _History.discardedState(State) ) {
@@ -784,7 +1000,7 @@
 						// Fetch
 						var
 							documentHash = History.getHash(),
-							iframeHash = History.normalizeHash(iframe.contentWindow.document.location.hash);
+							iframeHash = _History.unescapeHash(iframe.contentWindow.document.location.hash);
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -793,7 +1009,7 @@
 
 							// Create a history entry in the iframe
 							if ( iframeHash !== documentHash ) {
-								History.debug('hashchange.checker: iframe hash change', iframeHash, documentHash);
+								History.debug('hashchange.checker: iframe hash change', 'documentHash (new):', documentHash, 'iframeHash (old):', iframeHash);
 
 								// Equalise
 								lastIframeHash = iframeHash = documentHash;
@@ -803,7 +1019,7 @@
 								iframe.contentWindow.document.close();
 
 								// Update the iframe's hash
-								iframe.contentWindow.document.location.hash = documentHash;
+								iframe.contentWindow.document.location.hash = _History.escapeHash(documentHash);
 							}
 
 							// Trigger Hashchange Event
@@ -812,7 +1028,7 @@
 
 						// The iFrame Hash has changed (back button caused)
 						else if ( iframeHash !== lastIframeHash ) {
-							History.debug('hashchange.checker: iframe hash out of sync', iframeHash, documentHash);
+							History.debug('hashchange.checker: iframe hash out of sync', 'iframeHash (new):', iframeHash, 'documentHash (old):', documentHash);
 
 							// Equalise
 							lastIframeHash = iframeHash;
@@ -897,11 +1113,9 @@
 				// Store our location for use in detecting back/forward direction
 				_History.saveHash(currentHash);
 
-				// Create the State
-				try {
-					// State Hash
-					currentState = JSON.parse(currentHash);
-				} catch ( Exception ) {
+				// Expand Hash
+				currentState = History.expandHash(currentHash);
+				if ( !currentState ) {
 					// Traditional Anchor Hash
 					History.debug('_History.onHashChange: traditional anchor');
 					History.Adapter.trigger('anchorchange');
@@ -916,9 +1130,9 @@
 				}
 
 				// Create the state Hash
-				currentStateHash = History.createStateHash(currentState);
+				currentStateHash = History.contractState(currentState);
 
-				if ( true )
+				// Log
 				History.debug('_History.onHashChange: ',
 					'currentStateHash',
 					currentStateHash,
@@ -941,9 +1155,9 @@
 				// Check if we are DiscardedState
 				var discardObject = _History.discardedState(currentState);
 				if ( discardObject ) {
-					History.debug('forwardState:',History.createStateHash(discardObject.forwardState),'backState:',History.createStateHash(discardObject.backState));
+					History.debug('forwardState:',History.contractState(discardObject.forwardState),'backState:',History.contractState(discardObject.backState));
 					// Ignore this state as it has been discarded and go back to the state before it
-					if ( _History.getHashByIndex(-2) === History.createStateHash(discardObject.forwardState) ) {
+					if ( _History.getHashByIndex(-2) === History.contractState(discardObject.forwardState) ) {
 						// We are going backwards
 						History.debug('_History.onHashChange: go backwards');
 						History.back();
@@ -984,7 +1198,7 @@
 				// Fetch the State Object
 				var
 					newState = History.createStateObject(data,title,url),
-					newStateHash = History.createStateHash(newState),
+					newStateHash = History.contractState(newState),
 					oldState = History.getState(),
 					oldStateHash = History.getStateHash(),
 					html4Hash = unescape(History.getHash());
@@ -1009,14 +1223,14 @@
 
 				// Check if we are the same State
 				if ( newStateHash === oldStateHash ) {
-					History.debug('History.pushState: no change');
+					History.debug('History.pushState: no change', newStateHash);
 					return false;
 				}
 
 				// Update HTML4 Hash
 				if ( newStateHash !== html4Hash ) {
-					History.debug('History.pushState: update hash');
-					History.setHash(escape(newStateHash));
+					History.debug('History.pushState: update hash', newStateHash);
+					History.setHash(newStateHash);
 					return false;
 				}
 
@@ -1092,14 +1306,15 @@
 				// Check for a Hash, and handle apporiatly
 				var currentHash	= unescape(History.getHash());
 				if ( currentHash ) {
-					try {
-						var currentHashState = JSON.parse(currentHash);
+					// Expand Hash
+					var currentState = History.expandHash(currentHash);
+					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
-						History.debug('_History.onPopState: state anchor', currentHash, currentHashState);
-						History.replaceState(currentHashState.data, currentHashState.tite, currentHashState.url);
+						History.debug('_History.onPopState: state anchor', currentHash, currentState);
+						History.replaceState(currentState.data, currentState.tite, currentState.url);
 					}
-					catch ( Exception ) {
+					else {
 						// Traditional Anchor
 						History.debug('_History.onPopState: traditional anchor', currentHash);
 						History.Adapter.trigger(window,'anchorchange');
@@ -1181,7 +1396,7 @@
 				// Check if we are the same state
 				if ( _History.isLastState(newState) ) {
 					// There has been no change (just the page's hash has finally propagated)
-					History.debug('_History.onPopState: no change');
+					History.debug('_History.onPopState: no change', newState, _History.savedStates);
 					return false;
 				}
 
@@ -1332,19 +1547,27 @@
 			// Handle
 			if ( index > 0 ) {
 				// Forward
-				for ( var i=0; i<index; ++i ) {
+				for ( var i=1; i<=index; ++i ) {
+					var timeout = History.options.hashChangeCheckerDelay*20*i;
 					setTimeout(
-						History.forward,
-						History.options.hashChangeCheckerDelay*4*i
+						function(){
+							History.debug('History.go: heading forward');
+							History.forward();
+						},
+						timeout
 					);
 				}
 			}
 			else if ( index < 0 ) {
 				// Backward
-				for ( var i=0; i>index; --i ) {
+				for ( var i=-1; i>=index; --i ) {
+					var timeout = History.options.hashChangeCheckerDelay*20*(i*-1);
 					setTimeout(
-						History.back,
-						History.options.hashChangeCheckerDelay*4*(i*-1)
+						function(){
+							History.debug('History.go: heading back');
+							History.back();
+						},
+						timeout
 					);
 				}
 			}
@@ -1355,6 +1578,9 @@
 			// Return true
 			return true;
 		};
+
+
+		History.debug('History.emulated: hashchange['+History.emulated.hashChange+'] pushstate['+History.emulated.pushState+']');
 
 	}; // init
 
