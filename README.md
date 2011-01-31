@@ -110,7 +110,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Changelog
 
-- v1.3.0 - Upcoming (Expected 1st Week February 2011)
+- v1.3.0 - January 31 2011
 	- Support for cleaner HTML4 States
 
 - v1.2.1 - January 30 2011
