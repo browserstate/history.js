@@ -1,14 +1,14 @@
-Welcome to History.js (v1.3.0 - January 31 2011)
+Welcome to History.js (v1.3.1 - February 02 2011)
 ==================
 
-This project is the successor of jQuery History, it aims to:
+This project is the successor of [jQuery History](http://balupton.com/projects/jquery-history), it aims to:
 
-- Support HTML5's State Management
-- Provide a backwards compatible experience for Browsers which do not support HTML5's State Management *- including continued support `replaceState`, and state data storage*
-- Provide a backwards compatible experience for Browsers which do not support HTML4's OnHashChange *- including continued support for traditional anchors*
-- Provide a forwards compatible experience for HTML4 States in HTML5 Browsers *- so urls that contain states in hashes (a HTML4 State) will still work in HTML5 browsers*
-- Follow the original API's as much as possible *- support attaching data and title properties to states and both the `pushState` and `replaceState` methods in all browsers*
-- Support as many javascript frameworks as possible via adapters *- especially jQuery, MooTools and Prototype*
+- Support [HTML5's History/State APIs](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history)
+- Provide a backwards compatible experience for Browsers which do not support HTML5's History APIs
+- Provide a backwards compatible experience for Browsers which do not support HTML4's OnHashChange
+- Provide a forwards compatible experience for HTML4 States in HTML5 Browsers (see usage section for an example)
+- Follow the original API's as much as possible and support attaching data and title properties to states as well as both the `pushState` and `replaceState` methods in **both** HTML4 **and** HTML5 browsers.
+- Support as many javascript frameworks as possible via adapters - especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/) and [Prototype](http://www.prototypejs.org/)
 
 Licensed under the [New BSD License](http://creativecommons.org/licenses/BSD/)
 Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
@@ -16,26 +16,70 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Usage
 
-    (function(window,undefined){
+Working with History.js:
 
-      var History = window.History; // Note: We are using a capital H instead of a lower h
+	(function(window,undefined){
 
-      History.Adapter.bind(window,'statechange',functon(){ // Note: We are using statechange instead of popstate
-        var State = History.getState(); // Note: We are using History.getState() instead of event.state
-        History.log(State.data, State.title, State.url);
-      });
+		var History = window.History; // Note: We are using a capital H instead of a lower h
 
-      History.pushState({state:1}, "State 1", "?state=1");      // logs {state:1}, "State 1", "?state=1"
-      History.pushState({state:2}, "State 2", "?state=2");      // logs {state:2}, "State 2", "?state=2"
-      History.replaceState({state:3}, "State 3", "?state=3");   // logs {state:2}, "State 3", "?state=3"
-      History.back();                                           // logs {state:1}, "State 1", "?state=1"
-      History.back();                                           // logs {}, "Home Page", "?"
-      History.go(2);                                            // logs {state:3}, "State 3", "?state=3"
+		History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+			var State = History.getState(); // Note: We are using History.getState() instead of event.state
+			History.log(State.data, State.title, State.url);
+		});
 
-    })(window);
+		History.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"
+		History.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"
+		History.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"
+		History.pushState(null, null, "?state=4"); // logs {}, '', "?state=4"
+		History.back(); // logs {state:3}, "State 3", "?state=3"
+		History.back(); // logs {state:1}, "State 1", "?state=1"
+		History.back(); // logs {}, "Home Page", "?"
+		History.go(2); // logs {state:3}, "State 3", "?state=3"
+
+	})(window);
+
+So how would the above operations look in a HTML5 Browser?
+
+> www.mysite.com
+> www.mysite.com?state=1
+> www.mysite.com?state=2
+> www.mysite.com?state=3
+> www.mysite.com?state=4
+> www.mysite.com?state=3
+> www.mysite.com?state=1
+> www.mysite.com
+> www.mysite.com?state=3
+>
+> _Note: These urls also work in HTML4 browsers and Search Engines. So no need for the `#!` fragment-identifier that google ["recommends"](http://getsatisfaction.com/balupton/topics/support_googles_recommendation_for_ajax_deeplinking)._
+
+And how would they look in a HTML4 Browser?
+
+> www.mysite.com
+> www.mysite.com#?state=1/uid=1
+> www.mysite.com#?state=2/uid=2
+> www.mysite.com#?state=3/uid=3
+> www.mysite.com#?state=4
+> www.mysite.com#?state=3/uid=3
+> www.mysite.com#?state=1/uid=1
+> www.mysite.com
+> www.mysite.com#?state=3/uid=3
+>
+> _Note: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states their HTML5 equivalents so the user won't even notice :-)_
+
+What's the deal with the UIDs used in the HTML4 States?
+
+- UIDs are used when we utilise a `title` and/or `data` in our state. Adding a UID allows us to associate particular states with data and titles while keeping the urls as simple as possible (don't worry it's all tested, working and a lot smarter than I'm making it out to be).
+- If you aren't utilising `title` or `data` then we don't even include a UID (as there is no need for it) - as seen by State 4 above :-)
+- We also shrink the urls to make sure that the smallest url will be used. For instance we will adjust `http://www.mysite.com/#http://www.mysite.com/projects/History.js` to become `http://www.mysite.com/#/projects/History.js` automatically. (again tested, working, and smarter).
+- It works with domains, subdomains, subdirectories, whatever - doesn't matter where you put it. It's smart.
+
+Is there a working demo?
+
+> - Sure is, give it a download and navigate to the demo directory in your browser :-)
+> - If you are after something a bit more adventurous than a end-user demo, check out the tests.php file - it'll rock your world and show all the vast use cases that History.js supports.
 
 
-## Installation
+## Download & Installation
 
 1. Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/History.js/tarball/master) or [zip](https://github.com/balupton/History.js/zipball/master)
 
@@ -54,32 +98,23 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 3. Include the Adapter for your Framework:
 
-	- jQuery
+	- [jQuery](http://jquery.com/)
 
 			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.min.js"></script>
 
-	- Mootools
+	- [Mootools](http://mootools.net/)
 
 			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.min.js"></script>
 
-	- Prototype
+	- [Prototype](http://www.prototypejs.org/)
 
 			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.min.js"></script>
+
+  - _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
 4. Include History.js
 
 		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.min.js"></script>
-
-
-## Adapters
-
-### Supported
-
-- jQuery
-- Prototype
-- MooTools
-
-> If your favourite framework is not included? Then just write an adapter for it, and send it to us :-) Easy peasy.
 
 
 ## Browsers
@@ -94,6 +129,27 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 - IE 6,7,8
 
 
+## Exposed API
+
+### Functions
+
+- `History.pushState(data,title,url)` <br/> Pushes a new state to the browser, `data` and `title` can be null
+- `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser, `data` and `title` can be null
+- `History.getState()` <br/> Get's the current state of the browser, returns an object with `data`, `title` and `url`
+- `History.getHash()` <br/> Get's the current hash of the browser
+- `History.Adapter.bind(element,callback)` <br/> A framework independent event binder, you may either use this or your framework's native event binder.
+- `History.back()` <br/> Go back once through the history (same as hitting the browser's back button)
+- `History.forward()` <br/> Go forward once through the history (same as hitting the browser's forward button)
+- `History.go(X)` <br/> If X is negative go back through history X times, if X is positive go forwards through history X times
+- `History.log(...)` <br/> Logs messages to the console, the log element, and fallbacks to alert if neither of those two exist
+- `History.debug(...)` <br/> Same as `History.log` but only runs if `History.debug.enable === true`
+
+### Events
+
+- `window.onstatechange` <br/> Fired when the state of the page changes (does not include hashchanges)
+- `window.onanchorchange` <br/> Fired when the anchor of the page changes (does not include state hashes)
+
+
 ## Notes on Compatibility
 
 - State data will always contain the State's title and url at: `data.title` and `data.url`
@@ -103,12 +159,17 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 - History.js fixes a bug in Google Chrome where traversing back through the history to the home page does not return the correct state data.
 - Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
 	- As such, to ensure correct compatability between HTML5 and HTML4 browsers, we now have two new events:
-		- onstatechange: this is the same as onpopstate except does not fire for traditional anchors
-		- onanchorchange: this is the same as onhashchange but only fires for traditional anchors and not states
+		- `window.onstatechange`: this is the same as onpopstate except does not fire for traditional anchors
+		- `window.onanchorchange`: this is the same as onhashchange except does not fire for states
 	- To fetch the anchor/hash, you may use `History.getHash()`.
 
 
 ## Changelog
+
+- v1.3.1 - February 02 2011
+	- Better documentation
+	- New demo
+	- `History.log` will now `JSON.stringify` objects when outputting to the `log` element
 
 - v1.3.0 - January 31 2011
 	- Support for cleaner HTML4 States
@@ -135,5 +196,4 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Todo for Upcoming Releases
 
-- Add a proper demo
-- Add a compilation test to ensure `.debug = false` and no `History.log` calls exist.
+- Minor: Add a compilation test to ensure `.debug = false` and no `History.log` calls exist.

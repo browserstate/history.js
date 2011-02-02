@@ -1,21 +1,8 @@
-<?
-
-# Define our Pages
-$pages = array(1,2,3);
-
-# Page Get
-$page = empty($_GET['page']) ? $pages[0] : $_GET['page'];
-
-# Page Secure
-if ( !in_array($page, $pages) ) throw new Exception('Hacker!');
-
-# Page Path
-$page_path = dirname(__FILE__).DIRECTORY_SEPARATOR.'/pages/'.$page.'.php';
-
-# Adapter
-$adapter = 'jquery';
-
-?><!DOCTYPE HTML>
+<?php
+	# Javascript Framework Adapter
+	$adapter = 'jquery'; // jquery, prototype, mootools
+?>
+<!DOCTYPE HTML>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -23,7 +10,8 @@ $adapter = 'jquery';
 		History.js &lt; BrowserState Suite
 	</title>
 </head>
-<body>
+<body style="padding-bottom:40px">
+	<!-- Scripts -->
 	<script type="text/javascript">
 		if ( typeof JSON === 'undefined' ) {
 			var
@@ -31,39 +19,91 @@ $adapter = 'jquery';
 				scriptEl = document.createElement('script');
 			scriptEl.type = 'text/javascript';
 			scriptEl.src = url;
-			document.body.appendChild(scriptEl);
+			document.body.appendChild(scriptEl,document.body.firstChild);
 		}
 	</script>
-	<script type="text/javascript" src="./scripts/jquery.js"></script>
-	<script type="text/javascript">jQuery.noConflict()</script>
-
 	<? switch ( $adapter ) :
-		case 'jquery': ?>
-			<script type="text/javascript" src="../scripts/uncompressed/history.adapter.jquery.js"></script>
-			<? break;
-
-		case 'dojo':
+		case 'jquery':
 		case 'prototype':
 		case 'mootools': ?>
 			<script type="text/javascript" src="./scripts/<?=$adapter?>.js"></script>
 			<script type="text/javascript" src="../scripts/uncompressed/history.adapter.<?=$adapter?>.js"></script>
 			<? break;
+		default:
+			throw new Exception('That adapter is not supported!');
 	endswitch; ?>
-
 	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
-	<script type="text/javascript" src="./scripts/demo.js"></script>
 
+	<!-- HTML -->
 	<div id="wrap">
-		<ul id="menu">
-			<? foreach ( $pages as $page ) : ?>
-				<li>
-					<a href="?page=<?=$page?>"><?=ucwords($page)?></a>
-				</li>
-			<? endforeach; ?>
+		<!-- Intro -->
+		<h1><a href="https://github.com/balupton/History.js">History.js</a> by <a href="http://balupton.com">Benjamin Lupton</a></h1>
+		<p>History.js gracefully supports the <a href="https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history">HTML5 History/State APIs</a> (pushState, replaceState, onPopState) in all browsers. Including continued support for data, titles, replaceState. Supports <a href="http://jquery.com/">jQuery</a>, <a href="http://mootools.net">MooTools</a> and <a href="http://prototypejs.org">Prototype</a>. For HTML5 browsers this means that you can modify the URL directly, without needing to use hashes anymore. For HTML4 browsers it will revert back to using the old onhashchange functionality.</p>
+
+		<!-- Textarea for Logging -->
+		<textarea id="log" style="width:100%;height:400px"></textarea>
+
+		<!-- Note -->
+		<p>Click through the buttons in order and you'll get the results demonstrated in the <a href="../README.md">README.md</a> file.</p>
+
+		<!-- Buttons -->
+		<ul id="buttons">
 		</ul>
-		<div id="content">
-			<? require_once($page_path) ?>
+
+		<!-- Subscribe to Updates -->
+		<h3 style="margin-top:30px">Subscribe to Updates</h3>
+		<p>You'll be the first to know when new releases come out. Yes this form actually works, it just isn't styled yet to keep things simple.</p>
+		<form action="http://balupton.createsend.com/t/r/s/phujuu/" method="post" id="subForm">
+		<div>
+		<label for="name">Name:</label><input type="text" name="cm-name" id="name" /><br />
+		<label for="phujuu-phujuu">Email:</label><input type="text" name="cm-phujuu-phujuu" id="phujuu-phujuu" /><br />
+		<label for="Website">Website:</label><input type="text" name="cm-f-kjqtu" id="Website" /><br />
+		<input type="submit" value="Subscribe" />
 		</div>
+		</form>
+
+		<!-- Our Script -->
+		<script type="text/javascript">
+			(function(window,undefined){
+
+				// Establish Variables
+				var
+					History = window.History, // Note: We are using a capital H instead of a lower h
+					;
+
+				// Bind to State Change
+				History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+					// Log the State
+					var State = History.getState(); // Note: We are using History.getState() instead of event.state
+					History.log('statechange:', State.data, State.title, State.url);
+				});
+
+				// Prepare Buttons
+				var
+					buttons = document.getElementById('buttons'),
+					scripts = [
+						'History.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"',
+						'History.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"',
+						'History.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"',
+						'History.pushState(null, null, "?state=4"); // logs {}, "", "?state=4"',
+						'History.back(); // logs {state:3}, "State 3", "?state=3"',
+						'History.back(); // logs {state:1}, "State 1", "?state=1"',
+						'History.back(); // logs {}, "The page you started at", "?"',
+						'History.go(2); // logs {state:3}, "State 3", "?state=3" - Note: this will have a delay as there is some emulation happening here to ensure compatibility between all browsers. Real world use won\'t incur this delay.'
+					],
+					buttonsHTML = ''
+					;
+
+				// Add Buttons
+				for ( var i=0,n=scripts.length; i<n; ++i ) {
+					var _script = scripts[i];
+					buttonsHTML +=
+						'<li><button onclick=\'javascript:'+_script+'\'>'+_script+'</button></li>';
+				}
+				buttons.innerHTML = buttonsHTML;
+
+			})(window);
+		</script>
 	</div>
 
 </body>

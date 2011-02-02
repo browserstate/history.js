@@ -12,6 +12,7 @@ $adapter = 'jquery';
 	</title>
 </head>
 <body>
+	<!-- Scripts -->
 	<script type="text/javascript">
 		if ( typeof JSON === 'undefined' ) {
 			var
@@ -22,7 +23,6 @@ $adapter = 'jquery';
 			document.body.appendChild(scriptEl,document.body.firstChild);
 		}
 	</script>
-
 	<? switch ( $adapter ) :
 		case 'jquery':
 		case 'prototype':
@@ -30,10 +30,12 @@ $adapter = 'jquery';
 			<script type="text/javascript" src="./scripts/<?=$adapter?>.js"></script>
 			<script type="text/javascript" src="../scripts/uncompressed/history.adapter.<?=$adapter?>.js"></script>
 			<? break;
+		default:
+			throw new Exception('That adapter is not supported!');
 	endswitch; ?>
-
 	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
 
+	<!-- HTML -->
 	<textarea id="log" style="width:100%;height:500px"></textarea>
 	<button onclick="javascript:History.back()">back</button>
 	<button onclick="javascript:History.forward()">forward</button>
@@ -49,6 +51,7 @@ $adapter = 'jquery';
 		(function(window,undefined){
 
 			var History = window.History;
+			History.debug.enable = true;
 
 			var States = {
 				// Home

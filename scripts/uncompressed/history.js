@@ -11,6 +11,7 @@
 
 	// Localise Globals
 	var
+		console = window.console||undefined, // Prevent a JSLint complain
 		document = window.document, // Make sure we are using the correct document
 		_History = {}, // Private History Object
 		History = window.History, // Public History Object
@@ -51,7 +52,7 @@
 				History.log.apply(History,arguments);
 			}
 		};
-		History.debug.enable = false;
+		History.debug.enable = true;
 
 		/**
 		 * History.log(message,...)
@@ -59,7 +60,12 @@
 		 */
 		History.log = function(){
 			// Prepare
-			var consoleExists = typeof console !== 'undefined';
+			var
+				consoleExists = (typeof console !== 'undefined'),
+				textarea = document.getElementById('log'),
+				message = ("\n"+arguments[0]+"\n"),
+				i
+				;
 
 			// Write to Console
 			if ( consoleExists ) {
@@ -67,20 +73,32 @@
 			}
 
 			// Write to log
-			var message = "\n"+arguments[0]+"\n";
-			for ( var i=1,n=arguments.length; i<n; ++i ) {
-				message += "\n"+arguments[i]+"\n";
+			for ( i=1,n=arguments.length; i<n; ++i ) {
+				var arg = arguments[i];
+				if ( typeof arg === 'object' && typeof JSON !== 'undefined' ) {
+					try {
+						arg = JSON.stringify(arg);
+					}
+					catch ( Exception ) {
+						// Recursive Object
+					}
+				}
+				message += "\n"+arg+"\n";
 			}
-			var textarea = document.getElementById('log');
+
+			// Textarea
 			if ( textarea ) {
 				textarea.value += message+"\n-----\n";
-			} else if ( !consoleExists ) {
+				textarea.scrollTop = textarea.scrollHeight - textarea.clientHeight;
+			}
+			// No Textarea, No Console
+			else if ( !consoleExists ) {
 				alert(message);
 			}
 
 			// Return true
 			return true;
-		}
+		};
 
 		// ----------------------------------------------------------------------
 		// Emulated Status
@@ -94,7 +112,7 @@
 		 * @author James Padolsey <https://gist.github.com/527683>
 		 */
 		_History.getInternetExplorerMajorVersion = function(){
-			return _History.getInternetExplorerMajorVersion.cached =
+			var result = _History.getInternetExplorerMajorVersion.cached =
 					(typeof _History.getInternetExplorerMajorVersion.cached !== 'undefined')
 				?	_History.getInternetExplorerMajorVersion.cached
 				:	(function(){
@@ -109,6 +127,7 @@
 						return v > 4 ? v : undef;
 					})()
 				;
+			return result;
 		};
 
 		/**
@@ -119,11 +138,12 @@
 		 * @author Benjamin Lupton <contact@balupton.com>
 		 */
 		_History.isInternetExplorer = function(){
-			return _History.isInternetExplorer.cached =
+			var result = _History.isInternetExplorer.cached =
 					(typeof _History.isInternetExplorer.cached !== 'undefined')
 				?	_History.isInternetExplorer.cached
 				:	(_History.getInternetExplorerMajorVersion() !== 0)
 				;
+			return result;
 		};
 
 		/**
@@ -285,7 +305,7 @@
 				exists = typeof el !== 'undefined';
 
 			return exists;
-		}
+		};
 
 		// ----------------------------------------------------------------------
 		// State Object Helpers
@@ -1542,7 +1562,7 @@
 		};
 
 		History.go = function(index){
-			History.debug('History.go: called with index ['+index+']');
+			History.debug('History.go: called with index ['+index+']', History.getHash());
 
 			// Handle
 			if ( index > 0 ) {
@@ -1551,7 +1571,7 @@
 					var timeout = History.options.hashChangeCheckerDelay*20*i;
 					setTimeout(
 						function(){
-							History.debug('History.go: heading forward');
+							History.debug('History.go: heading forward', History.getHash());
 							History.forward();
 						},
 						timeout
@@ -1564,7 +1584,7 @@
 					var timeout = History.options.hashChangeCheckerDelay*20*(i*-1);
 					setTimeout(
 						function(){
-							History.debug('History.go: heading back');
+							History.debug('History.go: heading back', History.getHash());
 							History.back();
 						},
 						timeout
