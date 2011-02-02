@@ -40,29 +40,29 @@ Working with History.js:
 
 So how would the above operations look in a HTML5 Browser?
 
-> www.mysite.com
-> www.mysite.com?state=1
-> www.mysite.com?state=2
-> www.mysite.com?state=3
-> www.mysite.com?state=4
-> www.mysite.com?state=3
-> www.mysite.com?state=1
-> www.mysite.com
-> www.mysite.com?state=3
+> 1. www.mysite.com
+> 1. www.mysite.com?state=1
+> 1. www.mysite.com?state=2
+> 1. www.mysite.com?state=3
+> 1. www.mysite.com?state=4
+> 1. www.mysite.com?state=3
+> 1. www.mysite.com?state=1
+> 1. www.mysite.com
+> 1. www.mysite.com?state=3
 >
 > _Note: These urls also work in HTML4 browsers and Search Engines. So no need for the `#!` fragment-identifier that google ["recommends"](http://getsatisfaction.com/balupton/topics/support_googles_recommendation_for_ajax_deeplinking)._
 
 And how would they look in a HTML4 Browser?
 
-> www.mysite.com
-> www.mysite.com#?state=1/uid=1
-> www.mysite.com#?state=2/uid=2
-> www.mysite.com#?state=3/uid=3
-> www.mysite.com#?state=4
-> www.mysite.com#?state=3/uid=3
-> www.mysite.com#?state=1/uid=1
-> www.mysite.com
-> www.mysite.com#?state=3/uid=3
+> 1. www.mysite.com
+> 1. www.mysite.com#?state=1/uid=1
+> 1. www.mysite.com#?state=2/uid=2
+> 1. www.mysite.com#?state=3/uid=3
+> 1. www.mysite.com#?state=4
+> 1. www.mysite.com#?state=3/uid=3
+> 1. www.mysite.com#?state=1/uid=1
+> 1. www.mysite.com
+> 1. www.mysite.com#?state=3/uid=3
 >
 > _Note: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states their HTML5 equivalents so the user won't even notice :-)_
 
