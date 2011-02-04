@@ -1,5 +1,6 @@
-Welcome to History.js (v1.3.1 - February 02 2011)
+Welcome to History.js (v1.4 - Unreleased)
 ==================
+
 
 This project is the successor of [jQuery History](http://balupton.com/projects/jquery-history), it aims to:
 
@@ -166,10 +167,8 @@ Is there a working demo?
 
 ## Changelog
 
-- v1.3.1 - February 02 2011
-	- Better documentation
-	- New demo
-	- `History.log` will now `JSON.stringify` objects when outputting to the `log` element
+- v1.3.1 - February 04 2011
+	- Improved Documentation
 
 - v1.3.0 - January 31 2011
 	- Support for cleaner HTML4 States
