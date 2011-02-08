@@ -77,8 +77,8 @@ What's the deal with the UIDs used in the HTML4 States?
 
 Is there a working demo?
 
-> - Sure is, give it a download and navigate to the demo directory in your browser :-)
-> - If you are after something a bit more adventurous than a end-user demo, check out the tests.php file - it'll rock your world and show all the vast use cases that History.js supports.
+- Sure is, give it a download and navigate to the demo directory in your browser :-)
+- If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports.
 
 
 ## Download & Installation
@@ -179,6 +179,7 @@ Is there a working demo?
 	- Corrected Safari 5 Support
 	- Now uses queues instead of timeouts
 		- This means the API works exactly as expected, no more need to wrap calls in timeouts
+	- Included a Subscribe Form in the Demo for Version Updates via Email
 
 - v1.3.1 - February 04 2011
 	- Improved Documentation
@@ -208,4 +209,5 @@ Is there a working demo?
 
 ## Todo for Upcoming Releases
 
+- Normal: Add `History.queue`
 - Minor: Add a compilation test to ensure `.debug = false` and no `History.log` calls exist.
