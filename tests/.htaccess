@@ -9,4 +9,4 @@ RewriteRule ([a-z]+)/?$ products/history.js/tests/index.php?adapter=$1 [NC,L,QSA
 # Default Adapter
 RewriteCond %{REQUEST_FILENAME} !.js$
 RewriteCond %{QUERY_STRING} ^$
-RewriteRule ^(.*)$ products/history.js/tests/jquery/ [R,NC,L]
+RewriteRule ^(.*)$ products/history.js/tests/jquery [R,NC,L]

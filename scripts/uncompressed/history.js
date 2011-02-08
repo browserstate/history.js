@@ -37,7 +37,12 @@
 			 * History.options.hashChangeCheckerDelay
 			 * How long should the interval be before hashchange checks
 			 */
-			hashChangeCheckerDelay: 100
+			hashChangeCheckerDelay: 100,
+			/**
+			 * History.options.busyDelay
+			 * How long should we wait between busy events
+			 */
+			busyDelay: 250
 		};
 
 		// ----------------------------------------------------------------------
@@ -69,7 +74,12 @@
 
 			// Write to Console
 			if ( consoleExists ) {
-				console.log.apply(console,[arguments]);
+				if ( typeof console.debug !== 'undefined' ) {
+					console.debug.apply(console,[arguments]);
+				}
+				else {
+					console.log.apply(console,[arguments]);
+				}
 			}
 
 			// Write to log
@@ -1070,7 +1080,7 @@
 							lastIframeHash = iframeHash;
 
 							// Update the Hash
-							History.setHash(iframeHash,1);
+							History.setHash(iframeHash,false);
 						}
 
 						// Reset Running
@@ -1143,6 +1153,7 @@
 				if ( _History.isLastHash(currentHash) ) {
 					// There has been no change (just the page's hash has finally propagated)
 					History.debug('_History.onHashChange: no change');
+					History.busy(false);
 					return false;
 				}
 
@@ -1155,6 +1166,7 @@
 					// Traditional Anchor Hash
 					History.debug('_History.onHashChange: traditional anchor');
 					History.Adapter.trigger(window,'anchorchange');
+					History.busy(false);
 					return false;
 				}
 
@@ -1162,6 +1174,7 @@
 				if ( _History.isLastState(currentState) ) {
 					// There has been no change (just the page's hash has finally propagated)
 					History.debug('_History.onHashChange: no change');
+					History.busy(false);
 					return false;
 				}
 
@@ -1196,19 +1209,19 @@
 					if ( _History.getHashByIndex(-2) === History.contractState(discardObject.forwardState) ) {
 						// We are going backwards
 						History.debug('_History.onHashChange: go backwards');
-						History.back();
+						History.back(false);
 					} else {
 						// We are going forwards
 						History.debug('_History.onHashChange: go forwards');
-						History.forward();
+						History.forward(false);
 					}
+					History.busy(false);
 					return false;
 				}
 
 				// Push the new HTML5 State
 				History.debug('_History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,currentState.url,1);
-				History.busy(false);
+				History.pushState(currentState.data,currentState.title,currentState.url,false);
 
 				// Return true
 				return true;
@@ -1224,7 +1237,7 @@
 			 * @param {string} url
 			 * @return {true}
 			 */
-			History.pushState = function(data,title,url){
+			History.pushState = function(data,title,url,queue){
 				History.debug('History.pushState',this,arguments);
 
 				// Check the State
@@ -1265,7 +1278,7 @@
 				// Force update of the title
 				if ( document.title !== newState.title ) {
 					document.title = newState.title
-					document.getElementByTag('title')[0].innerHTML = newState.title;
+					document.getElementsByTagName('title')[0].innerHTML = newState.title;
 				}
 
 				History.debug(
@@ -1278,15 +1291,13 @@
 				// Check if we are the same State
 				if ( newStateHash === oldStateHash ) {
 					History.debug('History.pushState: no change', newStateHash);
-					History.busy(false);
 					return false;
 				}
 
 				// Update HTML4 Hash
 				if ( newStateHash !== html4Hash ) {
 					History.debug('History.pushState: update hash', newStateHash);
-					History.setHash(newStateHash,1);
-					History.busy(false);
+					History.setHash(newStateHash,false);
 					return false;
 				}
 
@@ -1296,9 +1307,7 @@
 				// Fire HTML5 Event
 				History.debug('History.pushState: trigger popstate');
 				History.Adapter.trigger(window,'statechange');
-
-				// Follow Queue
-				_History.popQueue();
+				History.busy(false);
 
 				// Return true
 				return true;
@@ -1333,6 +1342,9 @@
 					return false;
 				}
 
+				// Make Busy
+				History.busy(true);
+
 				// Fetch the State Objects
 				var
 					newState 				= History.createStateObject(data,title,url),
@@ -1343,7 +1355,7 @@
 				_History.discardState(oldState,newState,previousState);
 
 				// Alias to PushState
-				History.pushState(newState.data,newState.title,newState.url,1);
+				History.pushState(newState.data,newState.title,newState.url,false);
 
 				// Return true
 				return true;
@@ -1384,16 +1396,16 @@
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
 						History.debug('_History.onPopState: state anchor', currentHash, currentState);
-						History.replaceState(currentState.data, currentState.tite, currentState.url, 1);
+						History.replaceState(currentState.data, currentState.tite, currentState.url, false);
 					}
 					else {
 						// Traditional Anchor
 						History.debug('_History.onPopState: traditional anchor', currentHash);
 						History.Adapter.trigger(window,'anchorchange');
+						History.busy(false);
 					}
 
 					// We don't care for hashes
-					History.busy(false);
 					return false;
 				}
 
@@ -1604,7 +1616,7 @@
 		 * The list of queues to use
 		 * First In, First Out
 		 */
-		History.queues = [[],[]];
+		History.queues = [];
 
 		/**
 		 * History.busy(value)
@@ -1612,6 +1624,8 @@
 		 * @return {boolean} busy
 		 */
 		History.busy = function(value){
+			History.debug('History.busy: called', arguments, History.busy.flag, History.queues);
+
 			// Apply
 			if ( typeof value !== 'undefined' ) {
 				History.busy.flag = value;
@@ -1624,13 +1638,19 @@
 			// Queue
 			if ( !History.busy.flag ) {
 				// Execute the next item in the queue
-				for ( var i=History.queues.length-1; i >= 0; --i ) {
-					var queue = History.queues[i];
-					if ( queue.length === 0 ) continue;
-					var item = queue.shift();
-					History.debug('History.busy: firing', item);
-					item.callback.apply(item.scope||History,item.args);
-				}
+				clearTimeout(History.busy.timeout);
+				var fireNext = function(){
+					if ( History.busy.flag ) return;
+					for ( var i=History.queues.length-1; i >= 0; --i ) {
+						var queue = History.queues[i];
+						if ( queue.length === 0 ) continue;
+						var item = queue.shift();
+						History.debug('History.busy: firing', item);
+						item.callback.apply(item.scope||History,item.args);
+						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
+					}
+				};
+				History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
 			}
 
 			// Return
@@ -1659,7 +1679,7 @@
 		// HTML4 State Aliases
 
 		History.back = function(queue){
-			History.debug('History.back: called');
+			History.debug('History.back: called', arguments);
 
 			// Handle Queueing
 			if ( queue !== false && History.busy() ) {
@@ -1677,29 +1697,12 @@
 			// Make Busy + Continue
 			History.busy(true);
 
-			// Fix a bug in IE6
-			if ( History.emulated.hashChange && _History.isInternetExplorer() ) {
-				// Prepare
-				var currentHash = History.getHash();
-
-				// Apply Check
-				setTimeout(function(){
-					var newHash = History.getHash();
-					if ( newHash === currentHash ) {
-						// No change occurred, try again
-						History.debug('History.back: trying again');
-						return History.back(queue);
-					}
-					return true;
-				},History.options.hashChangeCheckerDelay*2);
-			}
-
 			// Go back
-			return history.go(-1);
+			history.go(-1);
 		};
 
 		History.forward = function(queue){
-			History.debug('History.forward: called');
+			History.debug('History.forward: called', arguments);
 
 			// Handle Queueing
 			if ( queue !== false && History.busy() ) {
@@ -1717,29 +1720,12 @@
 			// Make Busy + Continue
 			History.busy(true);
 
-			// Fix a bug in IE6
-			if ( History.emulated.hashChange && _History.isInternetExplorer() ) {
-				// Prepare
-				var currentHash = History.getHash();
-
-				// Apply Check
-				setTimeout(function(){
-					var newHash = History.getHash();
-					if ( newHash === currentHash ) {
-						// No change occurred, try again
-						History.debug('History.forward: trying again');
-						return History.forward(queue);
-					}
-					return true;
-				},History.options.hashChangeCheckerDelay*2);
-			}
-
 			// Go forward
-			return history.go(1);
+			history.go(1);
 		};
 
 		History.go = function(index,queue){
-			History.debug('History.go: called with index ['+index+']', History.getHash());
+			History.debug('History.go: called', arguments);
 
 			// Handle
 			if ( index > 0 ) {
