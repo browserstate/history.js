@@ -26,7 +26,7 @@
 		case 'jquery':
 		case 'prototype':
 		case 'mootools': ?>
-			<script type="text/javascript" src="./scripts/<?=$adapter?>.js"></script>
+			<script type="text/javascript" src="../vendor/<?=$adapter?>.js"></script>
 			<script type="text/javascript" src="../scripts/uncompressed/history.adapter.<?=$adapter?>.js"></script>
 			<? break;
 		default:
