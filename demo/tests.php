@@ -177,7 +177,7 @@ $adapter = 'jquery';
 						return false;
 					}
 					test()
-				}, addedTests*History.options.hashChangeCheckerDelay*5);
+				}, addedTests*History.options.hashChangeCheckerDelay*1);
 			};
 
 			History.Adapter.onDomLoad(function(){
@@ -221,6 +221,8 @@ $adapter = 'jquery';
 					// Test 10 / State 3 (1 -> 2 -> 3)
 					History.go(2);
 				});
+
+				return;
 
 				addTest(function(){
 					// Test 11 / State 4 (3 -> 4)

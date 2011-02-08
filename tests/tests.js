@@ -47,19 +47,23 @@ History.Adapter.bind(window,'statechange',function(){
 	var
 		stateIndex = stateOrder[currentTest],
 		expectedState = History.expandState(States[stateIndex]),
-		actualState = History.getState(),
-		expectedStateStr = JSON.stringify(expectedState),
-		actualStateStr = JSON.stringify(actualState);
+		actualState = History.getState();
 
 	++currentTest;
 
-	test('Test '+currentTest,function(){
-		same(actualState,expectedState,'State '+stateIndex);
+	var
+		testName = 'Test '+currentTest,
+		stateName = 'State '+stateIndex;
+
+	test(testName,function(){
+		var result = same(actualState,expectedState,stateName);
+		console.log(testName, stateName);
 	});
 });
 
 
 History.Adapter.onDomLoad(function(){
+	setTimeout(function(){
 
 	// Test 2 / State 1 (0 -> 1)
 	// Tests HTML4 -> HTML5 Graceful Upgrade
@@ -77,11 +81,15 @@ History.Adapter.onDomLoad(function(){
 	// Test 6 / State 1 (4 -> 3 -> 2 -> 1)
 	History.go(-2);
 
+return;
+
 	// Test 7 / State 0 (1 -> 0)
 	// Tests Default State
+	console.log('Fired: Test 7 / State 0 (1 -> 0)');
 	History.back();
 
 	// Test 8 / State 3 (0 -> 1 -> 2 -> 3)
+	console.log('Fired: Test 8 / State 3');
 	History.go(2);
 
 	// Test 9 / State 4 (3 -> 4)
@@ -102,4 +110,5 @@ History.Adapter.onDomLoad(function(){
 	// Test 12 / State 0 (1 -> 0)
 	History.back();
 
+	},1000); // wait for test one to complete
 });

@@ -68,7 +68,7 @@
 
 				// Establish Variables
 				var
-					History = window.History, // Note: We are using a capital H instead of a lower h
+					History = window.History // Note: We are using a capital H instead of a lower h
 					;
 
 				// Bind to State Change
@@ -89,7 +89,7 @@
 						'History.back(); // logs {state:3}, "State 3", "?state=3"',
 						'History.back(); // logs {state:1}, "State 1", "?state=1"',
 						'History.back(); // logs {}, "The page you started at", "?"',
-						'History.go(2); // logs {state:3}, "State 3", "?state=3" - Note: this will have a delay as there is some emulation happening here to ensure compatibility between all browsers. Real world use won\'t incur this delay.'
+						'History.go(2); // logs {state:3}, "State 3", "?state=3"'
 					],
 					buttonsHTML = ''
 					;
