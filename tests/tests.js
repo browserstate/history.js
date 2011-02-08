@@ -57,7 +57,7 @@ History.Adapter.bind(window,'statechange',function(){
 
 	test(testName,function(){
 		var result = same(actualState,expectedState,stateName);
-		console.log('Completed: '+testName +' / '+ stateName);
+		History.log('Completed: '+testName +' / '+ stateName);
 	});
 });
 
@@ -67,11 +67,11 @@ var addLog = function(){
 	if ( History.busy() ) {
 		History.pushQueue({
 			callback: function(){
-				console.log.apply(console,args);
+				History.log.apply(History,args);
 			}
 		});
 	} else {
-		console.log.apply(console,args);
+		History.log.apply(History,args);
 	}
 };
 
