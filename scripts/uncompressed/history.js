@@ -74,11 +74,14 @@
 
 			// Write to Console
 			if ( consoleExists ) {
+				var
+					args = Array.prototype.slice.call(arguments),
+					message = args.shift();
 				if ( typeof console.debug !== 'undefined' ) {
-					console.debug.apply(console,[arguments]);
+					console.debug.apply(console,[message,args]);
 				}
 				else {
-					console.log.apply(console,[arguments]);
+					console.log.apply(console,[message,args]);
 				}
 			}
 
@@ -161,7 +164,7 @@
 		 * Which features require emulating?
 		 */
 		History.emulated = {
-			pushState: !Boolean(window.history && window.history.pushState && window.history.replaceState),
+			pushState: !Boolean(window.history && window.history.pushState && window.history.replaceState && navigator.vendor !== 'Apple Computer, Inc.'),
 			hashChange: Boolean(
 				!('onhashchange' in window || 'onhashchange' in document)
 				||
@@ -994,6 +997,182 @@
 
 
 		// ----------------------------------------------------------------------
+		// Queueing
+
+		/**
+		 * History.queues
+		 * The list of queues to use
+		 * First In, First Out
+		 */
+		History.queues = [];
+
+		/**
+		 * History.busy(value)
+		 * @param {boolean} value [optional]
+		 * @return {boolean} busy
+		 */
+		History.busy = function(value){
+			History.debug('History.busy: called', arguments, History.busy.flag||undefined, History.queues);
+
+			// Apply
+			if ( typeof value !== 'undefined' ) {
+				History.busy.flag = value;
+			}
+			// Default
+			else if ( typeof History.busy.flag === 'undefined' ) {
+				History.busy.flag = false;
+			}
+
+			// Queue
+			if ( !History.busy.flag ) {
+				// Execute the next item in the queue
+				clearTimeout(History.busy.timeout);
+				var fireNext = function(){
+					if ( History.busy.flag ) return;
+					for ( var i=History.queues.length-1; i >= 0; --i ) {
+						var queue = History.queues[i];
+						if ( queue.length === 0 ) continue;
+						var item = queue.shift();
+						History.debug('History.busy: firing', item);
+						item.callback.apply(item.scope||History,item.args||[]);
+						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
+					}
+				};
+				History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
+			}
+
+			// Return
+			return History.busy.flag;
+		}
+
+		/**
+		 * History.pushQueue(callback,args)
+		 * Add an item to the queue
+		 * @param {Object} item [scope,callback,args,queue]
+		 */
+		History.pushQueue = function(item){
+			History.debug('History.pushQueue: called', arguments);
+
+			// Prepare the queue
+			History.queues[item.queue||0] = History.queues[item.queue||0]||[];
+
+			// Add to the queue
+			History.queues[item.queue||0].push(item);
+
+			// End pushQueue closure
+			return true;
+		};
+
+		// ----------------------------------------------------------------------
+		// HTML4 State Aliases
+
+		History.back = function(queue){
+			History.debug('History.back: called', arguments);
+
+			// Handle Queueing
+			if ( queue !== false && History.busy() ) {
+				// Wait + Push to Queue
+				History.debug('History.back: we must wait', arguments);
+				History.pushQueue({
+					scope: History,
+					callback: History.back,
+					args: arguments,
+					queue: queue
+				});
+				return false;
+			}
+
+			// Make Busy + Continue
+			History.busy(true);
+
+			// Fix a bug in IE6,IE7
+			if ( History.emulated.hashChange && _History.isInternetExplorer() ) {
+				// Prepare
+				var currentHash = History.getHash();
+
+				// Apply Check
+				setTimeout(function(){
+					var newHash = History.getHash();
+					if ( newHash === currentHash ) {
+						// No change occurred, try again
+						History.debug('History.back: trying again');
+						return History.back(false);
+					}
+					return true;
+				},History.options.hashChangeCheckerDelay*5);
+			}
+
+			// Go back
+			history.go(-1);
+		};
+
+		History.forward = function(queue){
+			History.debug('History.forward: called', arguments);
+
+			// Handle Queueing
+			if ( queue !== false && History.busy() ) {
+				// Wait + Push to Queue
+				History.debug('History.forward: we must wait', arguments);
+				History.pushQueue({
+					scope: History,
+					callback: History.forward,
+					args: arguments,
+					queue: queue
+				});
+				return false;
+			}
+
+			// Make Busy + Continue
+			History.busy(true);
+
+			// Fix a bug in IE6,IE7
+			if ( History.emulated.hashChange && _History.isInternetExplorer() ) {
+				// Prepare
+				var currentHash = History.getHash();
+
+				// Apply Check
+				setTimeout(function(){
+					var newHash = History.getHash();
+					if ( newHash === currentHash ) {
+						// No change occurred, try again
+						History.debug('History.forward: trying again');
+						return History.forward(false);
+					}
+					return true;
+				},History.options.hashChangeCheckerDelay*5);
+			}
+
+			// Go forward
+			history.go(1);
+		};
+
+		History.go = function(index,queue){
+			History.debug('History.go: called', arguments);
+
+			// Handle
+			if ( index > 0 ) {
+				// Forward
+				for ( var i=1; i<=index; ++i ) {
+					History.forward(queue);
+				}
+			}
+			else if ( index < 0 ) {
+				// Backward
+				for ( var i=-1; i>=index; --i ) {
+					History.back(queue);
+				}
+			}
+			else {
+				throw new Error('History.go: History.go requires a positive or negative integer passed.');
+			}
+
+			// Return true
+			return true;
+		};
+
+
+
+		// ----------------------------------------------------------------------
 		// HTML4 HashChange Support
 
 		if ( History.emulated.hashChange ) {
@@ -1001,7 +1180,7 @@
 			 * We must emulate the HTML4 HashChange Support by manually checking for hash changes
 			 */
 
-			(function(){
+			History.Adapter.onDomLoad(function(){
 				// Define our Checker Function
 				_History.checkerFunction = null;
 
@@ -1123,7 +1302,7 @@
 				// Return true
 				return true;
 
-			})(); // closure
+			}); // closure
 
 		}
 
@@ -1278,7 +1457,10 @@
 				// Force update of the title
 				if ( document.title !== newState.title ) {
 					document.title = newState.title
-					document.getElementsByTagName('title')[0].innerHTML = newState.title;
+					try {
+						document.getElementsByTagName('title')[0].innerHTML = newState.title;
+					}
+					catch ( Exception ) { }
 				}
 
 				History.debug(
@@ -1366,12 +1548,12 @@
 			 **/
 			if ( !document.location.hash || document.location.hash === '#' ) {
 				History.Adapter.onDomLoad(function(){
-					History.debug('hash1');
+					History.debug('Internet Explorer Initial State Change Fix');
 					var currentState = History.createStateObject({},'',document.location.href);
 					History.pushState(currentState.data,currentState.title,currentState.url);
 				});
 			} else if ( !History.emulated.hashChange ) {
-				History.debug('hash2');
+				History.debug('Firefox Initial State Change Fix');
 				History.Adapter.onDomLoad(function(){
 					_History.onHashChange();
 				});
@@ -1464,7 +1646,7 @@
 						oldState = _History.getStateByUrl(newStateUrl);
 
 					// Check if the URLs match
-					if ( newStateUrl == oldState.url ) {
+					if ( oldState && newStateUrl == oldState.url ) {
 						stateData = oldState.data;
 					}
 					else {
@@ -1605,151 +1787,7 @@
 				// Return true
 				return true;
 			}
-
 		}
-
-		// ----------------------------------------------------------------------
-		// Queueing
-
-		/**
-		 * History.queues
-		 * The list of queues to use
-		 * First In, First Out
-		 */
-		History.queues = [];
-
-		/**
-		 * History.busy(value)
-		 * @param {boolean} value [optional]
-		 * @return {boolean} busy
-		 */
-		History.busy = function(value){
-			History.debug('History.busy: called', arguments, History.busy.flag, History.queues);
-
-			// Apply
-			if ( typeof value !== 'undefined' ) {
-				History.busy.flag = value;
-			}
-			// Default
-			else if ( typeof History.busy.flag === 'undefined' ) {
-				History.busy.flag = false;
-			}
-
-			// Queue
-			if ( !History.busy.flag ) {
-				// Execute the next item in the queue
-				clearTimeout(History.busy.timeout);
-				var fireNext = function(){
-					if ( History.busy.flag ) return;
-					for ( var i=History.queues.length-1; i >= 0; --i ) {
-						var queue = History.queues[i];
-						if ( queue.length === 0 ) continue;
-						var item = queue.shift();
-						History.debug('History.busy: firing', item);
-						item.callback.apply(item.scope||History,item.args);
-						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
-					}
-				};
-				History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
-			}
-
-			// Return
-			return History.busy.flag;
-		}
-
-		/**
-		 * History.pushQueue(callback,args)
-		 * Add an item to the queue
-		 * @param {Object} item [scope,callback,args,queue]
-		 */
-		History.pushQueue = function(item){
-			History.debug('History.pushQueue: called', arguments);
-
-			// Prepare the queue
-			History.queues[item.queue||0] = History.queues[item.queue||0]||[];
-
-			// Add to the queue
-			History.queues[item.queue||0].push(item);
-
-			// End pushQueue closure
-			return true;
-		};
-
-		// ----------------------------------------------------------------------
-		// HTML4 State Aliases
-
-		History.back = function(queue){
-			History.debug('History.back: called', arguments);
-
-			// Handle Queueing
-			if ( queue !== false && History.busy() ) {
-				// Wait + Push to Queue
-				History.debug('History.back: we must wait', arguments);
-				History.pushQueue({
-					scope: History,
-					callback: History.back,
-					args: arguments,
-					queue: queue
-				});
-				return false;
-			}
-
-			// Make Busy + Continue
-			History.busy(true);
-
-			// Go back
-			history.go(-1);
-		};
-
-		History.forward = function(queue){
-			History.debug('History.forward: called', arguments);
-
-			// Handle Queueing
-			if ( queue !== false && History.busy() ) {
-				// Wait + Push to Queue
-				History.debug('History.forward: we must wait', arguments);
-				History.pushQueue({
-					scope: History,
-					callback: History.forward,
-					args: arguments,
-					queue: queue
-				});
-				return false;
-			}
-
-			// Make Busy + Continue
-			History.busy(true);
-
-			// Go forward
-			history.go(1);
-		};
-
-		History.go = function(index,queue){
-			History.debug('History.go: called', arguments);
-
-			// Handle
-			if ( index > 0 ) {
-				// Forward
-				for ( var i=1; i<=index; ++i ) {
-					History.forward(queue);
-				}
-			}
-			else if ( index < 0 ) {
-				// Backward
-				for ( var i=-1; i>=index; --i ) {
-					History.back(queue);
-				}
-			}
-			else {
-				throw new Error('History.go: History.go requires a positive or negative integer passed.');
-			}
-
-			// Return true
-			return true;
-		};
-
-
-		History.debug('History.emulated: hashchange['+History.emulated.hashChange+'] pushstate['+History.emulated.pushState+']');
 
 	}; // init
 

@@ -111,21 +111,24 @@ Is there a working demo?
 
 			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.min.js"></script>
 
-  - _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
+	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
 4. Include History.js
 
 		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.min.js"></script>
 
 
-## Browsers
+## Browsers: Tested and Working In
 
-### Tested and Working In:
+### HTML5 Browsers
 
-- Chrome 8
+- Chrome 8,9
+- Firefox 4
+
+### HTML4 Browsers
+
 - Opera 10,11
 - Safari 5
-- Firefox 4 Beta 9
 - Firefox 3
 - IE 6,7,8
 
@@ -138,7 +141,9 @@ Is there a working demo?
 - `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser, `data` and `title` can be null
 - `History.getState()` <br/> Get's the current state of the browser, returns an object with `data`, `title` and `url`
 - `History.getHash()` <br/> Get's the current hash of the browser
-- `History.Adapter.bind(element,callback)` <br/> A framework independent event binder, you may either use this or your framework's native event binder.
+- `History.Adapter.bind(element,event,callback)` <br/> A framework independent event binder, you may either use this or your framework's native event binder.
+- `History.Adapter.trigger(element,event)` <br/> A framework independent event trigger, you may either use this or your framework's native event trigger.
+- `History.Adapter.onDomLoad(callback)` <br/> A framework independent onDomLoad binder, you may either use this or your framework's native onDomLoad binder.
 - `History.back()` <br/> Go back once through the history (same as hitting the browser's back button)
 - `History.forward()` <br/> Go forward once through the history (same as hitting the browser's forward button)
 - `History.go(X)` <br/> If X is negative go back through history X times, if X is positive go forwards through history X times
@@ -166,6 +171,13 @@ Is there a working demo?
 
 
 ## Changelog
+
+- v1.4.0 - February 09 2011
+	- Small updates to Documentation
+	- Unit Testing now uses [QUnit](http://docs.jquery.com/Qunit)
+	- Corrected Safari 5 Support
+	- Now uses queues instead of timeouts
+		- This means the API works exactly as expected, no more need to wrap calls in timeouts
 
 - v1.3.1 - February 04 2011
 	- Improved Documentation

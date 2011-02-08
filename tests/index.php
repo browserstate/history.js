@@ -7,7 +7,7 @@
 	}
 	$Adapter = ucwords($adapter);
 	# Base URL
-	$base_url = 'http://localhost/products/history.js';
+	$base_url = 'http://'.$_SERVER['HTTP_HOST'].'/products/history.js';
 	$tests_url = $base_url.'/tests/'.$adapter;
 ?><!DOCTYPE html>
 <html>
@@ -19,7 +19,8 @@
 			document.location.href = "<?=$tests_url?>";
 		}
 	</script>
-
+</head>
+<body>
 	<!-- FireBug Lite -->
 	<script type="text/javascript">
 		if ( typeof console === 'undefined' ) {
@@ -53,13 +54,13 @@
 
 	<!-- Tests -->
 	<script type="text/javascript" src="<?=$base_url?>/tests/tests.js"></script>
-</head>
-<body>
+
 	<h1 id="qunit-header">History.js <?=$Adapter?> Test Suite</h1>
 	<h2 id="qunit-banner"></h2>
 	<div id="qunit-testrunner-toolbar"></div>
 	<h2 id="qunit-userAgent"></h2>
 	<ol id="qunit-tests"></ol>
 	<div id="qunit-fixture">test markup</div>
+	<div id="log"></div>
 </body>
 </html>

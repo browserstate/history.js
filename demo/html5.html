@@ -3,35 +3,38 @@
 </head>
 <body>
 	<script type="text/javascript">
-		window.onpopstate = function(event) {
-			console.log("location: " + document.location + ", data: " + JSON.stringify(event.state));
-		};
+		(function(){
 
-		setTimeout(function(){
-			history.pushState({page: 1}, "title 1", "?page=1");
-		},1e3);
-		setTimeout(function(){
-			history.pushState({page: 2}, "title 2", "?page=2");
-		},2e3);
-		setTimeout(function(){
-			history.replaceState({page: 3}, "title 3", "?page=3");
-		},3e3);
-		setTimeout(function(){
-			document.location.hash = 'asd';
-		},4e3);
-		setTimeout(function(){
-			history.back(); // alerts "location: http://example.com/example.html?page=3#asd, state: {"page":3}"
-		},5e3);
-		setTimeout(function(){
-			history.back(); // alerts "location: http://example.com/example.html?page=1, state: {"page":1}"
-		},6e3);
-		setTimeout(function(){
-			history.back(); // alerts "location: http://example.com/example.html, state: null
-		},7e3);
-		setTimeout(function(){
-			history.go(2);  // alerts "location: http://example.com/example.html?page=3, state: {"page":3}
-		},8e3);
+			window.onpopstate = function(event) {
+				console.log("location: " + document.location + ", data: " + JSON.stringify(event.state));
+			};
 
+			setTimeout(function(){
+				history.pushState({page: 1}, "title 1", "?page=1");
+			},1e3);
+			setTimeout(function(){
+				history.pushState({page: 2}, "title 2", "?page=2");
+			},2e3);
+			setTimeout(function(){
+				history.replaceState({page: 3}, "title 3", "?page=3");
+			},3e3);
+			setTimeout(function(){
+				document.location.hash = 'asd';
+			},4e3);
+			setTimeout(function(){
+				history.back(); // alerts "location: http://example.com/example.html?page=3#asd, state: {"page":3}"
+			},5e3);
+			setTimeout(function(){
+				history.back(); // alerts "location: http://example.com/example.html?page=1, state: {"page":1}"
+			},6e3);
+			setTimeout(function(){
+				history.back(); // alerts "location: http://example.com/example.html, state: null
+			},7e3);
+			setTimeout(function(){
+				history.go(2);  // alerts "location: http://example.com/example.html?page=3, state: {"page":3}
+			},8e3);
+
+		})();
 	</script>
 </body>
 </html>
