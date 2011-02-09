@@ -67,15 +67,9 @@ History.Adapter.bind(window,'statechange',function(){
 
 var addLog = function(){
 	var args = arguments;
-	if ( History.busy() ) {
-		History.pushQueue({
-			callback: function(){
-				History.log.apply(History,args);
-			}
-		});
-	} else {
+	History.queue(function(){
 		History.log.apply(History,args);
-	}
+	});
 };
 
 History.Adapter.onDomLoad(function(){

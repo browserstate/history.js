@@ -1,4 +1,4 @@
-Welcome to History.js (v1.4.0 - February 10 2011)
+Welcome to History.js (v1.4.1 - February 10 2011)
 ==================
 
 
@@ -79,7 +79,7 @@ What's the deal with the UIDs used in the HTML4 States?
 Is there a working demo?
 
 - Sure is, give it a download and navigate to the demo directory in your browser :-)
-- If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports. _Note: you will have to run a `git submodule init; git submodule update` prior to running the tests._
+- If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports. _Note: you will have to [run a `git submodule init; git submodule update` and update the `tests/.htaccess` for your path] prior to running the tests._
 
 
 ## Download & Installation
@@ -120,17 +120,28 @@ Is there a working demo?
 		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.min.js"></script>
 
 
+## Subscribe to Updates
+
+- For GitHub News Feed Updates:
+	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/History.js)
+- For Email Updates:
+	- There is a subscription form within the demo
+- For Commit RSS/Atom Updates:
+	- You can subscribe via the [GitHub Commit Atom Feed](https://github.com/balupton/History.js/commits/master.atom)
+
+
 ## Browsers: Tested and Working In
 
 ### HTML5 Browsers
 
 - Chrome 8,9
 - Firefox 4
+- Safari 5
+- Safari iOS 4.2.1
 
 ### HTML4 Browsers
 
 - Opera 10,11
-- Safari 5
 - Firefox 3
 - IE 6,7,8
 
@@ -162,7 +173,7 @@ Is there a working demo?
 
 - State data will always contain the State's title and url at: `data.title` and `data.url`
 - State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality.
-- State titles will always be applied to the document.title if set.
+- State titles will always be applied to the `document.title` if set.
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call.
 - History.js fixes a bug in Google Chrome where traversing back through the history to the home page does not return the correct state data.
 - Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
@@ -173,6 +184,10 @@ Is there a working demo?
 
 
 ## Changelog
+
+- v1.4.1 - February 10 2011
+	- Added HTML History API Support for Safari 5 and Safari iOS 4.2.1
+	- Cleaned code a bit (mostly with unit tests)
 
 - v1.4.0 - February 10 2011
 	- Unit Testing now uses [QUnit](http://docs.jquery.com/Qunit)
@@ -211,13 +226,4 @@ Is there a working demo?
 ## Todo for Upcoming Releases
 
 - Normal: Style Demo
-- Normal: Add `History.queue`
 - Minor: Add a compilation test to ensure `.debug = false` and no `History.log` calls exist.
-
-## Subscribe To Updates
-
-<form action="http://balupton.createsend.com/t/r/s/phujuu/" method="post" id="subForm">
-<label for="phujuu-phujuu">Email:</label>
-<input type="text" name="cm-phujuu-phujuu" id="phujuu-phujuu" />
-<input type="submit" value="Subscribe" />
-</form>

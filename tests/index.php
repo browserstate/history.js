@@ -7,7 +7,9 @@
 	}
 	$Adapter = ucwords($adapter);
 	# Base URL
-	$base_url = 'http://'.$_SERVER['HTTP_HOST'].'/products/history.js';
+	$relative_url = $_SERVER['REQUEST_URI'];
+	$relative_url = substr($relative_url,0,strpos($relative_url,'/history.js')).'/history.js';
+	$base_url = 'http://'.$_SERVER['HTTP_HOST'].$relative_url;
 	$tests_url = $base_url.'/tests/'.$adapter;
 ?><!DOCTYPE html>
 <html>
@@ -25,7 +27,7 @@
 	<script type="text/javascript">
 		if ( typeof console === 'undefined' ) {
 			var
-				url = 'https://getfirebug.com/firebug-lite.js',
+				url = '<?=$base_url?>/vendor/firebug-lite.js',
 				scriptEl = document.createElement('script');
 			scriptEl.type = 'text/javascript';
 			scriptEl.src = url;

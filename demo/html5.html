@@ -6,7 +6,10 @@
 		(function(){
 
 			window.onpopstate = function(event) {
-				console.log("location: " + document.location + ", data: " + JSON.stringify(event.state));
+				console.log("onpopstate: location: " + document.location.href + ", data: " + JSON.stringify(event.state));
+			};
+			window.onhashchange = function(event) {
+				console.log("onhashchange: location: " + document.location.href);
 			};
 
 			setTimeout(function(){

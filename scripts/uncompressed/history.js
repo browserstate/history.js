@@ -164,7 +164,7 @@
 		 * Which features require emulating?
 		 */
 		History.emulated = {
-			pushState: !Boolean(window.history && window.history.pushState && window.history.replaceState && navigator.vendor !== 'Apple Computer, Inc.'),
+			pushState: !Boolean(window.history && window.history.pushState && window.history.replaceState),
 			hashChange: Boolean(
 				!('onhashchange' in window || 'onhashchange' in document)
 				||
@@ -230,14 +230,14 @@
 				return false;
 			}
 
-			// Make Busy + Continue
-			History.busy(true);
-
 			// Prepare
 			var adjustedHash = _History.escapeHash(hash);
 
 			// Log hash
 			History.debug('History.setHash',this,arguments,'hash:',hash,'adjustedHash:',adjustedHash,'oldHash:',document.location.hash);
+
+			// Make Busy + Continue
+			History.busy(true);
 
 			// Apply hash
 			document.location.hash = adjustedHash;
@@ -1012,7 +1012,7 @@
 		 * @return {boolean} busy
 		 */
 		History.busy = function(value){
-			History.debug('History.busy: called', arguments, History.busy.flag||undefined, History.queues);
+			History.debug('History.busy: called: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues);
 
 			// Apply
 			if ( typeof value !== 'undefined' ) {
@@ -1034,7 +1034,7 @@
 						if ( queue.length === 0 ) continue;
 						var item = queue.shift();
 						History.debug('History.busy: firing', item);
-						item.callback.apply(item.scope||History,item.args||[]);
+						History.fireQueueItem(item);
 						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
 					}
 				};
@@ -1043,7 +1043,17 @@
 
 			// Return
 			return History.busy.flag;
-		}
+		};
+
+		/**
+		 * History.fireQueueItem(item)
+		 * Fire a Queue Item
+		 * @param {Object} item
+		 * @return {Mixed} result
+		 */
+		History.fireQueueItem = function(item){
+			return item.callback.apply(item.scope||History,item.args||[]);
+		};
 
 		/**
 		 * History.pushQueue(callback,args)
@@ -1063,9 +1073,40 @@
 			return true;
 		};
 
+		/**
+		 * History.queue (item,queue), (func,queue), (func), (item)
+		 * Either firs the item now if not busy, or adds it to the queue
+		 */
+		History.queue = function(item,queue){
+			// Prepare
+			if ( typeof item === 'function' ) {
+				item = {
+					callback: item
+				};
+			}
+			if ( typeof queue !== 'undefined' ) {
+				item.queue = queue;
+			}
+
+			// Handle
+			if ( History.busy() ) {
+				History.pushQueue(item);
+			} else {
+				History.fireQueueItem(item);
+			}
+
+			// End queue closure
+			return true;
+		};
+
 		// ----------------------------------------------------------------------
 		// HTML4 State Aliases
 
+		/**
+		 * History.back(queue)
+		 * Send the browser history back one item
+		 * @param {Integer} queue [optional]
+		 */
 		History.back = function(queue){
 			History.debug('History.back: called', arguments);
 
@@ -1104,8 +1145,16 @@
 
 			// Go back
 			history.go(-1);
+
+			// End back closure
+			return true;
 		};
 
+		/**
+		 * History.forward(queue)
+		 * Send the browser history forward one item
+		 * @param {Integer} queue [optional]
+		 */
 		History.forward = function(queue){
 			History.debug('History.forward: called', arguments);
 
@@ -1144,8 +1193,16 @@
 
 			// Go forward
 			history.go(1);
+
+			// End forward closure
+			return true;
 		};
 
+		/**
+		 * History.go(index,queue)
+		 * Send the browser history back or forward index times
+		 * @param {Integer} queue [optional]
+		 */
 		History.go = function(index,queue){
 			History.debug('History.go: called', arguments);
 
@@ -1166,10 +1223,9 @@
 				throw new Error('History.go: History.go requires a positive or negative integer passed.');
 			}
 
-			// Return true
+			// End go closure
 			return true;
 		};
-
 
 
 		// ----------------------------------------------------------------------
@@ -1787,7 +1843,30 @@
 				// Return true
 				return true;
 			}
+
+
+			/**
+			 * Ensure Cross Browser Compatibility
+			 **/
+			if ( navigator.vendor === 'Apple Computer, Inc.' ) {
+				/**
+				 * Fix Safari Initial State Issue
+				 */
+				History.Adapter.onDomLoad(function(){
+					History.debug('Safari Initial State Change Fix');
+					var currentState = History.createStateObject({},'',document.location.href);
+					History.pushState(currentState.data,currentState.title,currentState.url);
+				});
+
+				/**
+				 * Fix Safari HashChange Issue
+				 */
+				History.Adapter.bind(window,'hashchange',function(){
+					History.Adapter.trigger(window,'popstate');
+				});
+			}
 		}
+
 
 	}; // init
 
