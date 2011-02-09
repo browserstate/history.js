@@ -79,7 +79,7 @@ What's the deal with the UIDs used in the HTML4 States?
 Is there a working demo?
 
 - Sure is, give it a download and navigate to the demo directory in your browser :-)
-- If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports.
+- If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports. _Note: you will have to run a `git submodule init; git submodule update` prior to running the tests._
 
 
 ## Download & Installation
