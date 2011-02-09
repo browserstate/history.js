@@ -125,9 +125,14 @@ Is there a working demo?
 - For GitHub News Feed Updates:
 	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/History.js)
 - For Email Updates:
-	- There is a subscription form within the demo
+	- You can subscribe via the subscription form included in the demo page
 - For Commit RSS/Atom Updates:
 	- You can subscribe via the [GitHub Commit Atom Feed](https://github.com/balupton/History.js/commits/master.atom)
+
+
+## Getting Support
+
+History.js is an actively developed, supported and maintained project. You can grab support via its [GitHub Issue Tracker](https://github.com/balupton/History.js/issues). Alternatively you can reach [Benjamin Lupton](http://balupton.com) via [twitter](http://twitter.com/balupton), skype (balupton) or email (contact@balupton.com).
 
 
 ## Browsers: Tested and Working In
