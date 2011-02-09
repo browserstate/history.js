@@ -1,4 +1,4 @@
-Welcome to History.js (v1.4 - Unreleased)
+Welcome to History.js (v1.4.0 - February 10 2011)
 ==================
 
 
@@ -65,8 +65,9 @@ And how would they look in a HTML4 Browser?
 > 1. www.mysite.com
 > 1. www.mysite.com#?state=3/uid=3
 >
-> _Note: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states their HTML5 equivalents so the user won't even notice :-)_
-> _Second Note: There urls will be url-encoded in Firefox 3; IE6,7,8; and Safari 5. Opera does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work. There is nothing we can do about this.
+> _Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states their HTML5 equivalents so the user won't even notice :-)_
+>
+> _Note 2: There urls will be url-encoded in Firefox 3; IE6,7,8; and Safari 5. Opera does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work. There is nothing we can do about this._
 
 What's the deal with the UIDs used in the HTML4 States?
 
@@ -173,13 +174,13 @@ Is there a working demo?
 
 ## Changelog
 
-- v1.4.0 - February 09 2011
-	- Small updates to Documentation
+- v1.4.0 - February 10 2011
 	- Unit Testing now uses [QUnit](http://docs.jquery.com/Qunit)
 	- Corrected Safari 5 Support
 	- Now uses queues instead of timeouts
 		- This means the API works exactly as expected, no more need to wrap calls in timeouts
 	- Included a Subscribe Form in the Demo for Version Updates via Email
+	- Small updates to Documentation
 
 - v1.3.1 - February 04 2011
 	- Improved Documentation
@@ -209,5 +210,6 @@ Is there a working demo?
 
 ## Todo for Upcoming Releases
 
+- Normal: Style Demo
 - Normal: Add `History.queue`
 - Minor: Add a compilation test to ensure `.debug = false` and no `History.log` calls exist.

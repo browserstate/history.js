@@ -1,3 +1,6 @@
+// Prepare
+History.debug.enable = true;
+
 // Variables
 var
 	States = {

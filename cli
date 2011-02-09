@@ -55,9 +55,9 @@
 #   Benjamin Arthur Lupton
 #
 # == Copyright
-#   Copyright (c) 2008-2011 Benjamin Arthur Lupton.
-#   Licensed under the University of Illinois/NCSA Open Source License
-#   http://www.opensource.org/licenses/UoI-NCSA.php
+#   Copyright (c) 2008-2011 Benjamin Arthur Lupton
+#   Licensed under the New BSD License
+#   http://creativecommons.org/licenses/BSD/
 
 require 'optparse'
 require 'rdoc/usage'
