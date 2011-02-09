@@ -41,30 +41,30 @@ Working with History.js:
 
 So how would the above operations look in a HTML5 Browser?
 
-> 1. www.mysite.com
-> 1. www.mysite.com?state=1
-> 1. www.mysite.com?state=2
-> 1. www.mysite.com?state=3
-> 1. www.mysite.com?state=4
-> 1. www.mysite.com?state=3
-> 1. www.mysite.com?state=1
-> 1. www.mysite.com
-> 1. www.mysite.com?state=3
->
+1. www.mysite.com
+1. www.mysite.com?state=1
+1. www.mysite.com?state=2
+1. www.mysite.com?state=3
+1. www.mysite.com?state=4
+1. www.mysite.com?state=3
+1. www.mysite.com?state=1
+1. www.mysite.com
+1. www.mysite.com?state=3
+
 > _Note: These urls also work in HTML4 browsers and Search Engines. So no need for the `#!` fragment-identifier that google ["recommends"](http://getsatisfaction.com/balupton/topics/support_googles_recommendation_for_ajax_deeplinking)._
 
 And how would they look in a HTML4 Browser?
 
-> 1. www.mysite.com
-> 1. www.mysite.com#?state=1/uid=1
-> 1. www.mysite.com#?state=2/uid=2
-> 1. www.mysite.com#?state=3/uid=3
-> 1. www.mysite.com#?state=4
-> 1. www.mysite.com#?state=3/uid=3
-> 1. www.mysite.com#?state=1/uid=1
-> 1. www.mysite.com
-> 1. www.mysite.com#?state=3/uid=3
->
+1. www.mysite.com
+1. www.mysite.com#?state=1/uid=1
+1. www.mysite.com#?state=2/uid=2
+1. www.mysite.com#?state=3/uid=3
+1. www.mysite.com#?state=4
+1. www.mysite.com#?state=3/uid=3
+1. www.mysite.com#?state=1/uid=1
+1. www.mysite.com
+1. www.mysite.com#?state=3/uid=3
+
 > _Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states their HTML5 equivalents so the user won't even notice :-)_
 >
 > _Note 2: There urls will be url-encoded in Firefox 3; IE6,7,8; and Safari 5. Opera does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work. There is nothing we can do about this._
@@ -213,3 +213,11 @@ Is there a working demo?
 - Normal: Style Demo
 - Normal: Add `History.queue`
 - Minor: Add a compilation test to ensure `.debug = false` and no `History.log` calls exist.
+
+## Subscribe To Updates
+
+<form action="http://balupton.createsend.com/t/r/s/phujuu/" method="post" id="subForm">
+<label for="phujuu-phujuu">Email:</label>
+<input type="text" name="cm-phujuu-phujuu" id="phujuu-phujuu" />
+<input type="submit" value="Subscribe" />
+</form>
