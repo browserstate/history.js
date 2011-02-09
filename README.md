@@ -122,17 +122,17 @@ Is there a working demo?
 
 ## Subscribe to Updates
 
-- For GitHub News Feed Updates:
-	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/History.js)
 - For Email Updates:
 	- You can subscribe via the subscription form included in the demo page
 - For Commit RSS/Atom Updates:
 	- You can subscribe via the [GitHub Commit Atom Feed](https://github.com/balupton/History.js/commits/master.atom)
+- For GitHub News Feed Updates:
+	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/History.js)
 
 
 ## Getting Support
 
-History.js is an actively developed, supported and maintained project. You can grab support via its [GitHub Issue Tracker](https://github.com/balupton/History.js/issues). Alternatively you can reach [Benjamin Lupton](http://balupton.com) via [twitter](http://twitter.com/balupton), skype (balupton) or email (contact@balupton.com).
+History.js is an actively developed, supported and maintained project. You can grab support via its [GitHub Issue Tracker](https://github.com/balupton/History.js/issues). Alternatively you can reach [Benjamin Lupton](http://balupton.com) (the core developer) via [twitter](http://twitter.com/balupton), skype (balupton) or email (contact@balupton.com).
 
 
 ## Browsers: Tested and Working In
@@ -177,15 +177,16 @@ History.js is an actively developed, supported and maintained project. You can g
 ## Notes on Compatibility
 
 - State data will always contain the State's title and url at: `data.title` and `data.url`
-- State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality.
-- State titles will always be applied to the `document.title` if set.
-- ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call.
-- History.js fixes a bug in Google Chrome where traversing back through the history to the home page does not return the correct state data.
-- Setting a hash (even in HTML5 browsers) causes `onpopstate` to fire - this is expected/standard functionality.
-	- As such, to ensure correct compatability between HTML5 and HTML4 browsers, we now have two new events:
-		- `window.onstatechange`: this is the same as onpopstate except does not fire for traditional anchors
-		- `window.onanchorchange`: this is the same as onhashchange except does not fire for states
-	- To fetch the anchor/hash, you may use `History.getHash()`.
+- State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
+- State titles will always be applied to the `document.title` if set
+- ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
+- History.js fixes the following browser bugs:
+	- Chrome does not retrieve the correct data when traversing back to the start page
+	- Safari 5 and Safari iOS 4.2.1 do not fire `onpopstate` on page load or when the hash has changed
+- HTML4 Browsers on initial page load will have a hash inserted into the url; this is to ensure correct cross-compatibility between HTML4 browsers (as IE will refresh the page if the anchor is lost)
+- Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
+	- `window.onstatechange`: this is the same as onpopstate except does not fire for traditional anchors
+	- `window.onanchorchange`: this is the same as onhashchange except does not fire for states
 
 
 ## Changelog
