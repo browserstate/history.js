@@ -1,5 +1,9 @@
-// History.js jQuery Adapter
-// New-BSD License, Copyright 2011 Benjamin Arthur Lupton <contact@balupton.com>
+/**
+ * History.js jQuery Adapter
+ * @author Benjamin Arthur Lupton
+ * @copyright 2010-2011 Benjamin Arthur Lupton
+ * @license New BSD License - http://creativecommons.org/licenses/BSD/
+ */
 
 (function($,window,undefined){
 

@@ -1,5 +1,9 @@
-// History.js
-// New-BSD License, Copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+/**
+ * History.js
+ * @author Benjamin Arthur Lupton <contact@balupton.com>
+ * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+ * @license New BSD License <http://creativecommons.org/licenses/BSD/>
+ */
 
 (function(window,undefined){
 
@@ -121,7 +125,7 @@
 		 * Get's the major version of Internet Explorer
 		 * @return {integer}
 		 * @license Public Domain
-		 * @author Benjamin Lupton <contact@balupton.com>
+		 * @author Benjamin Arthur Lupton <contact@balupton.com>
 		 * @author James Padolsey <https://gist.github.com/527683>
 		 */
 		_History.getInternetExplorerMajorVersion = function(){
@@ -148,7 +152,7 @@
 		 * Are we using Internet Explorer?
 		 * @return {boolean}
 		 * @license Public Domain
-		 * @author Benjamin Lupton <contact@balupton.com>
+		 * @author Benjamin Arthur Lupton <contact@balupton.com>
 		 */
 		_History.isInternetExplorer = function(){
 			var result = _History.isInternetExplorer.cached =
