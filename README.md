@@ -117,9 +117,11 @@ Is there a working demo?
 
 4. Include History.js
 
-		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.all.js"></script>
+For support HTML5 and HTML4 browsers include this:
 
-> If you are not wanting to support HTML4 browsers (so no hash fallback), include this instead:
+    <script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.all.js"></script>
+
+For support for only HTML5 browsers (so no support for HTML4 browsers / aka hash fallback), include this instead:
 
     <script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js/history.html5.js"></script>
 
