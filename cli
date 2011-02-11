@@ -140,23 +140,25 @@ class App
 	end
 
 	def compressJavascriptFile ( in_file, out_file )
+		# Calculate
+		in_file_size = File.size(in_file)
+
 		# Handle
 		if in_file.equal? out_file
 			out_file = out_file.gsub(/\.js$/, '.min.js')
 			compressFileUglify(in_file,out_file)
+			`rm #{in_file}`
+			`mv #{out_file} #{in_file}`
+			out_file = in_file
 		else
 			compressFileUglify(in_file,out_file)
+			out_file_size = File.size(out_file)
 		end
 
 		# Calculate
-		in_file_size = File.size(in_file)
 		out_file_size = File.size(out_file)
 		ratio = Float(out_file_size)/Float(in_file_size)
 		reduction = ((1-ratio)*100).round
-
-		# Clean
-		`rm #{in_file}`
-		`mv #{out_file} #{in_file}`
 
 		# Log
 		puts "Compressed the file [#{in_file}] to [#{out_file}] with a #{reduction}% reduction"
@@ -196,7 +198,7 @@ class App
 				# Create In File
 				compiled_file = file.gsub(/\.js$/, '.all.js')
 				compiled_file_path = out_dir + '/' + compiled_file
-				compiled_file_handler = File.new(compiled_file_path, 'a+')
+				compiled_file_handler = File.new(compiled_file_path, 'w+')
 
 				# Cycle through Children
 				Dir.foreach(file_path) do |child_file|

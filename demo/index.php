@@ -27,12 +27,12 @@
 		case 'prototype':
 		case 'mootools': ?>
 			<script type="text/javascript" src="../vendor/<?=$adapter?>.js"></script>
-			<script type="text/javascript" src="../scripts/uncompressed/history.adapter.<?=$adapter?>.js"></script>
+			<script type="text/javascript" src="../scripts/compressed/history.adapter.<?=$adapter?>.js"></script>
 			<? break;
 		default:
 			throw new Exception('That adapter is not supported!');
 	endswitch; ?>
-	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
+	<script type="text/javascript" src="../scripts/compressed/history.all.js"></script>
 
 	<!-- HTML -->
 	<div id="wrap">

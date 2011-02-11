@@ -32,7 +32,7 @@
 		// ----------------------------------------------------------------------
 		// Check Status
 
-		if ( typeof History.initHtml4 === 'undefined' && typeof History.Adapter === 'undefined' ) {
+		if ( typeof History.initHtml5 === 'undefined' || typeof History.Adapter === 'undefined' ) {
 			return false;
 		}
 
