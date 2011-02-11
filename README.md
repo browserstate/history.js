@@ -1,4 +1,4 @@
-Welcome to History.js (v1.4.1 - February 10 2011)
+Welcome to History.js (v1.5.0 - Unreleased)
 ==================
 
 
@@ -91,7 +91,7 @@ Is there a working demo?
 		<script type="text/javascript">
 			if ( typeof JSON === 'undefined' ) {
 				var
-					url = 'http://www.yourwebsite.com/history.js/scripts/compressed/json2.min.js',
+					url = 'http://www.yourwebsite.com/history.js/scripts/compressed/json2.js',
 					scriptEl = document.createElement('script');
 				scriptEl.type = 'text/javascript';
 				scriptEl.src = url;
@@ -103,21 +103,25 @@ Is there a working demo?
 
 	- [jQuery](http://jquery.com/)
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.min.js"></script>
+			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
 
 	- [Mootools](http://mootools.net/)
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.min.js"></script>
+			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
 
 	- [Prototype](http://www.prototypejs.org/)
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.min.js"></script>
+			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
 
 	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
 4. Include History.js
 
-		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.min.js"></script>
+		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.all.js"></script>
+
+> If you are not wanting to support HTML4 browsers (so no hash fallback), include this instead:
+
+		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js/history.html5.js"></script>
 
 
 ## Subscribe to Updates
@@ -190,6 +194,11 @@ History.js is an actively developed, supported and maintained project. You can g
 
 
 ## Changelog
+
+- v1.5.0 - Unreleased
+	- Moved to UglifyJS instead of Google Closure
+	- Split HTML4 functionality from HTML5 functionality
+	- Installation details have changed (the filenames are different)
 
 - v1.4.1 - February 10 2011
 	- Added HTML History API Support for Safari 5 and Safari iOS 4.2.1
