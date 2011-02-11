@@ -20,7 +20,7 @@
 
 	// Check Existence of Adapter
 	if ( typeof History.Adapter !== 'undefined' ) {
-		throw new Error('History.js Adapter has already been emulated...');
+		throw new Error('History.js Adapter has already been loaded...');
 	}
 
 	/**
@@ -147,10 +147,14 @@
 		}
 	};
 
-	// Check Load Status
-	if ( typeof History.init !== 'undefined' ) {
-		// History.js loaded faster than the Adapter, Fire init
-		History.init();
+	// Check Load Status of HTML5 Support
+	if ( typeof History.initHtml5 !== 'undefined' ) {
+		History.initHtml5();
+	}
+
+	// Check Load Status of HTML4 Support
+	if ( typeof History.initHtml4 !== 'undefined' ) {
+		History.initHtml4();
 	}
 
 })(Prototype,window);

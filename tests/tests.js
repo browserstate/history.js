@@ -59,8 +59,8 @@ History.Adapter.bind(window,'statechange',function(){
 		stateName = 'State '+stateIndex;
 
 	test(testName,function(){
-		var result = same(actualState,expectedState,stateName);
 		History.log('Completed: '+testName +' / '+ stateName);
+		var result = same(actualState,expectedState,stateName);
 	});
 });
 

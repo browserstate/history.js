@@ -231,5 +231,11 @@ History.js is an actively developed, supported and maintained project. You can g
 
 ## Todo for Upcoming Releases
 
-- Normal: Style Demo
-- Minor: Add a compilation test to ensure `.debug = false` and no `History.log` calls exist.
+- Add data persistance to HTML4 browsers (navigate to 3rd party website, navigate back, state data should still be there)
+	- Default will use cookies (requires no configuration) - limited to a 4KB payload.
+	- Extension will use cookies and add an ajax pre-fetch to fetch full (unlimited) data (requires configuration through a server-side helper)
+- Add an Ajax extension to succeed the [jQuery Ajaxy](http://balupton.com/projects/jquery-ajaxy) project
+- Split HTML4 browser support (the hash fallback) from HTML5 browser support
+	- If the use case of "A HTML4 js-enabled user shares a link with a js-disabled user, the link does not work." is an essential use case in your application, then the HTML4 support will be detrimental. However; due to the HTML5 cross-browser-compatibility offered by History.js it's still a very valuable asset. This change will allow History.js to support a much broader audience, without any sacrifices.
+	- This can either be done by an option, or by splitting the code away (eg. `history.html4.js`) - the latter option is preferable as users only include the code they need.
+- Add a compilation test to ensure `.debug = false` and no `History.log` or `console.xxx` calls exist.

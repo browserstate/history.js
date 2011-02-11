@@ -3,10 +3,5 @@ RewriteEngine On
 RewriteBase /
 
 # Clean Adapter
-RewriteCond %{REQUEST_FILENAME} /[a-z]+$
-RewriteRule ([a-z]+)/?$ products/history.js/tests/index.php?adapter=$1 [NC,L,QSA]
-
-# Default Adapter
-RewriteCond %{REQUEST_FILENAME} !.js$
-RewriteCond %{QUERY_STRING} ^$
-RewriteRule ^(.*)$ products/history.js/tests/jquery [R,NC,L]
+RewriteCond %{REQUEST_FILENAME} !index.php$
+RewriteRule ([a-z]+)/([a-z0-9]+)/([a-z]+)/?$ products/history.js/tests/frame.php?dir=$1&support=$2&adapter=$3 [NC,L,QSA]
