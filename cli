@@ -67,7 +67,7 @@ require 'date'
 class App
 	SOURCEMAP		= './scripts/closure.map'
 	BUILDDIR		= './.build'
-	UGLIFYURL		= 'https://github.com/mishoo/UglifyJS/blob/master/bin/uglifyjs'
+	UGLIFYURL		= 'https://github.com/mishoo/UglifyJS/raw/master/bin/uglifyjs'
 	UGLIFYDIR		= './.build/uglify'
 	UGLIFYFILE	= './.build/uglify/uglify'
 	CLOSUREURL	= 'http://closure-compiler.googlecode.com/files/compiler-latest.zip'
@@ -99,6 +99,7 @@ class App
 			puts "Downloading the Closure Compiler..."
 			download(CLOSUREURL, CLOSUREZIP)
 			extract(CLOSUREDIR, CLOSUREZIP)
+			`chmod +x #{CLOSUREFILE}`
 		end
 
 		# Check for Uglify
@@ -106,6 +107,7 @@ class App
 			`mkdir -p #{UGLIFYDIR}`
 			puts "Downloading the Uglify Compiler..."
 			download(UGLIFYURL, UGLIFYFILE)
+			`chmod +x #{UGLIFYFILE}`
 		end
 
 		# Check for YUI Compiler
@@ -114,6 +116,7 @@ class App
 			puts "Downloading the YUI Compiler..."
 			download(YUIURL, (YUIZIP))
 			extract(YUIDIR, YUIZIP)
+			`chmod +x #{YUIFILE}`
 		end
 	end
 
@@ -137,31 +140,34 @@ class App
 	end
 
 	def compressJavascriptFile ( in_file, out_file )
-		compressFileUglify(in_file,out_file)
+		# Handle
+		if in_file.equal? out_file
+			out_file = out_file.gsub(/\.js$/, '.min.js')
+			compressFileUglify(in_file,out_file)
+		else
+			compressFileUglify(in_file,out_file)
+		end
+
+		# Calculate
+		in_file_size = File.size(in_file)
+		out_file_size = File.size(out_file)
+		ratio = Float(out_file_size)/Float(in_file_size)
+		reduction = ((1-ratio)*100).round
+
+		# Clean
+		`rm #{in_file}`
+		`mv #{out_file} #{in_file}`
+
+		# Log
+		puts "Compressed the file [#{in_file}] to [#{out_file}] with a #{reduction}% reduction"
 	end
 
 	def compressFileUglify ( in_file, out_file )
-		puts "Compressing the file [#{in_file}] to [#{out_file}]..."
-		if in_file.equal? out_file
-			out_file = out_file.gsub(/\.js$/, '.min.js')
-			result = `#{UGLIFYFILE} -o #{out_file} #{in_file}`
-			`rm #{in_file}`
-			`mv #{out_file} #{in_file}`
-		else
-			result = `#{UGLIFYFILE} -o #{out_file} #{in_file}`
-		end
+		result = `#{UGLIFYFILE} -o #{out_file} #{in_file}`
 	end
 
 	def compressFileClosure ( in_file, out_file )
-		puts "Compressing the file [#{in_file}] to [#{out_file}]..."
-		if in_file.equal? out_file
-			out_file = out_file.gsub(/\.js$/, '.min.js')
-			result = `java -jar #{CLOSUREFILE} --js_output_file=#{out_file} --js=#{in_file}`
-			`rm #{in_file}`
-			`mv #{out_file} #{in_file}`
-		else
-			result = `java -jar #{CLOSUREFILE} --js_output_file=#{out_file} --js=#{in_file}`
-		end
+		result = `java -jar #{CLOSUREFILE} --js_output_file=#{out_file} --js=#{in_file}`
 	end
 
 	# ===========================================================================
@@ -207,7 +213,7 @@ class App
 					child_file_handler.close
 
 					# Compress Child File
-					compressFileClosure(child_file_path,child_file_path)
+					compressJavascriptFile(child_file_path,child_file_path)
 				end
 
 				# Write File
@@ -218,7 +224,7 @@ class App
 			end
 
 			# Compress File
-			compressFileClosure(file_path,file_path)
+			compressJavascriptFile(file_path,file_path)
 		end
 
 	end

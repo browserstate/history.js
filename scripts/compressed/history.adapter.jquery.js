@@ -1,4 +1,6 @@
-/*
- New BSD License - http://creativecommons.org/licenses/BSD/
-*/
-(function(e,c){c.History=c.History||{};var a=c.History||{};if(typeof a.Adapter!=="undefined")throw Error("History.js Adapter has already been loaded...");a.Adapter={bind:function(b,d,f){return e(b).bind(d,f)},trigger:function(b,d){return e(b).trigger(d)},onDomLoad:function(b){jQuery(b)}};typeof a.initHtml5!=="undefined"&&a.initHtml5();typeof a.initHtml4!=="undefined"&&a.initHtml4()})(jQuery,window);
+/**
+ * History.js jQuery Adapter
+ * @author Benjamin Arthur Lupton
+ * @copyright 2010-2011 Benjamin Arthur Lupton
+ * @license New BSD License - http://creativecommons.org/licenses/BSD/
+ */(function(a,b,c){b.History=b.History||{};var d=b.History||{},e=b.history;if(typeof d.Adapter!=="undefined")throw new Error("History.js Adapter has already been loaded...");d.Adapter={bind:function(b,c,d){return a(b).bind(c,d)},trigger:function(b,c){return a(b).trigger(c)},onDomLoad:function(a){jQuery(a)}},typeof d.initHtml5!=="undefined"&&d.initHtml5(),typeof d.initHtml4!=="undefined"&&d.initHtml4()})(jQuery,window)

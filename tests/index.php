@@ -6,21 +6,17 @@
 <head>
 	<title>History.js Test Suite</title>
 	<style type="text/css">
-		body,html,.test,iframe {
+		body,html,iframe {
 			padding:0;
 			margin:0;
 			outline:none;
 			border:none;
 		}
-		.test,iframe {
-			display:block;
-			width:100%;
+		.dir {
+			padding-top:1em;
 		}
-		.test {
-			float:left;
-		}
-		iframe {
-			height:400px;
+		.support {
+			padding-top:1em;
 		}
 	</style>
 </head>
@@ -30,8 +26,12 @@
 	<p>HTML4 Browsers - should pass the HTML4 tests and fail the HTML5 tests</p>
 	<?php
 	foreach ( $dirs as $dir ) :
+		echo '<div class="dir">';
 		foreach ( $supports as $support ) :
+			echo '<div class="support">';
 			foreach ( $adapters as $adapter ) :
+				echo '<div class="adapter">';
+
 				# Url
 				$tests_full_url = $tests_url."/${dir}/${support}/${adapter}";
 
@@ -42,9 +42,13 @@
 				$title = "History.js ${Dir} ${Support} ${Adapter} Test Suite";
 
 				# Render
-				?><div class="test"><a href="<?=$tests_full_url?>"><?=$title?></a></div><?php
+				?><a href="<?=$tests_full_url?>"><?=$title?></a><?php
+
+				echo '</div>';
 			endforeach;
+			echo '</div>';
 		endforeach;
+		echo '</div>';
 	endforeach;
 	?>
 </body>
