@@ -65,9 +65,9 @@
 	</script>
 	<script type="text/javascript" src="<?=$base_url?>/vendor/<?=$adapter?>.js"></script>
 	<script type="text/javascript" src="<?=$base_url?>/scripts/<?=$dir?>/history.adapter.<?=$adapter?>.js"></script>
-	<script type="text/javascript" src="<?=$base_url?>/scripts/<?=$dir?>/history.js/history.html5.js"></script>
+	<script type="text/javascript" src="<?=$base_url?>/scripts/<?=$dir?>/history.js"></script>
 	<?php if ( $support === 'html4' ) : ?>
-	<script type="text/javascript" src="<?=$base_url?>/scripts/<?=$dir?>/history.js/history.html4.js"></script>
+	<script type="text/javascript" src="<?=$base_url?>/scripts/<?=$dir?>/history.html4.js"></script>
 	<?php endif; ?>
 
 	<!-- QUnit -->

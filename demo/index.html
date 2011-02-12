@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>
+		History.js &lt; BrowserState Suite
+	</title>
+</head>
+<body style="padding-bottom:40px">
+	<!-- Scripts -->
+	<script type="text/javascript">
+		if ( typeof JSON === 'undefined' ) {
+			var
+				url = '../scripts/uncompressed/json2.js',
+				scriptEl = document.createElement('script');
+			scriptEl.type = 'text/javascript';
+			scriptEl.src = url;
+			document.body.appendChild(scriptEl,document.body.firstChild);
+		}
+	</script>
+	<script type="text/javascript" src="../vendor/jquery.js"></script>
+	<script type="text/javascript" src="../scripts/compressed/history.adapter.jquery.js"></script>
+	<script type="text/javascript" src="../scripts/compressed/history.js"></script>
+	<script type="text/javascript" src="../scripts/compressed/history.html4.js"></script>
+
+	<!-- HTML -->
+	<div id="wrap">
+		<!-- Intro -->
+		<h1><a href="https://github.com/balupton/History.js">History.js</a> by <a href="http://balupton.com">Benjamin Lupton</a></h1>
+		<p>History.js gracefully supports the <a href="https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history">HTML5 History/State APIs</a> (pushState, replaceState, onPopState) in all browsers. Including continued support for data, titles, replaceState. Supports <a href="http://jquery.com/">jQuery</a>, <a href="http://mootools.net">MooTools</a> and <a href="http://prototypejs.org">Prototype</a>. For HTML5 browsers this means that you can modify the URL directly, without needing to use hashes anymore. For HTML4 browsers it will revert back to using the old onhashchange functionality.</p>
+
+		<!-- Textarea for Logging -->
+		<textarea id="log" style="width:100%;height:400px"></textarea>
+
+		<!-- Note -->
+		<p>Click through the buttons in order and you'll get the results demonstrated in the <a href="../README.md">README.md</a> file.</p>
+
+		<!-- Buttons -->
+		<ul id="buttons">
+		</ul>
+
+		<!-- Subscribe to Updates -->
+		<h3 style="margin-top:30px">Subscribe to Updates</h3>
+		<p>You'll be the first to know when new releases come out. Yes this form actually works, it just isn't styled yet to keep things simple.</p>
+		<form action="http://balupton.createsend.com/t/r/s/phujuu/" method="post" id="subForm">
+		<div>
+		<label for="name">Name:</label><input type="text" name="cm-name" id="name" /><br />
+		<label for="phujuu-phujuu">Email:</label><input type="text" name="cm-phujuu-phujuu" id="phujuu-phujuu" /><br />
+		<label for="Website">Website:</label><input type="text" name="cm-f-kjqtu" id="Website" /><br />
+		<input type="submit" value="Subscribe" />
+		</div>
+		</form>
+
+		<!-- Our Script -->
+		<script type="text/javascript">
+			(function(window,undefined){
+
+				// Establish Variables
+				var
+					History = window.History // Note: We are using a capital H instead of a lower h
+					;
+
+				// Bind to State Change
+				History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+					// Log the State
+					var State = History.getState(); // Note: We are using History.getState() instead of event.state
+					History.log('statechange:', State.data, State.title, State.url);
+				});
+
+				// Prepare Buttons
+				var
+					buttons = document.getElementById('buttons'),
+					scripts = [
+						'History.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"',
+						'History.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"',
+						'History.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"',
+						'History.pushState(null, null, "?state=4"); // logs {}, "", "?state=4"',
+						'History.back(); // logs {state:3}, "State 3", "?state=3"',
+						'History.back(); // logs {state:1}, "State 1", "?state=1"',
+						'History.back(); // logs {}, "The page you started at", "?"',
+						'History.go(2); // logs {state:3}, "State 3", "?state=3"'
+					],
+					buttonsHTML = ''
+					;
+
+				// Add Buttons
+				for ( var i=0,n=scripts.length; i<n; ++i ) {
+					var _script = scripts[i];
+					buttonsHTML +=
+						'<li><button onclick=\'javascript:'+_script+'\'>'+_script+'</button></li>';
+				}
+				buttons.innerHTML = buttonsHTML;
+
+			})(window);
+		</script>
+	</div>
+
+</body>
+</html>

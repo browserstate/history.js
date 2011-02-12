@@ -5,3 +5,5 @@ RewriteBase /
 # Clean Adapter
 RewriteCond %{REQUEST_FILENAME} !index.php$
 RewriteRule ([a-z]+)/([a-z0-9]+)/([a-z]+)/?$ products/history.js/tests/frame.php?dir=$1&support=$2&adapter=$3 [NC,L,QSA]
+
+# To alter the above for your test environment, all you need to do is change "products/history.js" to wherever history.js is located on your webserver. For example for me it's located at "http://localhost/products/history.js" - if for you it is located at "http://localhost/history.js" then you would change "products/history.js" to "history.js"

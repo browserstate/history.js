@@ -4,12 +4,11 @@ Welcome to History.js (v1.5.0 - Unreleased)
 
 This project is the successor of [jQuery History](http://balupton.com/projects/jquery-history), it aims to:
 
-- Support [HTML5's History/State APIs](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history)
-- Provide a backwards compatible experience for Browsers which do not support HTML5's History APIs
-- Provide a backwards compatible experience for Browsers which do not support HTML4's OnHashChange
-- Provide a forwards compatible experience for HTML4 States in HTML5 Browsers (see usage section for an example)
-- Follow the original API's as much as possible and support attaching data and title properties to states as well as both the `pushState` and `replaceState` methods in **both** HTML4 **and** HTML5 browsers.
-- Support as many javascript frameworks as possible via adapters - especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/) and [Prototype](http://www.prototypejs.org/)
+- Follow the [HTML5's History/State APIs](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
+- Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
+- Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
+- Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
+- Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/) and [Prototype](http://www.prototypejs.org/)
 
 Licensed under the [New BSD License](http://creativecommons.org/licenses/BSD/)
 Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
@@ -17,7 +16,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Usage
 
-Working with History.js:
+### Working with History.js:
 
 	(function(window,undefined){
 
@@ -39,7 +38,7 @@ Working with History.js:
 
 	})(window);
 
-So how would the above operations look in a HTML5 Browser?
+### How would the above operations look in a HTML5 Browser?
 
 1. www.mysite.com
 1. www.mysite.com?state=1
@@ -51,9 +50,9 @@ So how would the above operations look in a HTML5 Browser?
 1. www.mysite.com
 1. www.mysite.com?state=3
 
-> _Note: These urls also work in HTML4 browsers and Search Engines. So no need for the `#!` fragment-identifier that google ["recommends"](http://getsatisfaction.com/balupton/topics/support_googles_recommendation_for_ajax_deeplinking)._
+> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling).
 
-And how would they look in a HTML4 Browser?
+### How would they look in a HTML4 Browser?
 
 1. www.mysite.com
 1. www.mysite.com#?state=1/uid=1
@@ -65,18 +64,20 @@ And how would they look in a HTML4 Browser?
 1. www.mysite.com
 1. www.mysite.com#?state=3/uid=3
 
-> _Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states their HTML5 equivalents so the user won't even notice :-)_
+> Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states their HTML5 equivalents so the user won't even notice :-)
 >
-> _Note 2: There urls will be url-encoded in Firefox 3; IE6,7,8; and Safari 5. Opera does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work. There is nothing we can do about this._
+> Note 2: These urls will be url-encoded in Firefox 3; IE6,7,8; and Safari 5. Opera does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work. There is nothing we can do about this.
+>
+> Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
-What's the deal with the UIDs used in the HTML4 States?
+### What's the deal with the UIDs used in the HTML4 States?
 
 - UIDs are used when we utilise a `title` and/or `data` in our state. Adding a UID allows us to associate particular states with data and titles while keeping the urls as simple as possible (don't worry it's all tested, working and a lot smarter than I'm making it out to be).
 - If you aren't utilising `title` or `data` then we don't even include a UID (as there is no need for it) - as seen by State 4 above :-)
 - We also shrink the urls to make sure that the smallest url will be used. For instance we will adjust `http://www.mysite.com/#http://www.mysite.com/projects/History.js` to become `http://www.mysite.com/#/projects/History.js` automatically. (again tested, working, and smarter).
 - It works with domains, subdomains, subdirectories, whatever - doesn't matter where you put it. It's smart.
 
-Is there a working demo?
+### Is there a working demo?
 
 - Sure is, give it a download and navigate to the demo directory in your browser :-)
 - If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports. _Note: you will have to [run a `git submodule init; git submodule update` and update the `tests/.htaccess` for your path] prior to running the tests._
@@ -115,15 +116,13 @@ Is there a working demo?
 
 	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
+
 4. Include History.js
 
-	- For support of HTML5 and HTML4 browsers include this:
+		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
+		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.all.js"></script>
-
-	- For support of only HTML5 browsers (so no support for HTML4 browsers / aka hash fallback), include this instead:
-
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js/history.html5.js"></script>
+> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just remove the `history.html4.js` include in step #4 file and the JSON2 include in step #2 [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
 
 ## Subscribe to Updates
@@ -186,9 +185,11 @@ History.js is an actively developed, supported and maintained project. You can g
 - State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
 - State titles will always be applied to the `document.title` if set
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
-- History.js fixes the following browser bugs:
-	- Chrome does not retrieve the correct data when traversing back to the start page
-	- Safari 5 and Safari iOS 4.2.1 do not fire `onpopstate` on page load or when the hash has changed
+- History.js resolves the following browser bugs:
+	- Chrome does not retrieve the correct state data when traversing back to the start page
+	- Safari 5 and Safari iOS 4.2.1 do not fire the `onpopstate` event on page load or when the hash has changed
+	- MSIE 6 and 7 sometimes do not actually apply hash-changes
+	- Non-Opera HTML4 browsers sometimes fail when the hash is not `urlencoded`
 - HTML4 Browsers on initial page load will have a hash inserted into the url; this is to ensure correct cross-compatibility between HTML4 browsers (as IE will refresh the page if the anchor is lost)
 - Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as onpopstate except does not fire for traditional anchors
@@ -246,7 +247,4 @@ History.js is an actively developed, supported and maintained project. You can g
 	- Default will use cookies (requires no configuration) - limited to a 4KB payload.
 	- Extension will use cookies and add an ajax pre-fetch to fetch full (unlimited) data (requires configuration through a server-side helper)
 - Add an Ajax extension to succeed the [jQuery Ajaxy](http://balupton.com/projects/jquery-ajaxy) project
-- Split HTML4 browser support (the hash fallback) from HTML5 browser support
-	- If the use case of "A HTML4 js-enabled user shares a link with a js-disabled user, the link does not work." is an essential use case in your application, then the HTML4 support will be detrimental. However; due to the HTML5 cross-browser-compatibility offered by History.js it's still a very valuable asset. This change will allow History.js to support a much broader audience, without any sacrifices.
-	- This can either be done by an option, or by splitting the code away (eg. `history.html4.js`) - the latter option is preferable as users only include the code they need.
 - Add a compilation test to ensure `.debug = false` and no `History.log` or `console.xxx` calls exist.
