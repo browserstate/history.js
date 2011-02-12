@@ -1,4 +1,4 @@
-Welcome to History.js (v1.5.0 - Unreleased)
+Welcome to History.js (v1.5.0 - February 12 2011)
 ==================
 
 
@@ -181,15 +181,15 @@ History.js is an actively developed, supported and maintained project. You can g
 
 ## Notes on Compatibility
 
-- State data will always contain the State's title and url at: `data.title` and `data.url`
-- State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
-- State titles will always be applied to the `document.title` if set
-- ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
 - History.js resolves the following browser bugs:
 	- Chrome does not retrieve the correct state data when traversing back to the start page
 	- Safari 5 and Safari iOS 4.2.1 do not fire the `onpopstate` event on page load or when the hash has changed
 	- MSIE 6 and 7 sometimes do not actually apply hash-changes
 	- Non-Opera HTML4 browsers sometimes fail when the hash is not `urlencoded`
+- State data will always contain the State's title and url at: `data.title` and `data.url`
+- State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
+- State titles will always be applied to the `document.title` if set
+- ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
 - HTML4 Browsers on initial page load will have a hash inserted into the url; this is to ensure correct cross-compatibility between HTML4 browsers (as IE will refresh the page if the anchor is lost)
 - Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as onpopstate except does not fire for traditional anchors
@@ -198,7 +198,7 @@ History.js is an actively developed, supported and maintained project. You can g
 
 ## Changelog
 
-- v1.5.0 - Unreleased
+- v1.5.0 - February 12 2011
 	- Moved to UglifyJS instead of Google Closure
 	- Split HTML4 functionality from HTML5 functionality
 	- Installation details have changed (the filenames are different)
@@ -243,8 +243,11 @@ History.js is an actively developed, supported and maintained project. You can g
 
 ## Todo for Upcoming Releases
 
+- Allow for url to be optional in `pushState` and `replaceState` calls
 - Add data persistance to HTML4 browsers (navigate to 3rd party website, navigate back, state data should still be there)
 	- Default will use cookies (requires no configuration) - limited to a 4KB payload.
 	- Extension will use cookies and add an ajax pre-fetch to fetch full (unlimited) data (requires configuration through a server-side helper)
 - Add an Ajax extension to succeed the [jQuery Ajaxy](http://balupton.com/projects/jquery-ajaxy) project
 - Add a compilation test to ensure `.debug = false` and no `History.log` or `console.xxx` calls exist.
+
+It's likely these features and/or others have been included in the latest [dev branch](https://github.com/balupton/History.js/tree/dev). If you are wanting to fork and help out, then be sure to work on the dev branch and not master.
