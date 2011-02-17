@@ -174,8 +174,8 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ### Functions
 
-- `History.pushState(data,title,url)` <br/> Pushes a new state to the browser, `data` and `title` can be null
-- `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser, `data` and `title` can be null
+- `History.pushState(data,title,url)` <br/> Pushes a new state to the browser; `data` can be null or an object, `title` can be a string or null, `url` must be a string
+- `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser; `data` can be null or an object, `title` can be a string or null, `url` must be a string
 - `History.getState()` <br/> Get's the current state of the browser, returns an object with `data`, `title` and `url`
 - `History.getHash()` <br/> Get's the current hash of the browser
 - `History.Adapter.bind(element,event,callback)` <br/> A framework independent event binder, you may either use this or your framework's native event binder.
