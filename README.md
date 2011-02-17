@@ -4,7 +4,7 @@ Welcome to History.js (v1.5.0 - February 12 2011)
 
 This project is the successor of [jQuery History](http://balupton.com/projects/jquery-history), it aims to:
 
-- Follow the [HTML5's History/State APIs](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
+- Follow the [HTML5 History/State APIs](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
@@ -64,9 +64,9 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 1. www.mysite.com
 1. www.mysite.com#?state=3/uid=3
 
-> Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states their HTML5 equivalents so the user won't even notice :-)
+> Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states into their HTML5 equivalents so the user won't even notice :-)
 >
-> Note 2: These urls will be url-encoded in Firefox 3; IE6,7,8; and Safari 5. Opera does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work. There is nothing we can do about this.
+> Note 2: These urls will be url-encoded in all HTML4 Browsers except Opera as it does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work (the hashes won't actually apply). There is nothing we can do about this.
 >
 > Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
@@ -138,6 +138,20 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 ## Getting Support
 
 History.js is an actively developed, supported and maintained project. You can grab support via its [GitHub Issue Tracker](https://github.com/balupton/History.js/issues). Alternatively you can reach [Benjamin Lupton](http://balupton.com) (the core developer) via [twitter](http://twitter.com/balupton), skype (balupton) or email (contact@balupton.com).
+
+
+## Giving Support
+
+You can make a difference and show your support, here are a few ways you can give back!
+
+- Give it your honest rating on it's [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js)
+- If you have any feedback or suggestions let me know via History.js's [GitHub Issue Tracker](https://github.com/balupton/History.js/issues) so I can ensure you get the best experience!
+- Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
+- Donate via the donation form at the bottom of [balupton.com](http://balupton.com) - every cent truly does help!
+- Make it easier for me to contact you about future releases by subscribing via the signup form in the demo page - you'll be the first to know about new features and updates
+- Watch it via clicking the "watch" button up the top of History.js's [GitHub Project Page](https://github.com/balupton/History.js)
+
+Thanks! every little bit of help really does help make a difference. Again thank you.
 
 
 ## Browsers: Tested and Working In
