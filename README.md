@@ -142,16 +142,16 @@ History.js is an actively developed, supported and maintained project. You can g
 
 ## Giving Support
 
-You can make a difference and show your support, here are a few ways you can give back!
+If you'd love to give some support back and make a difference; here are a few great ways you can give back!
 
 - Give it your honest rating on it's [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js)
-- If you have any feedback or suggestions let me know via History.js's [GitHub Issue Tracker](https://github.com/balupton/History.js/issues) so I can ensure you get the best experience!
+- If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/History.js/issues) - so that I can ensure you get the best experience!
 - Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
-- Donate via the donation form at the bottom of [balupton.com](http://balupton.com) - every cent truly does help!
-- Make it easier for me to contact you about future releases by subscribing via the signup form in the demo page - you'll be the first to know about new features and updates
-- Watch it via clicking the "watch" button up the top of History.js's [GitHub Project Page](https://github.com/balupton/History.js)
+- Donate via the donation form at the bottom right of [balupton.com](http://balupton.com) - every cent truly does help!
+- Make it easier for me to let you know about future releases and updates by subscribing via the signup form inside the demo page
+- Watch it via clicking the "watch" button up the top of its [Project Page](https://github.com/balupton/History.js)
 
-Thanks! every little bit of help really does help make a difference. Again thank you.
+Thanks! every bit of help really does make a difference. Again thank you.
 
 
 ## Browsers: Tested and Working In
