@@ -144,7 +144,7 @@ History.js is an actively developed, supported and maintained project. You can g
 
 If you'd love to give some support back and make a difference; here are a few great ways you can give back!
 
-- Give it your honest rating on it's [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js)
+- Give it your honest rating on it's [jQuery Plugin Page](http://plugins.jquery.com/project/history-js)
 - If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/History.js/issues) - so that I can ensure you get the best experience!
 - Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
 - Donate via the donation form at the bottom right of [balupton.com](http://balupton.com) - every cent truly does help!
