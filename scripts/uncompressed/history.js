@@ -375,7 +375,7 @@
 			}
 			catch ( Exception ) {
 				var
-					parts = /(.*)\/uid=([0-9]+)$/.exec(hash),
+					parts = /(.*)\&uid=([0-9]+)$/.exec(hash),
 					url = parts ? (parts[1]||hash) : hash,
 					uid = parts ? String(parts[2]||'') : '';
 
@@ -452,7 +452,7 @@
 					_History.uidsToStates[uid] = State;
 
 					// Simplified Hash
-					hash = History.contractUrl(State.url)+'/uid='+uid;
+					hash = History.contractUrl(State.url)+'&uid='+uid;
 				}
 			}
 
