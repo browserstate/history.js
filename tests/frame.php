@@ -21,7 +21,7 @@
 	}
 
 	# Url
-	$tests_full_url = $tests_url."/${dir}/${support}/${adapter}";
+	$tests_full_url = $tests_url."/${dir}/${support}/${adapter}/";
 
 	# Titles
 	$Support = strtoupper($support);

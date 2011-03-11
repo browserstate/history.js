@@ -232,11 +232,6 @@
 				rootUrl += ':'+document.location.port;
 			}
 
-			// Check
-			if ( rootUrl === 'file://' ) {
-				rootUrl = History.getBasePage();
-			}
-
 			// Return
 			return rootUrl;
 		};
@@ -261,7 +256,9 @@
 
 		History.getBasePage = function(){
 			// Create
-			var basePage = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,'');
+			var basePage = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+				return /\./.test(part) ? '' : part;
+			});
 
 			// Return
 			return basePage;
@@ -403,28 +400,34 @@
 			// Prepare
 			var State = null;
 
-			// JSON
-			try {
-				State = JSON.parse(hash);
+			// Check
+			if ( hash === '' ) {
+				State = History.createStateObject();
 			}
-			catch ( Exception ) {
-				var
-					parts = /(.*)\/uid=([0-9]+)$/.exec(hash),
-					url = parts ? (parts[1]||hash) : hash,
-					uid = parts ? String(parts[2]||'') : '';
-
-				if ( uid ) {
-					State = _History.getStateByUid(uid)||null;
+			else {
+				// JSON
+				try {
+					State = JSON.parse(hash);
 				}
+				catch ( Exception ) {
+					var
+						parts = /(.*)\/uid=([0-9]+)$/.exec(hash),
+						url = parts ? (parts[1]||hash) : hash,
+						uid = parts ? String(parts[2]||'') : '';
 
-				if ( !State && /\//.test(hash) ) {
-					// Is a URL
-					var expandedUrl = History.expandUrl(hash);
-					State = History.createStateObject(null,null,expandedUrl);
-				}
-				else {
-					// Non State Hash
-					// do nothing
+					if ( uid ) {
+						State = _History.getStateByUid(uid)||null;
+					}
+
+					if ( !State && /\//.test(hash) ) {
+						// Is a URL
+						var expandedUrl = History.expandUrl(hash);
+						State = History.createStateObject(null,null,expandedUrl);
+					}
+					else {
+						// Non State Hash
+						// do nothing
+					}
 				}
 			}
 
@@ -772,11 +775,14 @@
 			// Log hash
 			History.debug('History.setHash',this,arguments,'hash:',hash,'adjustedHash:',adjustedHash,'oldHash:',document.location.hash);
 
-			// Make Busy + Continue
-			History.busy(true);
+			// Check
+			if ( document.location.hash !== adjustedHash ) {
+				// Make Busy + Continue
+				History.busy(true);
 
-			// Apply hash
-			document.location.hash = adjustedHash;
+				// Apply hash
+				document.location.hash = adjustedHash;
+			}
 
 			// Return hash
 			return hash;
@@ -1317,8 +1323,10 @@
 					History.Adapter.trigger(window,'popstate');
 				});
 			}
-		}
-	}; // init
+
+		} // if ( !History.emulated.pushState ) {
+
+	}; // History.initHtml5 = function(){
 
 	// Try Load HTML5 Support
 	History.initHtml5();

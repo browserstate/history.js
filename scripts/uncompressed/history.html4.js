@@ -466,7 +466,7 @@
 				currentState = History.expandHash(currentHash);
 				if ( !currentState ) {
 					// Traditional Anchor Hash
-					History.debug('_History.onHashChange: traditional anchor');
+					History.debug('_History.onHashChange: traditional anchor', currentHash);
 					History.Adapter.trigger(window,'anchorchange');
 					History.busy(false);
 					return false;
@@ -600,8 +600,8 @@
 				}
 
 				// Update HTML4 Hash
-				if ( newStateHash !== html4Hash ) {
-					History.debug('History.pushState: update hash', newStateHash);
+				if ( newStateHash !== html4Hash && newStateHash !== History.contractUrl() ) {
+					History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
 					return false;
 				}
@@ -667,22 +667,24 @@
 			};
 
 			/**
+			 * Create the initial State
+			 */
+			_History.saveState(_History.storeState(History.createStateObject({},'',document.location.href)));
+
+			/**
 			 * Ensure initial state is handled correctly
 			 **/
-			if ( !document.location.hash || document.location.hash === '#' ) {
-				History.Adapter.onDomLoad(function(){
-					History.debug('Internet Explorer Initial State Change Fix');
-					var currentState = History.createStateObject({},'',document.location.href);
-					History.pushState(currentState.data,currentState.title,currentState.url);
-				});
-			} else if ( !History.emulated.hashChange ) {
+			if ( document.location.hash && document.location.hash !== '#' && !History.emulated.hashChange ) {
 				History.debug('Firefox Initial State Change Fix');
 				History.Adapter.onDomLoad(function(){
 					_History.onHashChange();
 				});
 			}
-		}
-	}
+
+		} // if ( History.emulated.pushState ) {
+
+	}; // History.initHtml4 = function(){
+
 
 	// Try Load HTML4 Support
 	History.initHtml4();
