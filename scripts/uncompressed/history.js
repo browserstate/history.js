@@ -177,7 +177,7 @@
 		 * Which features require emulating?
 		 */
 		History.emulated = {
-			pushState: !Boolean(window.history && window.history.pushState && window.history.replaceState)
+			pushState: !Boolean(window.history && window.history.pushState && window.history.replaceState && navigator.platform !== 'iPhone')
 		};
 
 		/**
