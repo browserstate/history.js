@@ -45,8 +45,8 @@ var
 	stateOrder = [0,1,2,3,4,3,1,0,1,3,4,3,1,0],
 	currentTest = 0;
 
-// State Change
-History.Adapter.bind(window,'statechange',function(){
+// Check State
+var checkState = function(){
 	var
 		stateIndex = stateOrder[currentTest],
 		expectedState = History.expandState(States[stateIndex]),
@@ -62,9 +62,15 @@ History.Adapter.bind(window,'statechange',function(){
 		History.log('Completed: '+testName +' / '+ stateName);
 		var result = same(actualState,expectedState,stateName);
 	});
-});
+};
 
+// Check the Initial State
+checkState();
 
+// State Change
+History.Adapter.bind(window,'statechange',checkState);
+
+// Log
 var addLog = function(){
 	var args = arguments;
 	History.queue(function(){
@@ -72,6 +78,7 @@ var addLog = function(){
 	});
 };
 
+// Dom Load
 History.Adapter.onDomLoad(function(){
 	setTimeout(function(){
 

@@ -18,6 +18,7 @@
 	var
 		console = window.console||undefined, // Prevent a JSLint complain
 		document = window.document, // Make sure we are using the correct document
+		navigator = window.navigator, // Make sure we are using the correct navigator
 		_History = window._History, // Private History Object
 		History = window.History, // Public History Object
 		history = window.history; // Old History Object
@@ -216,6 +217,56 @@
 		// ----------------------------------------------------------------------
 		// State Object Helpers
 
+		History.getBaseUrl = function(){
+			// Create
+			var baseUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,'');
+
+			// Return
+			return baseUrl;
+		};
+
+		History.getRootUrl = function(){
+			// Create
+			var rootUrl = document.location.protocol+'//'+(document.location.hostname||document.location.host);
+			if ( document.location.port||false ) {
+				rootUrl += ':'+document.location.port;
+			}
+
+			// Check
+			if ( rootUrl === 'file://' ) {
+				rootUrl = History.getBasePage();
+			}
+
+			// Return
+			return rootUrl;
+		};
+
+		History.getBaseHref = function(){
+			// Create
+			var
+				baseElements = document.getElementsByTagName('base'),
+				baseElement = null,
+				baseHref = '';
+
+			// Test for Base Element
+			if ( baseElements.length === 1 ) {
+				// Prepare for Base Element
+				baseElement = baseElements[0];
+				baseHref = baseElement.href.replace(/[^\/]+$/,'');
+			}
+
+			// Return
+			return baseHref;
+		};
+
+		History.getBasePage = function(){
+			// Create
+			var basePage = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,'');
+
+			// Return
+			return basePage;
+		};
+
 		/**
 		 * History.contractUrl(url)
 		 * Ensures that we have a relative URL and not a absolute URL
@@ -226,15 +277,11 @@
 			// Prepare
 			url = History.expandUrl(url);
 
-			// Prepare for Base Domain
-			var baseDomain = document.location.protocol+'//'+(document.location.hostname||document.location.host);
-			if ( document.location.port||false ) {
-				baseDomain += ':'+document.location.port;
-			}
-			baseDomain += '/';
+			// Prepare for Root Url
+			var rootUrl = History.getRootUrl();
 
-			// Adjust for Base Domain
-			url = url.replace(baseDomain,'/');
+			// Adjust for Root Url
+			url = url.replace(rootUrl+'/','/');
 
 			// Return url
 			return url;
@@ -260,30 +307,22 @@
 				// Test for Base Page
 				if ( url.length === 0 || url.substring(0,1) === '?' ) {
 					// Fetch Base Page
-					var basePage = document.location.href.replace(/[#\?].*/,'');
+					var basePage = History.getBasePage();
 
 					// Adjust Page
-					url = basePage+url;
+					url = basePage + url;
 				}
 
 				// No Base Page
 				else {
 
 					// Prepare for Base Element
-					var
-						baseElements = document.getElementsByTagName('base'),
-						baseElement = null,
-						baseHref = '';
+					var baseHref = History.getBaseHref();
 
 					// Test for Base Element
-					if ( baseElements.length === 1 ) {
-						// Prepare for Base Element
-						baseElement = baseElements[0];
-						baseHref = baseElement.href;
-						if ( baseHref[baseHref.length-1] !== '/' ) baseHref += '/';
-
+					if ( baseHref ) {
 						// Adjust for Base Element
-						url = baseHref+url.replace(/^\//,'');
+						url = baseHref + '/' + url.replace(/^\//,'');
 					}
 
 					// No Base Element
@@ -291,24 +330,19 @@
 						// Test for Base URL
 						if ( url.substring(0,1) === '.' ) {
 							// Prepare for Base URL
-							var baseUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,'');
-							if ( baseUrl[baseUrl.length-1] !== '/' ) baseUrl += '/';
+							var baseUrl = History.getBaseUrl();
 
 							// Adjust for Base URL
-							url = baseUrl + url;
+							url = baseUrl + '/' + url;
 						}
 
 						// No Base URL
 						else {
-							// Prepare for Base Domain
-							var baseDomain = document.location.protocol+'//'+(document.location.hostname||document.location.host);
-							if ( document.location.port||false ) {
-								baseDomain += ':'+document.location.port;
-							}
-							baseDomain += '/';
+							// Prepare for Root Url
+							var rootUrl = History.getRootUrl();
 
-							// Adjust for Base Domain
-							url = baseDomain+url.replace(/^\//,'');
+							// Adjust for Root Url
+							url = rootUrl + '/' + url.replace(/^\//,'');
 						}
 					}
 				}
@@ -552,8 +586,8 @@
 		/**
 		 * _History.storeState
 		 * Store a State
-		 * @param {object} State
-		 * @return {boolean} true
+		 * @param {Object} newState
+		 * @return {Object} newState
 		 */
 		_History.storeState = function(newState){
 			// Prepare
@@ -574,8 +608,8 @@
 			// Store the State
 			_History.statesByUrl[newState.url] = _History.statesByHash[newStateHash] = newState;
 
-			// Return true
-			return true;
+			// Return newState
+			return newState;
 		};
 
 		/**
@@ -1267,20 +1301,15 @@
 				return true;
 			}
 
+			/**
+			 * Create the initial State
+			 */
+			_History.saveState(_History.storeState(History.createStateObject({},'',document.location.href)));
 
 			/**
 			 * Ensure Cross Browser Compatibility
 			 */
 			if ( navigator.vendor === 'Apple Computer, Inc.' ) {
-				/**
-				 * Fix Safari Initial State Issue
-				 */
-				History.Adapter.onDomLoad(function(){
-					History.debug('Safari Initial State Change Fix');
-					var currentState = History.createStateObject({},'',document.location.href);
-					History.pushState(currentState.data,currentState.title,currentState.url);
-				});
-
 				/**
 				 * Fix Safari HashChange Issue
 				 */

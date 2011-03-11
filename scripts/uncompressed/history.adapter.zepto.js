@@ -1,5 +1,5 @@
 /**
- * History.js jQuery Adapter
+ * History.js Zepto Adapter
  * @author Benjamin Arthur Lupton <contact@balupton.com>
  * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
@@ -53,7 +53,7 @@
 		 * @return {true}
 		 */
 		onDomLoad: function(callback) {
-			jQuery(callback);
+			$(callback);
 		}
 
 	};
@@ -68,4 +68,4 @@
 		History.initHtml4();
 	}
 
-})(jQuery,window);
+})(Zepto,window);

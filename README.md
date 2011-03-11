@@ -1,4 +1,4 @@
-Welcome to History.js (v1.5.0 - February 12 2011)
+Welcome to History.js (v1.6.0 - March ?? 2011)
 ==================
 
 
@@ -102,17 +102,21 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 3. Include the Adapter for your Framework:
 
-	- [jQuery](http://jquery.com/)
+	- [jQuery](http://jquery.com/) v1.4+
 
 			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
 
-	- [Mootools](http://mootools.net/)
+	- [Mootools](http://mootools.net/) v1.3+
 
 			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
 
-	- [Prototype](http://www.prototypejs.org/)
+	- [Prototype](http://www.prototypejs.org/) v1.7+
 
 			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
+
+	- [Zepto](http://www.prototypejs.org/) v0.5+
+
+			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.zepto.js"></script>
 
 	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
@@ -161,10 +165,10 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - Chrome 8,9
 - Firefox 4
 - Safari 5
-- Safari iOS 4.2.1
 
 ### HTML4 Browsers
 
+- Safari iOS 4.2.1
 - Opera 10,11
 - Firefox 3
 - IE 6,7,8
@@ -195,9 +199,10 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ## Notes on Compatibility
 
-- History.js resolves the following browser bugs:
-	- Chrome does not retrieve the correct state data when traversing back to the start page
-	- Safari 5 and Safari iOS 4.2.1 do not fire the `onpopstate` event on page load or when the hash has changed
+- History.js **solves** the following browser bugs:
+	- Chrome does not retrieve the correct state data when traversing back to the initial state
+	- Safari 5 and Safari iOS 4.2.1 do not fire the `onpopstate` event when the hash has changed, preventing HTML4 states from being picked up.
+	- Safari iOS 4.2.1 HTML5 History API works perfectly; however the actual back buttons of the browser fail. As such we use the HTML4 fallback for it allowing it to work perfectly with the same API.
 	- MSIE 6 and 7 sometimes do not actually apply hash-changes
 	- Non-Opera HTML4 browsers sometimes fail when the hash is not `urlencoded`
 - State data will always contain the State's title and url at: `data.title` and `data.url`
@@ -211,6 +216,13 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 
 ## Changelog
+
+- v1.6.0 - March ?? 2011
+	- Added Zepto adapter thanks to [Matt Garret](http://twitter.com/#!/matthewgarrett)
+	- The readme now references the supported versions of the libraries we use
+	- Updated vendors to the most recent copies. jQuery 1.5.1 and Mootools 1.3.1
+	- Reverted iOS Safari 4.2.1 to a HTML4 Browser
+	- **B/C BREAK:** StateChange now only fires if the state has changed, it no longer fires on init. This is following the [Firefox 4 History API Changes](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/) which we agree with - this breaks standard, but makes more sense.
 
 - v1.5.0 - February 12 2011
 	- Moved to UglifyJS instead of Google Closure

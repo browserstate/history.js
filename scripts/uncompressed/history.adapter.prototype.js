@@ -143,7 +143,7 @@
 		 * @return {true}
 		 */
 		onDomLoad: function(callback) {
-			Event.observe(window, 'load', callback);
+			Event.observe(window.document, 'dom:loaded', callback);
 		}
 	};
 
