@@ -177,7 +177,10 @@
 		 * Which features require emulating?
 		 */
 		History.emulated = {
-			pushState: !Boolean(window.history && window.history.pushState && window.history.replaceState && navigator.platform !== 'iPhone')
+			pushState: !Boolean(
+				window.history && window.history.pushState && window.history.replaceState
+				&& !/ Mobile\/(7W367a|8A400|8B117|8C134) /.test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+			)
 		};
 
 		/**
@@ -215,15 +218,7 @@
 		};
 
 		// ----------------------------------------------------------------------
-		// State Object Helpers
-
-		History.getBaseUrl = function(){
-			// Create
-			var baseUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,'');
-
-			// Return
-			return baseUrl;
-		};
+		// URL Helpers
 
 		History.getRootUrl = function(){
 			// Create
@@ -231,6 +226,7 @@
 			if ( document.location.port||false ) {
 				rootUrl += ':'+document.location.port;
 			}
+			rootUrl += '/';
 
 			// Return
 			return rootUrl;
@@ -250,104 +246,94 @@
 				baseHref = baseElement.href.replace(/[^\/]+$/,'');
 			}
 
+			// Adjust trailing slash
+			baseHref = baseHref.replace(/\/+$/,'');
+			if ( baseHref ) baseHref += '/';
+
 			// Return
 			return baseHref;
 		};
 
-		History.getBasePage = function(){
+		History.getBaseUrl = function(){
+			// Create
+			var baseUrl = History.getBaseHref()||History.getBasePageUrl()||History.getRootUrl();
+
+			// Return
+			return baseUrl;
+		};
+
+		History.getPageUrl = function(){
+			// Create
+			var basePage = document.location.href.replace(/\/+$/,'');
+
+			// Return
+			return basePage;
+		};
+
+		History.getBasePageUrl = function(){
 			// Create
 			var basePage = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
 				return /\./.test(part) ? '' : part;
-			});
+			}).replace(/\/+$/,'')+'/';
 
 			// Return
 			return basePage;
 		};
 
 		/**
-		 * History.contractUrl(url)
-		 * Ensures that we have a relative URL and not a absolute URL
-		 * @param {string} url
-		 * @return {string} url
-		 */
-		History.contractUrl = function(url){
-			// Prepare
-			url = History.expandUrl(url);
-
-			// Prepare for Root Url
-			var rootUrl = History.getRootUrl();
-
-			// Adjust for Root Url
-			url = url.replace(rootUrl+'/','/');
-
-			// Return url
-			return url;
-		};
-
-		/**
-		 * History.expandUrl(url)
+		 * History.getFullUrl(url)
 		 * Ensures that we have an absolute URL and not a relative URL
 		 * @param {string} url
 		 * @return {string} url
 		 */
-		History.expandUrl = function(url){
+		History.getFullUrl = function(url){
 			// Prepare
-			url = url||'';
+			var fullUrl = url, firstChar = url.substring(0,1);
 
-			// Test for Full URL
+			// Check
 			if ( /[a-z]+\:\/\//.test(url) ) {
-				// We have a Full URL
+				// Full URL
 			}
-
-			// Relative URL
+			else if ( firstChar === '/' ) {
+				// Root URL
+				fullUrl = History.getRootUrl()+url;
+			}
+			else if ( firstChar === '#' ) {
+				// Anchor URL
+				fullUrl = History.getPageUrl().replace(/#.*/,'')+url;
+			}
+			else if ( firstChar === '?' ) {
+				// Query URL
+				fullUrl = History.getPageUrl().replace(/[\?#].*/,'')+url;
+			}
 			else {
-				// Test for Base Page
-				if ( url.length === 0 || url.substring(0,1) === '?' ) {
-					// Fetch Base Page
-					var basePage = History.getBasePage();
-
-					// Adjust Page
-					url = basePage + url;
-				}
-
-				// No Base Page
-				else {
-
-					// Prepare for Base Element
-					var baseHref = History.getBaseHref();
-
-					// Test for Base Element
-					if ( baseHref ) {
-						// Adjust for Base Element
-						url = baseHref + '/' + url.replace(/^\//,'');
-					}
-
-					// No Base Element
-					else {
-						// Test for Base URL
-						if ( url.substring(0,1) === '.' ) {
-							// Prepare for Base URL
-							var baseUrl = History.getBaseUrl();
-
-							// Adjust for Base URL
-							url = baseUrl + '/' + url;
-						}
-
-						// No Base URL
-						else {
-							// Prepare for Root Url
-							var rootUrl = History.getRootUrl();
-
-							// Adjust for Root Url
-							url = rootUrl + '/' + url.replace(/^\//,'');
-						}
-					}
-				}
+				// Relative URL
+				fullUrl = History.getBaseUrl()+url;
 			}
 
-			// Return url
-			return url;
+			// Return
+			return fullUrl;
 		};
+
+		/**
+		 * History.getShortUrl(url)
+		 * Ensures that we have a relative URL and not a absolute URL
+		 * @param {string} url
+		 * @return {string} url
+		 */
+		History.getShortUrl = function(url){
+			// Prepare
+			var shortUrl, rootUrl = History.getRootUrl();
+
+			// Adjust
+			shortUrl = url.replace(rootUrl,'/');
+
+			// Return
+			return shortUrl;
+		};
+
+		// ----------------------------------------------------------------------
+		// State Object Helpers
 
 		/**
 		 * History.expandState(State)
@@ -359,7 +345,7 @@
 			oldState = oldState||{};
 			var newState = {
 				'data': oldState.data||{},
-				'url': History.expandUrl(oldState.url||''),
+				'url': History.getFullUrl(oldState.url||''),
 				'title': oldState.title||''
 			};
 			newState.data.title = newState.data.title||newState.title;
@@ -421,7 +407,7 @@
 
 					if ( !State && /\//.test(hash) ) {
 						// Is a URL
-						var expandedUrl = History.expandUrl(hash);
+						var expandedUrl = History.getFullUrl(hash);
 						State = History.createStateObject(null,null,expandedUrl);
 					}
 					else {
@@ -464,7 +450,7 @@
 
 				// Handle
 				if ( _History.isEmptyObject(State) && !State.title ) {
-					hash = History.contractUrl(State.url);
+					hash = History.getShortUrl(State.url);
 				}
 				else {
 					// Serialised Hash
@@ -489,7 +475,7 @@
 					_History.uidsToStates[uid] = State;
 
 					// Simplified Hash
-					hash = History.contractUrl(State.url)+'/uid='+uid;
+					hash = History.getShortUrl(State.url)+'/uid='+uid;
 				}
 			}
 
@@ -753,7 +739,7 @@
 		 * History.setHash(hash)
 		 * Sets the document hash
 		 * @param {string} hash
-		 * @return {string}
+		 * @return {History}
 		 */
 		History.setHash = function(hash,queue){
 			// Handle Queueing
@@ -775,17 +761,40 @@
 			// Log hash
 			History.debug('History.setHash',this,arguments,'hash:',hash,'adjustedHash:',adjustedHash,'oldHash:',document.location.hash);
 
-			// Check
-			if ( document.location.hash !== adjustedHash ) {
-				// Make Busy + Continue
-				History.busy(true);
+			// Make Busy + Continue
+			History.busy(true);
 
-				// Apply hash
-				document.location.hash = adjustedHash;
+			// Check if hash is a state
+			var State = History.expandHash(hash);
+			if ( State ) {
+				// Hash is a state so skip the setHash
+				History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',this,arguments);
+
+				// PushState
+				History.pushState(State.data,State.title,State.url,false);
+			}
+			else if ( document.location.hash !== adjustedHash ) {
+
+				// Hash is a proper hash, so apply it
+
+				// Handle browser bugs
+				if ( !History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' ) {
+					// Fix Safari Bug https://bugs.webkit.org/show_bug.cgi?id=56249
+
+					// Fetch the base page
+					var pageUrl = History.getPageUrl();
+
+					// Safari hash apply
+					History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
+				}
+				else {
+					// Normal hash apply
+					document.location.hash = adjustedHash;
+				}
 			}
 
-			// Return hash
-			return hash;
+			// Chain
+			return History;
 		};
 
 		/**
@@ -947,6 +956,64 @@
 		// ----------------------------------------------------------------------
 		// State Aliases
 
+		History.stateChanged = false;
+		History.doubleChecker = null;
+
+		History.doubleCheckComplete = function(){
+			// Update
+			History.stateChanged = true;
+
+			// Clear
+			History.doubleCheckReset();
+
+			// Chain
+			return History;
+		}
+
+		History.doubleCheckReset = function(){
+			// Clear
+			if ( History.doubleChecker ) {
+				clearTimeout(History.doubleChecker);
+				History.doubleChecker = null;
+			}
+
+			// Chain
+			return History;
+		}
+
+		History.doubleCheck = function(tryAgain){
+			// Prepare
+			var
+				safariBug = (!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.'),
+				ieBug = (History.emulated.hashChange && _History.isInternetExplorer()),
+				hasBug = safariBug || ieBug;
+
+			// Reset
+			History.stateChanged = false;
+			History.doubleCheckReset();
+
+			// Fix IE6,IE7 bug where calling history.back or history.forward does not actually change the hash (whereas doing it manually does)
+			// Fix Safari 5 bug where sometimes the state does not change: https://bugs.webkit.org/show_bug.cgi?id=42940
+			if ( hasBug ) {
+				// Apply Check
+				History.doubleChecker = setTimeout(
+					function(){
+						History.doubleCheckReset();
+						if ( !History.stateChanged ) {
+							History.log('History.doubleCheck: State has not yet changed, trying again', arguments);
+							// Re-Attempt
+							tryAgain();
+						}
+						return true;
+					},
+					History.options.hashChangeCheckerDelay*5
+				);
+			}
+
+			// Chain
+			return History;
+		};
+
 		/**
 		 * History.back(queue)
 		 * Send the browser history back one item
@@ -971,22 +1038,10 @@
 			// Make Busy + Continue
 			History.busy(true);
 
-			// Fix a bug in IE6,IE7
-			if ( History.emulated.hashChange && _History.isInternetExplorer() ) {
-				// Prepare
-				var currentHash = History.getHash();
-
-				// Apply Check
-				setTimeout(function(){
-					var newHash = History.getHash();
-					if ( newHash === currentHash ) {
-						// No change occurred, try again
-						History.debug('History.back: trying again');
-						return History.back(false);
-					}
-					return true;
-				},History.options.hashChangeCheckerDelay*5);
-			}
+			// Fix certain browser bugs that prevent the state from changing
+			History.doubleCheck(function(){
+				History.back(false);
+			});
 
 			// Go back
 			history.go(-1);
@@ -1019,22 +1074,10 @@
 			// Make Busy + Continue
 			History.busy(true);
 
-			// Fix a bug in IE6,IE7
-			if ( History.emulated.hashChange && _History.isInternetExplorer() ) {
-				// Prepare
-				var currentHash = History.getHash();
-
-				// Apply Check
-				setTimeout(function(){
-					var newHash = History.getHash();
-					if ( newHash === currentHash ) {
-						// No change occurred, try again
-						History.debug('History.forward: trying again');
-						return History.forward(false);
-					}
-					return true;
-				},History.options.hashChangeCheckerDelay*5);
-			}
+			// Fix certain browser bugs that prevent the state from changing
+			History.doubleCheck(function(){
+				History.forward(false);
+			});
 
 			// Go forward
 			history.go(1);
@@ -1088,6 +1131,9 @@
 			_History.onPopState = function(event){
 				History.debug('_History.onPopState',this,arguments);
 
+				// Reset the double check
+				History.doubleCheckComplete();
+
 				// Check for a Hash, and handle apporiatly
 				var currentHash	= unescape(History.getHash());
 				if ( currentHash ) {
@@ -1139,29 +1185,34 @@
 				else if ( typeof event.state !== 'undefined' ) {
 					// Vanilla: Back/forward button was used
 
-					// Using Chrome Fix
-					var
-						newStateUrl = History.expandUrl(document.location.href),
-						oldState = _History.getStateByUrl(newStateUrl),
-						duplicateExists = _History.urlDuplicateExists(newStateUrl);
-
-					// Does oldState Exist?
-					if ( typeof oldState !== 'undefined' && !duplicateExists ) {
-						stateData = oldState.data;
-					}
-					else {
+					// Browser Fix
+					if ( false ) {
+						// Use the way that should work
 						stateData = event.state;
 					}
+					else {
+						// Using Chrome Fix
+						var
+							newStateUrl = History.getFullUrl(document.location.href),
+							oldState = _History.getStateByUrl(newStateUrl),
+							duplicateExists = _History.urlDuplicateExists(newStateUrl);
 
-					// Use the way that should work
-					// stateData = event.state;
+						// Does oldState Exist?
+						if ( typeof oldState !== 'undefined' && !duplicateExists ) {
+							stateData = oldState.data;
+						}
+						else {
+							stateData = event.state;
+						}
+					}
+
 				}
 				else {
 					// Vanilla: A new state was pushed, and popstate was called manually
 
 					// Get State object from the last state
 					var
-						newStateUrl = History.expandUrl(document.location.href),
+						newStateUrl = History.getFullUrl(document.location.href),
 						oldState = _History.getStateByUrl(newStateUrl);
 
 					// Check if the URLs match
@@ -1191,8 +1242,8 @@
 				History.debug(
 					'_History.onPopState',
 					'newState:', newState,
-					'oldState:', _History.getStateByUrl(History.expandUrl(document.location.href)),
-					'duplicateExists:', _History.urlDuplicateExists(History.expandUrl(document.location.href))
+					'oldState:', _History.getStateByUrl(History.getFullUrl(document.location.href)),
+					'duplicateExists:', _History.urlDuplicateExists(History.getFullUrl(document.location.href))
 				);
 
 				// Store the State
@@ -1224,7 +1275,7 @@
 			 */
 			History.pushState = function(data,title,url,queue){
 				// Check the State
-				if ( History.extractHashFromUrl(url) ) {
+				if ( History.extractHashFromUrl(url) && History.emulated.pushState ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
 				}
 
@@ -1271,7 +1322,7 @@
 			 */
 			History.replaceState = function(data,title,url,queue){
 				// Check the State
-				if ( History.extractHashFromUrl(url) ) {
+				if ( History.extractHashFromUrl(url) && History.emulated.pushState ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
 				}
 
@@ -1320,7 +1371,8 @@
 				 * Fix Safari HashChange Issue
 				 */
 				History.Adapter.bind(window,'hashchange',function(){
-					History.Adapter.trigger(window,'popstate');
+					//History.Adapter.trigger(window,'popstate');
+					_History.onPopState();
 				});
 			}
 

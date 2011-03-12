@@ -1,0 +1,61 @@
+<html>
+<head>
+	<title>Safari Hash ReplaceState History Traversal Bug</title>
+</head>
+<body>
+	<p>This demo demonstrates an issue with Safari 5.0.4 (6533.20.27) handing of hashes and replace state. When a hash is set, and then replaced using replaceState the history list are then broken, when traversing back the hash does not change.</p>
+	<p>Note: The issue requires a clean history list, as such this should always be opened in a new tab/window where there are no prior history items.</p>
+	<p>Reported by <a href="http://balupton.com">Benjamin Lupton</a> author of <a href="http://github.com/balupton/history.js">History.js</a></p>
+	<button id="bug">bug</button>
+	<button id="workaround">workaround</button>
+	<button id="reset">reset</button>
+	<textarea id="log" style="width:100%;height:200px;margin-top:1em;"></textarea>
+	<script type="text/javascript">
+		(function(){
+
+			window.onpopstate = function(event) {
+				var message = ("onpopstate: location: " + document.location.href);
+				document.getElementById('log').innerHTML += message+"\n\n";
+			};
+
+			window.onhashchange = function(event) {
+				var message = ("onhashchange: location: " + document.location.href);
+				document.getElementById('log').innerHTML += message+"\n\n";
+			};
+
+			document.getElementById('bug').onclick = function(){
+				setTimeout(function(){
+					document.location.hash = Math.random();
+				},1e3);
+
+				setTimeout(function(){
+					history.replaceState(null,'','?blah');
+				},2e3);
+
+				setTimeout(function(){
+					history.back(); // should take us to the initial page, it doesn't
+				},3e3);
+			};
+
+			document.getElementById('workaround').onclick = function(){
+				setTimeout(function(){
+					history.pushState(null,'','#'+Math.random());
+				},1e3);
+
+				setTimeout(function(){
+					history.replaceState(null,'','?blah');
+				},2e3);
+
+				setTimeout(function(){
+					history.back(); // will take us to the initial page
+				},3e3);
+			};
+
+			document.getElementById('reset').onclick = function(){
+				document.location.href = document.location.href.replace(/[\#\?].*/,"");
+			};
+
+		})();
+	</script>
+</body>
+</html>

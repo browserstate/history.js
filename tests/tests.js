@@ -45,6 +45,9 @@ var
 	stateOrder = [0,1,2,3,4,3,1,0,1,3,4,3,1,0],
 	currentTest = 0;
 
+// Original Title
+var title = document.title;
+
 // Check State
 var checkState = function(){
 	var
@@ -53,6 +56,8 @@ var checkState = function(){
 		actualState = History.getState();
 
 	++currentTest;
+
+	document.title = title+': '+actualState.url;
 
 	var
 		testName = 'Test '+currentTest,

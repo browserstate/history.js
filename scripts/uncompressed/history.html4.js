@@ -40,49 +40,6 @@
 		// Emulated Status
 
 		/**
-		 * _History.getInternetExplorerMajorVersion()
-		 * Get's the major version of Internet Explorer
-		 * @return {integer}
-		 * @license Public Domain
-		 * @author Benjamin Arthur Lupton <contact@balupton.com>
-		 * @author James Padolsey <https://gist.github.com/527683>
-		 */
-		_History.getInternetExplorerMajorVersion = function(){
-			var result = _History.getInternetExplorerMajorVersion.cached =
-					(typeof _History.getInternetExplorerMajorVersion.cached !== 'undefined')
-				?	_History.getInternetExplorerMajorVersion.cached
-				:	(function(){
-						var undef,
-								v = 3,
-								div = document.createElement('div'),
-								all = div.getElementsByTagName('i');
-						while (
-								div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
-								all[0]
-						);
-						return v > 4 ? v : undef;
-					})()
-				;
-			return result;
-		};
-
-		/**
-		 * _History.isInternetExplorer()
-		 * Are we using Internet Explorer?
-		 * @return {boolean}
-		 * @license Public Domain
-		 * @author Benjamin Arthur Lupton <contact@balupton.com>
-		 */
-		_History.isInternetExplorer = function(){
-			var result = _History.isInternetExplorer.cached =
-					(typeof _History.isInternetExplorer.cached !== 'undefined')
-				?	_History.isInternetExplorer.cached
-				:	(_History.getInternetExplorerMajorVersion() !== 0)
-				;
-			return result;
-		};
-
-		/**
 		 * History.emulated
 		 * Which features require emulating?
 		 */
@@ -600,7 +557,7 @@
 				}
 
 				// Update HTML4 Hash
-				if ( newStateHash !== html4Hash && newStateHash !== History.contractUrl() ) {
+				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl() ) {
 					History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
 					return false;
