@@ -191,7 +191,8 @@
 		 * Which bugs are present
 		 */
 		History.bugs = {
-			safariPoll: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.'),
+			setHash: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2][0-9]|3[0-3])/.test(navigator.userAgent)),
+			safariPoll: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2][0-9]|3[0-3])/.test(navigator.userAgent)),
 			ieDoubleCheck: Boolean(History.emulated.hashChange && History.isInternetExplorer())
 		};
 
@@ -947,7 +948,7 @@
 				// Hash is a proper hash, so apply it
 
 				// Handle browser bugs
-				if ( !History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' ) {
+				if ( History.bugs.setHash ) {
 					// Fix Safari Bug https://bugs.webkit.org/show_bug.cgi?id=56249
 
 					// Fetch the base page
