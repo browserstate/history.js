@@ -401,18 +401,22 @@
 			if ( oldState || (typeof oldState.data !== 'object') ) {
 				oldState.data = {};
 			}
+			if ( oldState.data._state || (typeof oldState.data._state !== 'object') ) {
+				oldState.data._state = {};
+			}
 
 			// Create
 			var newState = {
 				'data': oldState.data||{},
-				'url': History.getFullUrl(oldState.url||oldState.data.url||''),
-				'title': oldState.title||oldState.data.title||''
+				'url': History.getFullUrl(oldState.url||oldState.data._state.url||''),
+				'title': oldState.title||oldState.data._state.title||''
 			};
 
 			// Adjust
-			newState.data.title = newState.title;
-			newState.data.url = newState.url;
-			newState.id = History.getStateId(newState);
+			newState.data._state = {};
+			newState.data._state.title	= newState.title;
+			newState.data._state.url		= newState.url;
+			newState.data._state.id			= newState.id			= History.getStateId(newState);
 
 			// Return
 			return newState;
@@ -485,12 +489,12 @@
 		};
 
 		/**
-		 * History.getHashFromState(State)
+		 * History.getStateHash(State)
 		 * Creates a Hash for the State Object
 		 * @param {State} State
 		 * @return {String} hash
 		 */
-		History.getHashFromState = function(State){
+		History.getStateHash = function(State){
 			// Prepare
 			var hash = null;
 
@@ -597,7 +601,7 @@
 		History.storeState = function(newState){
 			// Prepare
 			var
-				newStateHash = History.getHashFromState(newState),
+				newStateHash = History.getStateHash(newState),
 				hasDuplicate = History.hasUrlDuplicate(newState);
 
 			// Store duplicate status
@@ -624,8 +628,8 @@
 		History.isLastStoredState = function(newState){
 			// Prepare
 			var
-				newStateHash = History.getHashFromState(newState),
-				oldStateHash = History.getHashFromState(History.getLastStoredState());
+				newStateHash = History.getStateHash(newState),
+				oldStateHash = History.getStateHash(History.getLastStoredState());
 
 			// Check
 			var isLast = History.storedStates.length && newStateHash === oldStateHash;
@@ -643,8 +647,8 @@
 		History.isLastSavedState = function(newState){
 			// Prepare
 			var
-				newStateHash = History.getHashFromState(newState),
-				oldStateHash = History.getHashFromState(History.getLastSavedState());
+				newStateHash = History.getStateHash(newState),
+				oldStateHash = History.getStateHash(History.getLastSavedState());
 
 			// Check
 			var isLast = History.savedStates.length && newStateHash === oldStateHash;
@@ -723,14 +727,14 @@
 		History.hasUrlDuplicate = function(newState) {
 			// Prepare
 			var
-				newStateHash = History.getHashFromState(newState),
+				newStateHash = History.getStateHash(newState),
 				oldState = History.getStateByUrl(newState.url),
 				hasConflict = false;
 
 			// Check for Conflict
 			if ( typeof oldState !== 'undefined' ) {
 				// Compare Hashes
-				var oldStateHash = History.getHashFromState(oldState);
+				var oldStateHash = History.getStateHash(oldState);
 				if ( oldStateHash !== newStateHash ) {
 					// We have a conflict
 					hasConflict = true;
@@ -1091,10 +1095,15 @@
 			// Poll the URL
 
 			// Get the Last State which has the new URL
-			var newState = History.getStateByUrl(document.location.href);
+			var
+				urlState = History.getStateByUrl(document.location.href),
+				newState;
 
 			// Check for a difference
-			if ( History.isLastSavedState(newState) ) {
+			if ( !History.isLastSavedState(urlState) ) {
+				newState = urlState;
+			}
+			else {
 				return;
 			}
 
@@ -1282,7 +1291,7 @@
 				// Fetch Data
 				if ( event.state === null ) {
 					// Vanilla: State has no data (new state, not pushed)
-					stateData = event.state;
+					stateData = null;
 				}
 				else if ( typeof event.state !== 'undefined' ) {
 					// Vanilla: Back/forward button was used
@@ -1327,10 +1336,11 @@
 				}
 
 				// Resolve newState
-				stateData		= (typeof stateData !== 'object' || stateData === null) ? {} : stateData;
-				stateTitle	=	stateData.title||'',
-				stateUrl		=	stateData.url||document.location.href,
-				newState		=	History.createStateObject(stateData,stateTitle,stateUrl);
+				stateData					= (typeof stateData !== 'object' || stateData === null) ? {} : stateData;
+				stateData._state	= (typeof stateData._state !== 'object' || stateData._state === null) ? {} : stateData._state;
+				stateTitle				=	stateData._state.title||'',
+				stateUrl					=	stateData._state.url||document.location.href,
+				newState					=	History.createStateObject(stateData,stateTitle,stateUrl);
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(newState) ) {
