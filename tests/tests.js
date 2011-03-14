@@ -6,7 +6,8 @@ var
 	States = {
 		// Home
 		0: {
-			'url': document.location.href.replace(/#.*$/,'')
+			'url': document.location.href.replace(/#.*$/,''),
+			'title': document.title
 		},
 		// One
 		1: {
@@ -53,7 +54,7 @@ var checkState = function(){
 	var
 		stateIndex = stateOrder[currentTest],
 		expectedState = History.normalizeState(States[stateIndex]),
-		actualState = History.getState();
+		actualState = History.getState(false);
 
 	++currentTest;
 
@@ -69,7 +70,7 @@ var checkState = function(){
 	});
 
 	// Image Load to Stress Safari
-	(new Image()).src = "image.php";
+	// (new Image()).src = "image.php";
 };
 
 // Check the Initial State

@@ -508,7 +508,7 @@
 				var
 					newState = History.createStateObject(data,title,url),
 					newStateHash = History.getStateHash(newState),
-					oldState = History.getState(),
+					oldState = History.getState(false),
 					oldStateHash = History.getStateHash(),
 					html4Hash = unescape(History.getHash());
 
@@ -594,7 +594,7 @@
 				// Fetch the State Objects
 				var
 					newState 				= History.createStateObject(data,title,url),
-					oldState 				= History.getState(),
+					oldState 				= History.getState(false),
 					previousState 	= History.getStateByIndex(-2)
 
 				// Discard Old State
