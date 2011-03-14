@@ -148,7 +148,7 @@ History.js is an actively developed, supported and maintained project. You can g
 
 If you'd love to give some support back and make a difference; here are a few great ways you can give back!
 
-- Give it your honest rating on it's [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js)
+- Give it your honest rating on it's [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js) and its [Ohloh Page](https://www.ohloh.net/p/history-js)
 - If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/History.js/issues) - so that I can ensure you get the best experience!
 - Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
 - Donate via the donation form at the bottom right of [balupton.com](http://balupton.com) - every cent truly does help!
@@ -195,7 +195,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ### Events
 
-- `window.onstatechange` <br/> Fired when the state of the page changes (does not include hashchanges)
+- `window.onstatechange` <br/> Fired when the state of the page changes (does not include hash changes)
 - `window.onanchorchange` <br/> Fired when the anchor of the page changes (does not include state hashes)
 
 
@@ -203,7 +203,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 - History.js **solves** the following browser bugs:
 	- HTML5 Browsers
-		- Chrome 8 and 9 (fixed in 10) do not contain the correct state data when traversing back to the initial state
+		- Chrome 8 sometimes does not contain the correct state data when traversing back to the initial state
 		- Safari 5 and Safari iOS 4 do not fire the `onpopstate` event when the hash has changed unlike the other browsers
 		- Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call / [bug report](https://bugs.webkit.org/show_bug.cgi?id=56249)
 		- Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions / [bug report](https://bugs.webkit.org/show_bug.cgi?id=42940)
@@ -213,14 +213,14 @@ Thanks! every bit of help really does make a difference. Again thank you.
 		- Old browsers like MSIE 6,7 and Firefox 2 does not have a hashchange event
 		- MSIE 6 and 7 sometimes do not apply a hashchange even it was told to (requiring a second call to the apply function)
 		- Non-Opera HTML4 browsers sometimes do not apply the hash when the hash is not `urlencoded`
-- State data will always contain the State's title and url at: `data.title` and `data.url`
+- State data must not contain the key `_state`, as it is reserved for History.js
 - State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
 - State titles will always be applied to the `document.title` if set
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
 - HTML4 Browsers on initial page load will have a hash inserted into the url; this is to ensure correct cross-compatibility between HTML4 browsers (as IE will refresh the page if the anchor is lost)
 - Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
-	- `window.onstatechange`: this is the same as onpopstate except does not fire for traditional anchors
-	- `window.onanchorchange`: this is the same as onhashchange except does not fire for states
+	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
+	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
 
 
 ## Changelog
@@ -228,9 +228,10 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - v1.6.0 - March ?? 2011
 	- Added Zepto adapter thanks to [Matt Garret](http://twitter.com/#!/matthewgarrett)
 	- The readme now references the supported versions of the libraries we use
-	- Updated vendors to the most recent copies. jQuery 1.5.1 and Mootools 1.3.1
+	- Updated vendors to the most recent versions. jQuery 1.5.1 and Mootools 1.3.1
 	- Reverted versions of iOS prior to version 4.3 to be HTML4 browsers, iOS 4.3 is a HTML5 browser
-	- Fixed issue with extra state being inserted on Safari 5 requiring an extra click on the back button to go home. [Reported](https://github.com/balupton/history.js/issues#issue/17) by [Rob Madole](http://robmadole.com/)
+	- Fixed issue with extra state being inserted on Safari 5 requiring an extra click on the back button to go home - [Reported](https://github.com/balupton/history.js/issues#issue/17) by [Rob Madole](http://robmadole.com/)
+	- Fixed issue with Safari 5 and Safari iOS 4 sometimes failing to apply the state change under busy conditions - Solution conceived with [Matt Garret](http://twitter.com/matthewgarrett)
 	- **B/C BREAK:** StateChange now only fires if the state has changed, it no longer fires on init. This is following the [Firefox 4 History API Changes](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/) which we agree with - this breaks standard, but makes more sense.
 
 - v1.5.0 - February 12 2011

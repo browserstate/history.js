@@ -12,4 +12,4 @@
 	$supports = array('html5','html4');
 
 	# Adapter
-	$adapters = array('jquery','mootools','prototype','zepto');
+	$adapters = array('jquery','mootools','prototype','zepto','yui');
