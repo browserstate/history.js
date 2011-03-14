@@ -21,7 +21,7 @@
 	}
 
 	# Url
-	$tests_full_url = $tests_url."/${dir}/${support}/${adapter}/";
+	$tests_full_url = $tests_url."${dir}/${support}/${adapter}/";
 
 	# Titles
 	$Support = strtoupper($support);
@@ -32,6 +32,7 @@
 <html>
 <head>
 	<title><?=$title?></title>
+	<base href="<?=$tests_url?>" />
 	<!-- Check -->
 	<script type="text/javascript">
 		if ( document.location.href !== "<?=$tests_full_url?>" ) {
@@ -44,7 +45,7 @@
 	<script type="text/javascript">
 		if ( typeof console === 'undefined' ) {
 			var
-				url = '<?=$base_url?>/vendor/firebug-lite.js',
+				url = '../vendor/firebug-lite.js',
 				scriptEl = document.createElement('script');
 			scriptEl.type = 'text/javascript';
 			scriptEl.src = url;
@@ -56,26 +57,26 @@
 	<script type="text/javascript">
 		if ( typeof JSON === 'undefined' ) {
 			var
-				url = '<?=$base_url?>/scripts/uncompressed/json2.js',
+				url = '../scripts/uncompressed/json2.js',
 				scriptEl = document.createElement('script');
 			scriptEl.type = 'text/javascript';
 			scriptEl.src = url;
 			document.body.appendChild(scriptEl,document.body.firstChild);
 		}
 	</script>
-	<script type="text/javascript" src="<?=$base_url?>/vendor/<?=$adapter?>.js"></script>
-	<script type="text/javascript" src="<?=$base_url?>/scripts/<?=$dir?>/history.adapter.<?=$adapter?>.js"></script>
-	<script type="text/javascript" src="<?=$base_url?>/scripts/<?=$dir?>/history.js"></script>
+	<script type="text/javascript" src="../vendor/<?=$adapter?>.js"></script>
+	<script type="text/javascript" src="../scripts/<?=$dir?>/history.adapter.<?=$adapter?>.js"></script>
+	<script type="text/javascript" src="../scripts/<?=$dir?>/history.js"></script>
 	<?php if ( $support === 'html4' ) : ?>
-	<script type="text/javascript" src="<?=$base_url?>/scripts/<?=$dir?>/history.html4.js"></script>
+	<script type="text/javascript" src="../scripts/<?=$dir?>/history.html4.js"></script>
 	<?php endif; ?>
 
 	<!-- QUnit -->
-	<link rel="stylesheet" href="<?=$base_url?>/vendor/qunit/qunit/qunit.css" type="text/css" media="screen">
-	<script type="text/javascript" src="<?=$base_url?>/vendor/qunit/qunit/qunit.js"></script>
+	<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css" type="text/css" media="screen">
+	<script type="text/javascript" src="../vendor/qunit/qunit/qunit.js"></script>
 
 	<!-- Tests -->
-	<script type="text/javascript" src="<?=$base_url?>/tests/tests.js"></script>
+	<script type="text/javascript" src="tests.js"></script>
 
 	<h1 id="qunit-header"><?=$title?></h1>
 	<h2 id="qunit-banner"></h2>

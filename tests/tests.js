@@ -52,7 +52,7 @@ var title = document.title;
 var checkState = function(){
 	var
 		stateIndex = stateOrder[currentTest],
-		expectedState = History.expandState(States[stateIndex]),
+		expectedState = History.normalizeState(States[stateIndex]),
 		actualState = History.getState();
 
 	++currentTest;
@@ -67,6 +67,9 @@ var checkState = function(){
 		History.log('Completed: '+testName +' / '+ stateName);
 		var result = same(actualState,expectedState,stateName);
 	});
+
+	// Image Load to Stress Safari
+	(new Image()).src = "image.php";
 };
 
 // Check the Initial State
@@ -90,7 +93,7 @@ History.Adapter.onDomLoad(function(){
 	// Test 2 / State 1 (0 -> 1)
 	// Tests HTML4 -> HTML5 Graceful Upgrade
 	addLog('Test 2',History.queues,History.busy.flag);
-	History.setHash(History.contractState(History.expandState(States[1])));
+	History.setHash(History.getHashFromState(States[1]));
 
 	// Test 3 / State 2 (1 -> 2)
 	addLog('Test 3',History.queues,History.busy.flag);
