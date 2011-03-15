@@ -1,5 +1,5 @@
 // Prepare
-History.debug.enable = true;
+History.options.debug = true;
 
 // Variables
 var
@@ -94,7 +94,7 @@ History.Adapter.onDomLoad(function(){
 	// Test 2 / State 1 (0 -> 1)
 	// Tests HTML4 -> HTML5 Graceful Upgrade
 	addLog('Test 2',History.queues,History.busy.flag);
-	History.setHash(History.getStateHash(States[1]));
+	History.setHash(History.getHashByState(States[1]));
 
 	// Test 3 / State 2 (1 -> 2)
 	addLog('Test 3',History.queues,History.busy.flag);
@@ -113,6 +113,8 @@ History.Adapter.onDomLoad(function(){
 	addLog('Test 6,7',History.queues,History.busy.flag);
 	History.go(-2);
 
+
+	return;
 	// Test 8 / State 0 (1 -> 0)
 	// Tests Default State
 	addLog('Test 8',History.queues,History.busy.flag);

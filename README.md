@@ -209,9 +209,10 @@ Thanks! every bit of help really does make a difference. Again thank you.
 		- Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions / [bug report](https://bugs.webkit.org/show_bug.cgi?id=42940)
 		- Google Chrome 8,9,10 and Firefox 4 prior to the RC will always fire `onpopstate` once the page has loaded / [change recommendation](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/)
 		- Safari iOS 4.0, 4.1, 4.2 have a working HTML5 History API - although the actual back buttons of the browsers do not work, therefore we treat them as HTML4 browsers
+		- None of the HTML5 browsers actually utilise the `title` argument to the `pushState` and `replaceState` calls
 	- HTML4 Browsers
-		- Old browsers like MSIE 6,7 and Firefox 2 does not have a hashchange event
-		- MSIE 6 and 7 sometimes do not apply a hashchange even it was told to (requiring a second call to the apply function)
+		- Old browsers like MSIE 6,7 and Firefox 2 do not have a `onhashchange` event
+		- MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
 		- Non-Opera HTML4 browsers sometimes do not apply the hash when the hash is not `urlencoded`
 - State data must not contain the key `_state`, as it is reserved for History.js
 - State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
@@ -229,10 +230,10 @@ Thanks! every bit of help really does make a difference. Again thank you.
 	- Added Zepto adapter thanks to [Matt Garret](http://twitter.com/#!/matthewgarrett)
 	- The readme now references the supported versions of the libraries we use
 	- Updated vendors to the most recent versions. jQuery 1.5.1 and Mootools 1.3.1
-	- Reverted versions of iOS prior to version 4.3 to be HTML4 browsers, iOS 4.3 is a HTML5 browser
+	- Reverted versions of Safari iOS prior to version 4.3 to be HTML4 browsers, Safari iOS 4.3 is a HTML5 browser
 	- Fixed issue with extra state being inserted on Safari 5 requiring an extra click on the back button to go home - [Reported](https://github.com/balupton/history.js/issues#issue/17) by [Rob Madole](http://robmadole.com/)
 	- Fixed issue with Safari 5 and Safari iOS 4 sometimes failing to apply the state change under busy conditions - Solution conceived with [Matt Garret](http://twitter.com/matthewgarrett)
-	- **B/C BREAK:** StateChange now only fires if the state has changed, it no longer fires on init. This is following the [Firefox 4 History API Changes](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/) which we agree with - this breaks standard, but makes more sense.
+	- **B/C BREAK:** StateChange now only fires if the state has changed, it no longer fires on page initialisation. This is following the [Firefox 4 History API Changes](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/) which we agree with - this breaks standard, but makes more sense.
 
 - v1.5.0 - February 12 2011
 	- Moved to UglifyJS instead of Google Closure

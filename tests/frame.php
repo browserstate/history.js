@@ -54,7 +54,7 @@
 	</script>
 
 	<!-- History.js -->
-	<script type="text/javascript">
+	<script type="text/javascript" defer>
 		if ( typeof JSON === 'undefined' ) {
 			var
 				url = '../scripts/uncompressed/json2.js',
@@ -64,20 +64,21 @@
 			document.body.appendChild(scriptEl,document.body.firstChild);
 		}
 	</script>
-	<script type="text/javascript" src="../vendor/<?=$adapter?>.js"></script>
-	<script type="text/javascript" src="../scripts/<?=$dir?>/history.adapter.<?=$adapter?>.js"></script>
-	<script type="text/javascript" src="../scripts/<?=$dir?>/history.js"></script>
+	<script type="text/javascript" src="../vendor/<?=$adapter?>.js" defer></script>
+	<script type="text/javascript" src="../scripts/<?=$dir?>/history.adapter.<?=$adapter?>.js" defer></script>
+	<script type="text/javascript" src="../scripts/<?=$dir?>/history.js" defer></script>
 	<?php if ( $support === 'html4' ) : ?>
-	<script type="text/javascript" src="../scripts/<?=$dir?>/history.html4.js"></script>
+	<script type="text/javascript" src="../scripts/<?=$dir?>/history.html4.js" defer></script>
 	<?php endif; ?>
 
 	<!-- QUnit -->
 	<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css" type="text/css" media="screen">
-	<script type="text/javascript" src="../vendor/qunit/qunit/qunit.js"></script>
+	<script type="text/javascript" src="../vendor/qunit/qunit/qunit.js" defer></script>
 
 	<!-- Tests -->
-	<script type="text/javascript" src="tests.js"></script>
+	<script type="text/javascript" src="tests.js" defer></script>
 
+	<!-- Elements -->
 	<h1 id="qunit-header"><?=$title?></h1>
 	<h2 id="qunit-banner"></h2>
 	<div id="qunit-testrunner-toolbar"></div>
