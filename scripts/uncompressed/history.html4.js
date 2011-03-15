@@ -387,7 +387,7 @@
 				// Prepare
 				var
 					currentUrl						= (event && event.newURL) || document.location.href;
-					currentHash						= unescape(History.extractHashFromUrl(currentUrl)),
+					currentHash						= unescape(History.extractHashByUrl(currentUrl)),
 					currentState					= null,
 					currentStateHash			= null,
 					currentStateHashExits	= null;
@@ -484,7 +484,7 @@
 				History.debug('History.pushState',this,arguments);
 
 				// Check the State
-				if ( History.extractHashFromUrl(url) ) {
+				if ( History.extractHashByUrl(url) ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
 				}
 
@@ -571,7 +571,7 @@
 			History.replaceState = function(data,title,url,queue){
 				History.debug('History.replaceState',this,arguments);
 				// Check the State
-				if ( History.extractHashFromUrl(url) ) {
+				if ( History.extractHashByUrl(url) ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
 				}
 
