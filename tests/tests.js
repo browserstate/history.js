@@ -7,7 +7,7 @@ var
 		// Home
 		0: {
 			'url': document.location.href.replace(/#.*$/,''),
-			'title': document.title
+			'title': ''
 		},
 		// One
 		1: {
@@ -113,8 +113,6 @@ History.Adapter.onDomLoad(function(){
 	addLog('Test 6,7',History.queues,History.busy.flag);
 	History.go(-2);
 
-
-	return;
 	// Test 8 / State 0 (1 -> 0)
 	// Tests Default State
 	addLog('Test 8',History.queues,History.busy.flag);

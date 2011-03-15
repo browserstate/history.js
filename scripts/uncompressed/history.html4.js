@@ -508,7 +508,7 @@
 					newState = History.createStateObject(data,title,url),
 					newStateHash = History.getHashByState(newState),
 					oldState = History.getState(false),
-					oldStateHash = History.getHashByState(History.getLastSavedState()),
+					oldStateHash = History.getHashByState(oldState),
 					html4Hash = unescape(History.getHash());
 
 				// Store the newState
@@ -518,13 +518,7 @@
 				History.recycleState(newState);
 
 				// Force update of the title
-				if ( document.title !== newState.title ) {
-					document.title = newState.title
-					try {
-						document.getElementsByTagName('title')[0].innerHTML = newState.title;
-					}
-					catch ( Exception ) { }
-				}
+				History.setTitle(newState);
 
 				History.debug(
 					'History.pushState: details',
@@ -534,7 +528,7 @@
 				);
 
 				// Check if we are the same State
-				if ( newStateHash === oldStateHash ) {
+				if ( History.isLastHash(newStateHash) ) {
 					History.debug('History.pushState: no change', newStateHash);
 					History.busy(false);
 					return false;
@@ -610,7 +604,7 @@
 			/**
 			 * Create the initial State
 			 */
-			History.saveState(History.storeState(History.createStateObject({},document.title,document.location.href)));
+			History.saveState(History.storeState(History.createStateObject({},'',document.location.href)));
 
 			/**
 			 * Ensure initial state is handled correctly

@@ -510,9 +510,9 @@
 			newState.title = oldState.title||oldState.data._state.title||'';
 			newState.url = History.getFullUrl(oldState.url||oldState.data._state.url||document.location.href);
 			newState.hash = History.getShortUrl(newState.url);
-
-			// Data
 			newState.data = History.cloneObject(oldState.data);
+
+			// Data State
 			newState.data._state = {};
 			newState.data._state.title	= newState.title;
 			newState.data._state.url		= newState.url;
@@ -558,7 +558,6 @@
 
 				// Check
 				var dataNotEmpty = !History.isEmptyObject(dataClone);
-				console.log(newState.title,dataNotEmpty,dataClone);
 
 				// Apply
 				if ( newState.title || dataNotEmpty ) {
@@ -574,12 +573,8 @@
 					newState.hash += '?';
 				}
 				newState.hash += '&_state='+State.id;
-
-				// Safari Bug Fix
-				if ( History.hasUrlDuplicate(newState) ) {
-					newState.data._state.url = newState.url = History.getFullUrl(newState.hash);
-				}
 			}
+			newState.hashedUrl = History.getFullUrl(newState.hash);
 
 			// Return
 			return newState;
@@ -761,16 +756,18 @@
 		/**
 		 * History.getStateByUrl
 		 * Get a state by it's url
-		 * @param {string} stateUrl
+		 * @param {string} url
 		 */
-		History.getStateByUrl = function(stateUrl){
+		History.getStateByUrl = function(url){
 			// Prepare
-			stateUrl = History.getFullUrl(stateUrl);
+			var
+				stateUrl = History.getFullUrl(url),
+				stateHash = History.getShortUrl(url);
 
 			// Fetch
 			var
 				id = History.urlsToIds[stateUrl]||undefined,
-				State = History.getStateById(id);
+				State = History.getStateById(id)||History.getStateByHash(stateHash);
 
 			// Return
 			return State;
@@ -1097,6 +1094,35 @@
 			return isTraditionalAnchor;
 		};
 
+		/**
+		 * History.setTitle(title)
+		 * Applies the title to the document
+		 * @param {State} newState
+		 * @return {Boolean}
+		 */
+		History.setTitle = function(newState){
+			// Prepare
+			var title = newState.title;
+
+			// Initial
+			if ( !title ) {
+				var firstState = History.getStateByIndex(0);
+				if ( firstState && firstState.url === newState.url ) {
+					title = firstState.title;
+				}
+			}
+
+			// Apply
+			document.title = newState.title
+			try {
+				document.getElementsByTagName('title')[0].innerHTML = newState.title;
+			}
+			catch ( Exception ) { }
+
+			// Chain
+			return History;
+		}
+
 		// ----------------------------------------------------------------------
 		// Queueing
 
@@ -1413,7 +1439,17 @@
 		// ----------------------------------------------------------------------
 		// HTML5 State Support
 
-		if ( !History.emulated.pushState ) {
+		if ( History.emulated.pushState ) {
+			/*
+			 * Provide Skeleton for HTML4 Browsers
+			 */
+
+			// Prepare
+			var emptyFunction = function(){};
+			History.pushState = History.pushState||emptyFunction;
+			History.replaceState = History.replaceState||emptyFunction;
+		}
+		else {
 			/*
 			 * Use native HTML5 History API Implementation
 			 */
@@ -1542,9 +1578,7 @@
 				History.saveState(newState);
 
 				// Force update of the title
-				if ( newState.title ) {
-					document.title = newState.title
-				}
+				History.setTitle(newState);
 
 				// Fire Our Event
 				History.Adapter.trigger(window,'statechange');
@@ -1593,7 +1627,11 @@
 				History.storeState(newState);
 
 				// Push the newState
-				history.pushState(newState.data,newState.title,newState.url);
+				var pushUrl =
+					(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
+					? newState.hashedUrl
+					: newState.url;
+				history.pushState(newState.data,newState.title,pushUrl);
 
 				// Fire HTML5 Event
 				History.Adapter.trigger(window,'popstate');
@@ -1640,7 +1678,11 @@
 				History.storeState(newState);
 
 				// Push the newState
-				history.replaceState(newState.data,newState.title,newState.url);
+				var pushUrl =
+					(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
+					? newState.hashedUrl
+					: newState.url;
+				history.replaceState(newState.data,newState.title,pushUrl);
 
 				// Fire HTML5 Event
 				History.Adapter.trigger(window,'popstate');
@@ -1652,7 +1694,7 @@
 			/**
 			 * Create the initial State
 			 */
-			History.saveState(History.storeState(History.createStateObject({},document.title,document.location.href)));
+			History.saveState(History.storeState(History.createStateObject({},'',document.location.href)));
 
 			/**
 			 * Setup Safari Fix
