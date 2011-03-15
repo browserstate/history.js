@@ -528,7 +528,7 @@
 				);
 
 				// Check if we are the same State
-				if ( History.isLastHash(newStateHash) ) {
+				if ( newStateHash === oldStateHash ) {
 					History.debug('History.pushState: no change', newStateHash);
 					History.busy(false);
 					return false;

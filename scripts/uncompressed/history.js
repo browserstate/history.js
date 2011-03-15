@@ -91,6 +91,11 @@
 		 */
 		History.options.debug = false;
 
+		/**
+		 * History.options.initialTitle
+		 * What is the title of the initial state
+		 */
+		History.options.initialTitle = document.title;
 
 		// ----------------------------------------------------------------------
 		// Debug
@@ -1108,16 +1113,16 @@
 			if ( !title ) {
 				var firstState = History.getStateByIndex(0);
 				if ( firstState && firstState.url === newState.url ) {
-					title = firstState.title;
+					title = firstState.title||History.options.initialTitle;
 				}
 			}
 
 			// Apply
-			document.title = newState.title
 			try {
-				document.getElementsByTagName('title')[0].innerHTML = newState.title;
+				document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
 			}
 			catch ( Exception ) { }
+			document.title = title;
 
 			// Chain
 			return History;
