@@ -1062,9 +1062,11 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			if ( /[^a-zA-Z0-9\/\-\_\%\.]/.test(result) ) {
-				result = escape(result);
-			}
+			result = escape(result)
+				.replace('%21','!')
+				.replace('%26','&')
+				.replace('%3D','=')
+				.replace('%3F','?');
 
 			// Return result
 			return result;
