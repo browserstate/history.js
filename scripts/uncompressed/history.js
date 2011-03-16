@@ -341,8 +341,13 @@
 		 * @return {String} pageUrl
 		 */
 		History.getPageUrl = function(){
+			// Fetch
+			var
+				State = History.getState(),
+				stateUrl = State.url||document.location.href;
+
 			// Create
-			var pageUrl = document.location.href.replace(/\/+$/,'').replace(/[^\/]+$/,function(part,index,string){
+			var pageUrl = stateUrl.replace(/\/+$/,'').replace(/[^\/]+$/,function(part,index,string){
 				return /\./.test(part) ? part : part+'/';
 			});
 

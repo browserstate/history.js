@@ -41,9 +41,21 @@ var
 		// Log
 		5: {
 			'url': '?state=1#log'
+		},
+		// Six
+		6: {
+			'url': 'six.html'
+		},
+		// Seven
+		7: {
+			'url': 'seven'
+		},
+		// Eight
+		8: {
+			'url': '/eight'
 		}
 	},
-	stateOrder = [0,1,2,3,4,3,1,0,1,3,4,3,1,0],
+	stateOrder = [0,1,2,3,4,3,1,0,1,3,4,3,1,0,6,7,8,1,8,7,6,0],
 	currentTest = 0;
 
 // Original Title
@@ -91,6 +103,9 @@ var addLog = function(){
 History.Adapter.onDomLoad(function(){
 	setTimeout(function(){
 
+	// ----------------------------------------------------------------------
+	// Test State Functionality: Adding
+
 	// Test 2 / State 1 (0 -> 1)
 	// Tests HTML4 -> HTML5 Graceful Upgrade
 	addLog('Test 2',History.queues,History.busy.flag);
@@ -107,6 +122,9 @@ History.Adapter.onDomLoad(function(){
 	// Test 5 / State 4 (3 -> 4)
 	addLog('Test 5',History.queues,History.busy.flag);
 	History.pushState(States[4].data, States[4].title, States[4].url);
+
+	// ----------------------------------------------------------------------
+	// Test State Functionality: Traversing
 
 	// Test 6 / State 3 (4 -> 3)
 	// Test 7 / State 1 (3 -> 2 -> 1)
@@ -135,6 +153,9 @@ History.Adapter.onDomLoad(function(){
 	addLog('Test 13',History.queues,History.busy.flag);
 	History.back();
 
+	// ----------------------------------------------------------------------
+	// Test State Functionality: Traditional Anchors
+
 	// Test 13-2 / State 1 (1 -> #log) / No Change
 	addLog('Test 13-2',History.queues,History.busy.flag);
 	History.setHash('log');
@@ -145,6 +166,45 @@ History.Adapter.onDomLoad(function(){
 
 	// Test 14 / State 0 (1 -> 0)
 	addLog('Test 14',History.queues,History.busy.flag);
+	History.back();
+
+	// ----------------------------------------------------------------------
+	// Test URL Handling: Adding
+
+	// Test 15 / State 6 (1 -> 6)
+	addLog('Test 15',History.queues,History.busy.flag);
+	History.pushState(States[6].data, States[6].title, States[6].url);
+
+	// Test 16 / State 7 (6 -> 7)
+	addLog('Test 16',History.queues,History.busy.flag);
+	History.pushState(States[7].data, States[7].title, States[7].url);
+
+	// Test 17 / State 7 (7 -> 8)
+	addLog('Test 17',History.queues,History.busy.flag);
+	History.pushState(States[8].data, States[8].title, States[8].url);
+
+	// Test 18 / State 1 (8 -> 1)
+	// Should be /eight?state=1
+	addLog('Test 18',History.queues,History.busy.flag);
+	History.pushState(States[1].data, States[1].title, States[1].url);
+
+	// ----------------------------------------------------------------------
+	// Test URL Handling: Traversing
+
+	// Test 19 / State 8 (1 -> 8)
+	addLog('Test 19',History.queues,History.busy.flag);
+	History.back();
+
+	// Test 20 / State 7 (8 -> 7)
+	addLog('Test 20',History.queues,History.busy.flag);
+	History.back();
+
+	// Test 21 / State 6 (7 -> 6)
+	addLog('Test 21',History.queues,History.busy.flag);
+	History.back();
+
+	// Test 22 / State 0 (6 -> 0)
+	addLog('Test 22',History.queues,History.busy.flag);
 	History.back();
 
 	},5000); // wait for test one to complete
