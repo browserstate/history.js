@@ -89,7 +89,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 2. Include [JSON2](http://www.json.org/js.html) for HTML4 Browsers Only *(replace www.yourwebsite.com)*
 
-		<script type="text/javascript">
+		<script>
 			if ( typeof JSON === 'undefined' ) {
 				var
 					url = 'http://www.yourwebsite.com/history.js/scripts/compressed/json2.js',
@@ -104,27 +104,27 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 	- [jQuery](http://jquery.com/) v1.4+
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
 
 	- [Mootools](http://mootools.net/) v1.3+
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
 
 	- [Prototype](http://www.prototypejs.org/) v1.7+
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
 
 	- [Zepto](http://www.prototypejs.org/) v0.5+
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.zepto.js"></script>
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.zepto.js"></script>
 
 	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
 
 4. Include History.js
 
-		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
-		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
 
 > Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just remove the `history.html4.js` include in step #4 file and the JSON2 include in step #2 [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 

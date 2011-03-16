@@ -118,7 +118,7 @@
 		History.log = function(){
 			// Prepare
 			var
-				consoleExists = (typeof console !== 'undefined'),
+				consoleExists = (typeof console !== 'undefined' && typeof console.apply !== 'undefined'),
 				textarea = document.getElementById('log'),
 				message = ("\n"+arguments[0]+"\n"),
 				i

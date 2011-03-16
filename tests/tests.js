@@ -219,5 +219,5 @@ History.Adapter.onDomLoad(function(){
 	addLog('Test 22',History.queues,History.busy.flag);
 	History.back();
 
-	},5000); // wait for test one to complete
+	},1000); // wait for test one to complete
 });
