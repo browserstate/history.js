@@ -577,13 +577,13 @@
 			}
 
 			// Extras
-			if ( addId && !/(.*)\&_state=([0-9]+)$/.test(newState.url) ) {
+			if ( addId && !/(.*)\&_suid=([0-9]+)$/.test(newState.url) ) {
 				// Extract Hash
 				newState.hash = History.getShortUrl(State.url);
 				if ( !/\?/.test(newState.hash) ) {
 					newState.hash += '?';
 				}
-				newState.hash += '&_state='+State.id;
+				newState.hash += '&_suid='+State.id;
 			}
 			newState.hashedUrl = History.getFullUrl(newState.hash);
 
@@ -696,7 +696,7 @@
 			// Extract
 			if ( !id ) {
 				var parts,url;
-				parts = /(.*)\&_state=([0-9]+)$/.exec(hash);
+				parts = /(.*)\&_suid=([0-9]+)$/.exec(hash);
 				url = parts ? (parts[1]||hash) : hash;
 				id = parts ? String(parts[2]||'') : '';
 			}

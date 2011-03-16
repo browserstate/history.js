@@ -55,14 +55,14 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 ### How would they look in a HTML4 Browser?
 
 1. www.mysite.com
-1. www.mysite.com#?state=1/uid=1
-1. www.mysite.com#?state=2/uid=2
-1. www.mysite.com#?state=3/uid=3
+1. www.mysite.com#?state=1&_suid=1
+1. www.mysite.com#?state=2&_suid=2
+1. www.mysite.com#?state=3&_suid=3
 1. www.mysite.com#?state=4
-1. www.mysite.com#?state=3/uid=3
-1. www.mysite.com#?state=1/uid=1
+1. www.mysite.com#?state=3&_suid=3
+1. www.mysite.com#?state=1&_suid=1
 1. www.mysite.com
-1. www.mysite.com#?state=3/uid=3
+1. www.mysite.com#?state=3&_suid=3
 
 > Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states into their HTML5 equivalents so the user won't even notice :-)
 >
@@ -70,10 +70,10 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 >
 > Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
-### What's the deal with the UIDs used in the HTML4 States?
+### What's the deal with the SUIDs used in the HTML4 States?
 
-- UIDs are used when we utilise a `title` and/or `data` in our state. Adding a UID allows us to associate particular states with data and titles while keeping the urls as simple as possible (don't worry it's all tested, working and a lot smarter than I'm making it out to be).
-- If you aren't utilising `title` or `data` then we don't even include a UID (as there is no need for it) - as seen by State 4 above :-)
+- SUIDs (State Unique Identifiers) are used when we utilise a `title` and/or `data` in our state. Adding a SUID allows us to associate particular states with data and titles while keeping the urls as simple as possible (don't worry it's all tested, working and a lot smarter than I'm making it out to be).
+- If you aren't utilising `title` or `data` then we don't even include a SUID (as there is no need for it) - as seen by State 4 above :-)
 - We also shrink the urls to make sure that the smallest url will be used. For instance we will adjust `http://www.mysite.com/#http://www.mysite.com/projects/History.js` to become `http://www.mysite.com/#/projects/History.js` automatically. (again tested, working, and smarter).
 - It works with domains, subdomains, subdirectories, whatever - doesn't matter where you put it. It's smart.
 
@@ -204,6 +204,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - History.js **solves** the following browser bugs:
 	- HTML5 Browsers
 		- Chrome 8 sometimes does not contain the correct state data when traversing back to the initial state
+		- Safari 5, Safari iOS 4 and Firefox 3 and 4 do not fire the `onhashchange` event when the page is loaded with a hash
 		- Safari 5 and Safari iOS 4 do not fire the `onpopstate` event when the hash has changed unlike the other browsers
 		- Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call / [bug report](https://bugs.webkit.org/show_bug.cgi?id=56249)
 		- Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions / [bug report](https://bugs.webkit.org/show_bug.cgi?id=42940)
