@@ -43,7 +43,7 @@
 		 * Which features require emulating?
 		 */
 		History.emulated.hashChange = Boolean(
-			!('onhashchange' in window || 'onhashchange' in document)
+			!(('onhashchange' in window) || ('onhashchange' in document))
 			||
 			(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8)
 		);
@@ -337,10 +337,6 @@
 					// We are not IE
 					// Firefox 1 or 2, Opera
 
-					// Define some variables that will help in our checker function
-					var
-						lastDocumentHash = null;
-
 					// Define the checker function
 					History.checkerFunction = function(){
 						// Prepare
@@ -385,7 +381,7 @@
 				History.debug('History.onHashChange',this,arguments);
 				// Prepare
 				var
-					currentUrl						= (event && event.newURL) || document.location.href;
+					currentUrl						= ((event && event.newURL) || document.location.href),
 					currentHash						= unescape(History.getHashByUrl(currentUrl)),
 					currentState					= null,
 					currentStateHash			= null,
@@ -520,6 +516,7 @@
 				// Force update of the title
 				History.setTitle(newState);
 
+				// Log
 				History.debug(
 					'History.pushState: details',
 					'newStateHash:', newStateHash,
@@ -587,9 +584,9 @@
 
 				// Fetch the State Objects
 				var
-					newState 				= History.createStateObject(data,title,url),
-					oldState 				= History.getState(false),
-					previousState 	= History.getStateByIndex(-2)
+					newState        = History.createStateObject(data,title,url),
+					oldState        = History.getState(false),
+					previousState   = History.getStateByIndex(-2);
 
 				// Discard Old State
 				History.discardState(oldState,newState,previousState);
@@ -608,11 +605,10 @@
 
 			/**
 			 * Ensure initial state is handled correctly
-			 **/
-			if ( document.location.hash && document.location.hash !== '#' && !History.emulated.hashChange ) {
-				History.debug('Firefox Initial State Change Fix');
+			 */
+			if ( History.getHash() && !History.emulated.hashChange ) {
 				History.Adapter.onDomLoad(function(){
-					History.onHashChange();
+					History.Adapter.trigger(window,'hashchange');
 				});
 			}
 

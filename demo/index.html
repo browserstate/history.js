@@ -63,7 +63,8 @@
 				// Establish Variables
 				var
 					History = window.History, // Note: We are using a capital H instead of a lower h
-					State = History.getState();
+					State = History.getState(),
+					$log = $('#log');
 
 				// Log Initial State
 				History.log('initial:', State.data, State.title, State.url);

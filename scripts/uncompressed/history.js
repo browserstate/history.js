@@ -71,31 +71,32 @@
 		 * History.options.hashChangeInterval
 		 * How long should the interval be before hashchange checks
 		 */
-		History.options.hashChangeInterval = 100;
+		History.options.hashChangeInterval = History.options.hashChangeInterval || 100;
 
 		/**
 		 * History.options.safariPollInterval
 		 * How long should the interval be before safari poll checks
 		 */
-		History.options.safariPollInterval = 500;
+		History.options.safariPollInterval = History.options.safariPollInterval || 500;
 
 		/**
 		 * History.options.busyDelay
 		 * How long should we wait between busy events
 		 */
-		History.options.busyDelay = 250;
+		History.options.busyDelay = History.options.busyDelay || 250;
 
 		/**
 		 * History.options.debug
 		 * If true will enable debug messages to be logged
 		 */
-		History.options.debug = false;
+		History.options.debug = History.options.debug || false;
 
 		/**
 		 * History.options.initialTitle
 		 * What is the title of the initial state
 		 */
-		History.options.initialTitle = document.title;
+		History.options.initialTitle = History.options.initialTitle || document.title;
+
 
 		// ----------------------------------------------------------------------
 		// Debug
@@ -1250,21 +1251,40 @@
 		// ----------------------------------------------------------------------
 		// IE Bug Fix
 
+		/**
+		 * History.stateChanged
+		 * States whether or not the state has changed since the last double check was initialised
+		 */
 		History.stateChanged = false;
+
+		/**
+		 * History.doubleChecker
+		 * Contains the timeout used for the double checks
+		 */
 		History.doubleChecker = null;
 
+		/**
+		 * History.doubleCheckComplete()
+		 * Complete a double check
+		 * @return {History}
+		 */
 		History.doubleCheckComplete = function(){
 			// Update
 			History.stateChanged = true;
 
 			// Clear
-			History.doubleCheckReset();
+			History.doubleCheckClear();
 
 			// Chain
 			return History;
 		}
 
-		History.doubleCheckReset = function(){
+		/**
+		 * History.doubleCheckClear()
+		 * Clear a double check
+		 * @return {History}
+		 */
+		History.doubleCheckClear = function(){
 			// Clear
 			if ( History.doubleChecker ) {
 				clearTimeout(History.doubleChecker);
@@ -1275,10 +1295,15 @@
 			return History;
 		}
 
+		/**
+		 * History.doubleCheck()
+		 * Create a double check
+		 * @return {History}
+		 */
 		History.doubleCheck = function(tryAgain){
 			// Reset
 			History.stateChanged = false;
-			History.doubleCheckReset();
+			History.doubleCheckClear();
 
 			// Fix IE6,IE7 bug where calling history.back or history.forward does not actually change the hash (whereas doing it manually does)
 			// Fix Safari 5 bug where sometimes the state does not change: https://bugs.webkit.org/show_bug.cgi?id=42940
@@ -1286,7 +1311,7 @@
 				// Apply Check
 				History.doubleChecker = setTimeout(
 					function(){
-						History.doubleCheckReset();
+						History.doubleCheckClear();
 						if ( !History.stateChanged ) {
 							History.log('History.doubleCheck: State has not yet changed, trying again', arguments);
 							// Re-Attempt
@@ -1305,11 +1330,11 @@
 		// ----------------------------------------------------------------------
 		// Safari Bug Fix
 
-		History.nextState = false;
-
 		/**
+		 * History.safariStatePoll()
 		 * Poll the current state
-		 **/
+		 * @return {History}
+		 */
 		History.safariStatePoll = function(){
 			// Poll the URL
 
@@ -1633,18 +1658,25 @@
 				// Create the newState
 				var newState = History.createStateObject(data,title,url);
 
-				// Store the newState
-				History.storeState(newState);
+				// Check it
+				if ( History.isLastSavedState(newState) ) {
+					// Won't be a change
+					History.busy(false);
+				}
+				else {
+					// Store the newState
+					History.storeState(newState);
 
-				// Push the newState
-				var pushUrl =
-					(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
-					? newState.hashedUrl
-					: newState.url;
-				history.pushState(newState.data,newState.title,pushUrl);
+					// Push the newState
+					var pushUrl =
+						(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
+						? newState.hashedUrl
+						: newState.url;
+					history.pushState(newState.data,newState.title,pushUrl);
 
-				// Fire HTML5 Event
-				History.Adapter.trigger(window,'popstate');
+					// Fire HTML5 Event
+					History.Adapter.trigger(window,'popstate');
+				}
 
 				// End pushState closure
 				return true;
@@ -1684,18 +1716,25 @@
 				// Create the newState
 				var newState = History.createStateObject(data,title,url);
 
-				// Store the newState
-				History.storeState(newState);
+				// Check it
+				if ( History.isLastSavedState(newState) ) {
+					// Won't be a change
+					History.busy(false);
+				}
+				else {
+					// Store the newState
+					History.storeState(newState);
 
-				// Push the newState
-				var pushUrl =
-					(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
-					? newState.hashedUrl
-					: newState.url;
-				history.replaceState(newState.data,newState.title,pushUrl);
+					// Push the newState
+					var pushUrl =
+						(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
+						? newState.hashedUrl
+						: newState.url;
+					history.replaceState(newState.data,newState.title,pushUrl);
 
-				// Fire HTML5 Event
-				History.Adapter.trigger(window,'popstate');
+					// Fire HTML5 Event
+					History.Adapter.trigger(window,'popstate');
+				}
 
 				// End replaceState closure
 				return true;
@@ -1716,14 +1755,22 @@
 			/**
 			 * Ensure Cross Browser Compatibility
 			 */
-			if ( navigator.vendor === 'Apple Computer, Inc.' ) {
+			if ( navigator.vendor === 'Apple Computer, Inc.' || (navigator.appCodeName||'') === 'Mozilla' ) {
 				/**
 				 * Fix Safari HashChange Issue
 				 */
+
+				// Setup Alias
 				History.Adapter.bind(window,'hashchange',function(){
 					History.Adapter.trigger(window,'popstate');
-					//History.onPopState();
 				});
+
+				// Initialise Alias
+				if ( History.getHash() ) {
+					History.Adapter.onDomLoad(function(){
+						History.Adapter.trigger(window,'hashchange');
+					});
+				}
 			}
 
 		} // !History.emulated.pushState

@@ -44,6 +44,9 @@ var
 		},
 		// Six
 		6: {
+			'data': {
+				'state': 6
+			},
 			'url': 'six.html'
 		},
 		// Seven
@@ -115,6 +118,14 @@ History.Adapter.onDomLoad(function(){
 	addLog('Test 3',History.queues,History.busy.flag);
 	History.pushState(States[2].data, States[2].title, States[2].url);
 
+	// Test 3-2 / State 2 (2 -> 2) / No Change
+	addLog('Test 3-2',History.queues,History.busy.flag);
+	History.pushState(States[2].data, States[2].title, States[2].url);
+
+	// Test 3-3 / State 2 (2 -> 2) / No Change
+	addLog('Test 3-3',History.queues,History.busy.flag);
+	History.replaceState(States[2].data, States[2].title, States[2].url);
+
 	// Test 4 / State 3 (2 -> 3)
 	addLog('Test 4',History.queues,History.busy.flag);
 	History.replaceState(States[3].data, States[3].title, States[3].url);
@@ -172,6 +183,7 @@ History.Adapter.onDomLoad(function(){
 	// Test URL Handling: Adding
 
 	// Test 15 / State 6 (1 -> 6)
+	// Also tests data with no title
 	addLog('Test 15',History.queues,History.busy.flag);
 	History.pushState(States[6].data, States[6].title, States[6].url);
 
