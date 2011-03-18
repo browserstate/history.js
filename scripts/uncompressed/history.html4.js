@@ -7,6 +7,7 @@
  */
 
 (function(window,undefined){
+	"use strict";
 
 	// --------------------------------------------------------------------------
 	// Initialise
@@ -244,7 +245,11 @@
 			 * We must emulate the HTML4 HashChange Support by manually checking for hash changes
 			 */
 
-			History.Adapter.onDomLoad(function(){
+			/**
+			 * History.hashChangeInit()
+			 * Init the HashChange Emulation
+			 */
+			History.hashChangeInit = function(){
 				// Define our Checker Function
 				History.checkerFunction = null;
 
@@ -359,11 +364,15 @@
 				// Apply the checker function
 				setInterval(History.checkerFunction, History.options.hashChangeInterval);
 
-				// End onDomLoad closure
+				// Done
 				return true;
-			});
+			}; // History.hashChangeInit
+
+			// Bind hashChangeInit
+			History.Adapter.onDomLoad(History.hashChangeInit);
 
 		} // History.emulated.hashChange
+
 
 		// ----------------------------------------------------------------------
 		// HTML5 State Support
