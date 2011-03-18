@@ -382,7 +382,7 @@
 				// Prepare
 				var
 					currentUrl						= ((event && event.newURL) || document.location.href),
-					currentHash						= unescape(History.getHashByUrl(currentUrl)),
+					currentHash						= History.getHashByUrl(currentUrl),
 					currentState					= null,
 					currentStateHash			= null,
 					currentStateHashExits	= null;
@@ -505,7 +505,7 @@
 					newStateHash = History.getHashByState(newState),
 					oldState = History.getState(false),
 					oldStateHash = History.getHashByState(oldState),
-					html4Hash = unescape(History.getHash());
+					html4Hash = History.getHash();
 
 				// Store the newState
 				History.storeState(newState);

@@ -120,21 +120,23 @@
 			var
 				consoleExists = (typeof console !== 'undefined' && typeof console.apply !== 'undefined'),
 				textarea = document.getElementById('log'),
-				message = ("\n"+arguments[0]+"\n"),
-				i
+				message,
+				i,n
 				;
 
 			// Write to Console
 			if ( consoleExists ) {
-				var
-					args = Array.prototype.slice.call(arguments),
-					message = args.shift();
+				var args = Array.prototype.slice.call(arguments);
+				message = args.shift();
 				if ( typeof console.debug !== 'undefined' ) {
 					console.debug.apply(console,[message,args]);
 				}
 				else {
 					console.log.apply(console,[message,args]);
 				}
+			}
+			else {
+				message = ("\n"+arguments[0]+"\n");
 			}
 
 			// Write to log
@@ -186,10 +188,9 @@
 								div = document.createElement('div'),
 								all = div.getElementsByTagName('i');
 						while (
-								div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
-								all[0]
-						);
-						return v > 4 ? v : undef;
+								(div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->') && all[0]
+						)
+						return (v > 4) ? v : undefined;
 					})()
 				;
 			return result;
@@ -349,7 +350,7 @@
 
 			// Create
 			var pageUrl = stateUrl.replace(/\/+$/,'').replace(/[^\/]+$/,function(part,index,string){
-				return /\./.test(part) ? part : part+'/';
+				return (/\./).test(part) ? part : part+'/';
 			});
 
 			// Return
@@ -364,7 +365,7 @@
 		History.getBasePageUrl = function(){
 			// Create
 			var basePageUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
-				return /\./.test(part) ? '' : part;
+				return (/\./).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
 			// Return
@@ -579,11 +580,11 @@
 			// Extras
 			if ( addId && !/(.*)\&_suid=([0-9]+)$/.test(newState.url) ) {
 				// Extract Hash
-				newState.hash = History.getShortUrl(State.url);
+				newState.hash = History.getShortUrl(newState.url);
 				if ( !/\?/.test(newState.hash) ) {
 					newState.hash += '?';
 				}
-				newState.hash += '&_suid='+State.id;
+				newState.hash += '&_suid='+newState.id;
 			}
 			newState.hashedUrl = History.getFullUrl(newState.hash);
 
@@ -631,7 +632,7 @@
 		 */
 		History.getStateString = function(passedState){
 			// Prepare
-			State = History.normalizeState(passedState);
+			var State = History.normalizeState(passedState);
 
 			// Clean
 			var cleanedState = {
@@ -652,7 +653,7 @@
 		 */
 		History.getStateId = function(passedState){
 			// Prepare
-			State = History.normalizeState(passedState);
+			var State = History.normalizeState(passedState);
 
 			// Fetch
 			var id = State.id;
@@ -703,7 +704,7 @@
 
 			// Return
 			return id;
-		}
+		};
 
 		/**
 		 * History.getStateByHash(hash)
@@ -973,7 +974,7 @@
 
 			// Unescape hash
 			if ( /[\%]/.test(result) ) {
-				result = unescape(result);
+				result = window.unescape(result);
 			}
 
 			// Return result
@@ -1062,7 +1063,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			result = escape(result)
+			result = window.escape(result)
 				.replace('%21','!')
 				.replace('%26','&')
 				.replace('%3D','=')
@@ -1134,7 +1135,7 @@
 
 			// Chain
 			return History;
-		}
+		};
 
 		// ----------------------------------------------------------------------
 		// Queueing
@@ -1279,7 +1280,7 @@
 
 			// Chain
 			return History;
-		}
+		};
 
 		/**
 		 * History.doubleCheckClear()
@@ -1295,7 +1296,7 @@
 
 			// Chain
 			return History;
-		}
+		};
 
 		/**
 		 * History.doubleCheck()
@@ -1451,16 +1452,19 @@
 		History.go = function(index,queue){
 			History.debug('History.go: called', arguments);
 
+			// Prepare
+			var i;
+
 			// Handle
 			if ( index > 0 ) {
 				// Forward
-				for ( var i=1; i<=index; ++i ) {
+				for ( i=1; i<=index; ++i ) {
 					History.forward(queue);
 				}
 			}
 			else if ( index < 0 ) {
 				// Backward
-				for ( var i=-1; i>=index; --i ) {
+				for ( i=-1; i>=index; --i ) {
 					History.back(queue);
 				}
 			}
@@ -1502,7 +1506,7 @@
 				History.doubleCheckComplete();
 
 				// Check for a Hash, and handle apporiatly
-				var currentHash	= unescape(History.getHash());
+				var currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
 					var currentState = History.getStateByHash(currentHash);
@@ -1529,7 +1533,9 @@
 					stateData										= {},
 					stateTitle									= null,
 					stateUrl										= null,
-					newState										= null;
+					newState										= null,
+					newStateUrl                 = null,
+					oldState                    = null;
 
 				// Prepare
 				event = event||{};
@@ -1555,10 +1561,9 @@
 					}
 					else {
 						// Using Chrome Fix
-						var
-							newStateUrl = document.location.href,
-							oldState = History.getStateByUrl(newStateUrl),
-							urlConflict = History.hasUrlConflict(newStateUrl);
+						newStateUrl = document.location.href;
+						oldState = History.getStateByUrl(newStateUrl);
+						var urlConflict = History.hasUrlConflict(newStateUrl);
 
 						// Does oldState Exist?
 						if ( typeof oldState !== 'undefined' && !urlConflict ) {
@@ -1574,9 +1579,8 @@
 					// Vanilla: A new state was pushed, and popstate was called manually
 
 					// Get State object from the last state
-					var
-						newStateUrl = History.getFullUrl(document.location.href),
-						oldState = History.getStateByUrl(newStateUrl);
+					newStateUrl = History.getFullUrl(document.location.href);
+					oldState = History.getStateByUrl(newStateUrl);
 
 					// Check if the URLs match
 					if ( oldState && (newStateUrl === oldState.url) ) {
@@ -1590,8 +1594,8 @@
 				// Resolve newState
 				stateData					= (typeof stateData !== 'object' || stateData === null) ? {} : stateData;
 				stateData._state	= (typeof stateData._state !== 'object' || stateData._state === null) ? {} : stateData._state;
-				stateTitle				=	stateData._state.title||'',
-				stateUrl					=	stateData._state.url||document.location.href,
+				stateTitle				=	stateData._state.title||'';
+				stateUrl					=	stateData._state.url||document.location.href;
 				newState					=	History.createStateObject(stateData,stateTitle,stateUrl);
 
 				// Check if we are the same state
@@ -1682,7 +1686,7 @@
 
 				// End pushState closure
 				return true;
-			}
+			};
 
 			/**
 			 * History.replaceState(data,title,url)
@@ -1740,7 +1744,7 @@
 
 				// End replaceState closure
 				return true;
-			}
+			};
 
 			/**
 			 * Create the initial State

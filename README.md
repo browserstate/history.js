@@ -89,16 +89,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 2. Include [JSON2](http://www.json.org/js.html) for HTML4 Browsers Only *(replace www.yourwebsite.com)*
 
-		<script>
-			if ( typeof JSON === 'undefined' ) {
-				var
-					url = 'http://www.yourwebsite.com/history.js/scripts/compressed/json2.js',
-					scriptEl = document.createElement('script');
-				scriptEl.type = 'text/javascript';
-				scriptEl.src = url;
-				document.body.appendChild(scriptEl);
-			}
-		</script>
+		<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
 
 3. Include the Adapter for your Framework:
 
