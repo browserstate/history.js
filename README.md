@@ -219,13 +219,13 @@ Thanks! every bit of help really does make a difference. Again thank you.
 ## Changelog
 
 - v1.6.0 - March ?? 2011
-	- Added Zepto adapter thanks to [Matt Garret](http://twitter.com/#!/matthewgarrett)
+	- Added Zepto adapter thanks to [Matt Garrett](http://twitter.com/#!/matthewgarrett)
 	- The readme now references the supported versions of the libraries we use
 	- Updated vendors to the most recent versions. jQuery 1.5.1 and Mootools 1.3.1
 	- Reverted versions of Safari iOS prior to version 4.3 to be HTML4 browsers, Safari iOS 4.3 is a HTML5 browser
 	- Refined code in History.js and its adapters
 	- Fixed issue with extra state being inserted on Safari 5 requiring an extra click on the back button to go home - [Reported](https://github.com/balupton/history.js/issues#issue/17) by [Rob Madole](http://robmadole.com/)
-	- Fixed issue with Safari 5 and Safari iOS 4 sometimes failing to apply the state change under busy conditions - Solution conceived with [Matt Garret](http://twitter.com/matthewgarrett)
+	- Fixed issue with Safari 5 and Safari iOS 4 sometimes failing to apply the state change under busy conditions - Solution conceived with [Matt Garrett](http://twitter.com/matthewgarrett)
 	- Fixed issue with HTML4 browsers requiring a query-string in the urls of states - [Reported](https://github.com/balupton/history.js/issues#issue/26) by [azago](https://github.com/azago)
 	- Fixed issue with HTML4 browsers requiring title in the states in order to use state data - [Reported](https://github.com/balupton/history.js/issues#issue/25) by [Jonathan McLaughlin](http://system-werks.com/)
 	- Fixed issue with HTML4 browsers failing is a state is pushed/replaced twice in a row - [Reported](https://github.com/balupton/history.js/issues#issue/17) by [Joey Baker](http://byjoeybaker.com/)
