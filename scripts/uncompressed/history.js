@@ -81,6 +81,12 @@
 		History.options.safariPollInterval = History.options.safariPollInterval || 500;
 
 		/**
+		 * History.options.doubleCheckInterval
+		 * How long should the interval be before we perform a double check
+		 */
+		History.options.doubleCheckInterval = History.options.doubleCheckInterval || 500;
+
+		/**
 		 * History.options.busyDelay
 		 * How long should we wait between busy events
 		 */
@@ -184,14 +190,11 @@
 					(typeof History.getInternetExplorerMajorVersion.cached !== 'undefined')
 				?	History.getInternetExplorerMajorVersion.cached
 				:	(function(){
-						var undef,
-								v = 3,
+						var v = 3,
 								div = document.createElement('div'),
 								all = div.getElementsByTagName('i');
-						while (
-								(div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->') && all[0]
-						)
-						return (v > 4) ? v : undefined;
+						while ( (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->') && all[0] ) {}
+						return (v > 4) ? v : false;
 					})()
 				;
 			return result;
@@ -205,10 +208,11 @@
 		 * @author Benjamin Arthur Lupton <contact@balupton.com>
 		 */
 		History.isInternetExplorer = function(){
-			var result = History.isInternetExplorer.cached =
-					(typeof History.isInternetExplorer.cached !== 'undefined')
-				?	History.isInternetExplorer.cached
-				:	(History.getInternetExplorerMajorVersion() !== 0)
+			var result =
+				History.isInternetExplorer.cached =
+				(typeof History.isInternetExplorer.cached !== 'undefined')
+					?	History.isInternetExplorer.cached
+					:	Boolean(History.getInternetExplorerMajorVersion())
 				;
 			return result;
 		};
@@ -221,6 +225,11 @@
 			pushState: !Boolean(
 				window.history && window.history.pushState && window.history.replaceState
 				&& !/ Mobile\/(7W367a|8A400|8B117|8C134) /.test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+			),
+			hashChange: Boolean(
+				!(('onhashchange' in window) || ('onhashchange' in document))
+				||
+				(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8)
 			)
 		};
 
@@ -244,7 +253,12 @@
 			/**
 			 * MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
 			 */
-			ieDoubleCheck: Boolean(History.emulated.hashChange && History.isInternetExplorer())
+			ieDoubleCheck: Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8),
+
+			/**
+			 * MSIE 6 requires the entire hash to be encoded for the hashes to trigger the onHashChange event
+			 */
+			hashEscape: Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 7)
 		};
 
 		/**
@@ -405,7 +419,7 @@
 			}
 
 			// Return
-			return fullUrl;
+			return fullUrl.replace(/\#$/,'');
 		};
 
 		/**
@@ -416,13 +430,13 @@
 		 */
 		History.getShortUrl = function(url){
 			// Prepare
-			var shortUrl, rootUrl = History.getRootUrl();
+			var shortUrl, rootUrl = History.getRootUrl(); // History.getBaseHref()||History.getBasePageUrl()
 
 			// Adjust
 			shortUrl = url.replace(rootUrl,'/');
 
 			// Return
-			return shortUrl;
+			return shortUrl.replace(/\#$/,'');
 		};
 
 		// ----------------------------------------------------------------------
@@ -974,7 +988,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			if ( /[\%]/.test(result) ) {
+			if ( /[\%[^2][^5]/.test(result) ) {
 				result = window.unescape(result);
 			}
 
@@ -1014,11 +1028,11 @@
 				return false;
 			}
 
+			// Log
+			History.debug('History.setHash: called',hash);
+
 			// Prepare
 			var adjustedHash = History.escapeHash(hash);
-
-			// Log hash
-			History.debug('History.setHash',this,arguments,'hash:',hash,'adjustedHash:',adjustedHash,'oldHash:',document.location.hash);
 
 			// Make Busy + Continue
 			History.busy(true);
@@ -1027,7 +1041,7 @@
 			var State = History.getStateByHash(hash);
 			if ( State && !History.emulated.pushState ) {
 				// Hash is a state so skip the setHash
-				History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',this,arguments);
+				History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',arguments);
 
 				// PushState
 				History.pushState(State.data,State.title,State.url,false);
@@ -1064,11 +1078,17 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			result = window.escape(result)
-				.replace('%21','!')
-				.replace('%26','&')
-				.replace('%3D','=')
-				.replace('%3F','?');
+			result = window.escape(result);
+
+			// IE6 Escape Bug
+			if ( !History.bugs.hashEscape ) {
+				// Restore common parts
+				result = result
+					.replace('%21','!')
+					.replace('%26','&')
+					.replace('%3D','=')
+					.replace('%3F','?');
+			}
 
 			// Return result
 			return result;
@@ -1154,10 +1174,11 @@
 		 * @return {boolean} busy
 		 */
 		History.busy = function(value){
-			History.debug('History.busy: called: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues);
+			// History.debug('History.busy: called: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues);
 
 			// Apply
 			if ( typeof value !== 'undefined' ) {
+				History.debug('History.busy: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues.length);
 				History.busy.flag = value;
 			}
 			// Default
@@ -1175,7 +1196,7 @@
 						var queue = History.queues[i];
 						if ( queue.length === 0 ) continue;
 						var item = queue.shift();
-						History.debug('History.busy: firing', item);
+						// History.debug('History.busy: firing', item);
 						History.fireQueueItem(item);
 						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
 					}
@@ -1203,7 +1224,7 @@
 		 * @param {Object} item [scope,callback,args,queue]
 		 */
 		History.pushQueue = function(item){
-			History.debug('History.pushQueue: called', arguments);
+			// History.debug('History.pushQueue: called', arguments);
 
 			// Prepare the queue
 			History.queues[item.queue||0] = History.queues[item.queue||0]||[];
@@ -1265,7 +1286,7 @@
 		 * History.doubleChecker
 		 * Contains the timeout used for the double checks
 		 */
-		History.doubleChecker = null;
+		History.doubleChecker = false;
 
 		/**
 		 * History.doubleCheckComplete()
@@ -1292,7 +1313,7 @@
 			// Clear
 			if ( History.doubleChecker ) {
 				clearTimeout(History.doubleChecker);
-				History.doubleChecker = null;
+				History.doubleChecker = false;
 			}
 
 			// Chain
@@ -1317,13 +1338,13 @@
 					function(){
 						History.doubleCheckClear();
 						if ( !History.stateChanged ) {
-							History.log('History.doubleCheck: State has not yet changed, trying again', arguments);
+							History.debug('History.doubleCheck: State has not yet changed, trying again', arguments);
 							// Re-Attempt
 							tryAgain();
 						}
 						return true;
 					},
-					History.options.hashChangeInterval*5
+					History.options.doubleCheckInterval
 				);
 			}
 
@@ -1358,12 +1379,12 @@
 			// Check if we have a state with that url
 			// If not create it
 			if ( !newState ) {
-				History.log('History.safariStatePoll: new');
+				History.debug('History.safariStatePoll: new');
 				newState = History.createStateObject();
 			}
 
 			// Apply the New State
-			History.log('History.safariStatePoll: trigger');
+			History.debug('History.safariStatePoll: trigger');
 			History.Adapter.trigger(window,'popstate');
 
 			// Chain
@@ -1501,7 +1522,7 @@
 			 * Refresh the Current State
 			 */
 			History.onPopState = function(event){
-				History.debug('History.onPopState',this,arguments);
+				// History.debug('History.onPopState', arguments);
 
 				// Reset the double check
 				History.doubleCheckComplete();
@@ -1607,14 +1628,6 @@
 					return false;
 				}
 
-				// Log
-				History.debug(
-					'History.onPopState',
-					'newState:', newState,
-					'oldState:', History.getStateByUrl(document.location.href),
-					'urlConflict:', History.hasUrlConflict(document.location.href)
-				);
-
 				// Store the State
 				History.storeState(newState);
 				History.saveState(newState);
@@ -1641,6 +1654,8 @@
 			 * @return {true}
 			 */
 			History.pushState = function(data,title,url,queue){
+				History.debug('History.pushState: called', arguments);
+
 				// Check the State
 				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
@@ -1679,6 +1694,7 @@
 						(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
 						? newState.hashedUrl
 						: newState.url;
+					alert(pushUrl);
 					history.pushState(newState.data,newState.title,pushUrl);
 
 					// Fire HTML5 Event
@@ -1699,6 +1715,8 @@
 			 * @return {true}
 			 */
 			History.replaceState = function(data,title,url,queue){
+				History.debug('History.replaceState: called', arguments);
+
 				// Check the State
 				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
@@ -1737,6 +1755,7 @@
 						(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
 						? newState.hashedUrl
 						: newState.url;
+					alert(pushUrl);
 					history.replaceState(newState.data,newState.title,pushUrl);
 
 					// Fire HTML5 Event

@@ -50,6 +50,16 @@
 	<script src="../vendor/qunit/qunit/qunit.js"></script>
 </head>
 <body>
+	<!-- Elements -->
+	<h1 id="qunit-header"><?=$title?></h1>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+	<div id="qunit-fixture">test markup</div>
+	<button onclick="history.back()">back</button><button onclick="history.forward()">forward</button>
+	<textarea id="log" style="width:100%;height:400px"></textarea>
+
 	<!-- FireBug Lite -->
 	<script>if ( typeof window.console === 'undefined' ) { document.write('<script src=".../vendor/firebug-lite.js"><\/script>'); }</script>
 
@@ -65,14 +75,5 @@
 
 	<!-- Tests -->
 	<script src="tests.js"></script>
-
-	<!-- Elements -->
-	<h1 id="qunit-header"><?=$title?></h1>
-	<h2 id="qunit-banner"></h2>
-	<div id="qunit-testrunner-toolbar"></div>
-	<h2 id="qunit-userAgent"></h2>
-	<ol id="qunit-tests"></ol>
-	<div id="qunit-fixture">test markup</div>
-	<div id="log"></div>
 </body>
 </html>

@@ -37,19 +37,6 @@
 		}
 
 		// ----------------------------------------------------------------------
-		// Emulated Status
-
-		/**
-		 * History.emulated
-		 * Which features require emulating?
-		 */
-		History.emulated.hashChange = Boolean(
-			!(('onhashchange' in window) || ('onhashchange' in document))
-			||
-			(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8)
-		);
-
-		// ----------------------------------------------------------------------
 		// Hash Storage
 
 		/**
@@ -144,7 +131,7 @@
 		 * @return {true}
 		 */
 		History.discardState = function(discardedState,forwardState,backState){
-			History.debug('History.discardState',this,arguments);
+			History.debug('History.discardState', arguments);
 			// Prepare
 			var discardedStateHash = History.getHashByState(discardedState);
 
@@ -169,7 +156,7 @@
 		 * @return {true}
 		 */
 		History.discardHash = function(discardedHash,forwardState,backState){
-			History.debug('History.discardState',this,arguments);
+			History.debug('History.discardState', arguments);
 			// Create Discard Object
 			var discardObject = {
 				'discardedHash': discardedHash,
@@ -224,7 +211,7 @@
 		 * @return {true}
 		 */
 		History.recycleState = function(State){
-			History.debug('History.recycleState',this,arguments);
+			History.debug('History.recycleState', arguments);
 			// Prepare
 			var StateHash = History.getHashByState(State);
 
@@ -276,15 +263,15 @@
 
 					// Define some variables that will help in our checker function
 					var
-						lastDocumentHash = null,
-						lastIframeHash = null,
+						lastDocumentHash = '',
+						lastIframeHash = '',
 						checkerRunning = false;
 
 					// Define the checker function
 					History.checkerFunction = function(){
 						// Check Running
 						if ( checkerRunning ) {
-							History.debug('hashchange.checker: checker is running');
+							// History.debug('hashchange.checker: checker is running');
 							return false;
 						}
 
@@ -293,8 +280,8 @@
 
 						// Fetch
 						var
-							documentHash = History.getHash(),
-							iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash);
+							documentHash = History.getHash()||'',
+							iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash)||'';
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -387,7 +374,8 @@
 			 * Trigger HTML5's window.onpopstate via HTML4 HashChange Support
 			 */
 			History.onHashChange = function(event){
-				History.debug('History.onHashChange',this,arguments);
+				History.debug('History.onHashChange', arguments);
+
 				// Prepare
 				var
 					currentUrl						= ((event && event.newURL) || document.location.href),
@@ -403,6 +391,9 @@
 					History.busy(false);
 					return false;
 				}
+
+				// Reset the double check
+				History.doubleCheckComplete();
 
 				// Store our location for use in detecting back/forward direction
 				History.saveHash(currentHash);
@@ -428,30 +419,9 @@
 				// Create the state Hash
 				currentStateHash = History.getHashByState(currentState);
 
-				// Log
-				History.debug('History.onHashChange: ',
-					'currentStateHash',
-					currentStateHash,
-					'Hash -1',
-					History.getHashByIndex(-1),
-					'Hash -2',
-					History.getHashByIndex(-2),
-					'Hash -3',
-					History.getHashByIndex(-3),
-					'Hash -4',
-					History.getHashByIndex(-4),
-					'Hash -5',
-					History.getHashByIndex(-5),
-					'Hash -6',
-					History.getHashByIndex(-6),
-					'Hash -7',
-					History.getHashByIndex(-7)
-				);
-
 				// Check if we are DiscardedState
 				var discardObject = History.discardedState(currentState);
 				if ( discardObject ) {
-					History.debug('forwardState:',History.getHashByState(discardObject.forwardState),'backState:',History.getHashByState(discardObject.backState));
 					// Ignore this state as it has been discarded and go back to the state before it
 					if ( History.getHashByIndex(-2) === History.getHashByState(discardObject.forwardState) ) {
 						// We are going backwards
@@ -485,7 +455,7 @@
 			 * @return {true}
 			 */
 			History.pushState = function(data,title,url,queue){
-				History.debug('History.pushState',this,arguments);
+				History.debug('History.pushState: called', arguments);
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
@@ -525,14 +495,6 @@
 				// Force update of the title
 				History.setTitle(newState);
 
-				// Log
-				History.debug(
-					'History.pushState: details',
-					'newStateHash:', newStateHash,
-					'oldStateHash:', oldStateHash,
-					'html4Hash:', html4Hash
-				);
-
 				// Check if we are the same State
 				if ( newStateHash === oldStateHash ) {
 					History.debug('History.pushState: no change', newStateHash);
@@ -569,7 +531,8 @@
 			 * @return {true}
 			 */
 			History.replaceState = function(data,title,url,queue){
-				History.debug('History.replaceState',this,arguments);
+				History.debug('History.replaceState: called', arguments);
+
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
