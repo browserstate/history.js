@@ -131,7 +131,7 @@
 		 * @return {true}
 		 */
 		History.discardState = function(discardedState,forwardState,backState){
-			History.debug('History.discardState', arguments);
+			//History.debug('History.discardState', arguments);
 			// Prepare
 			var discardedStateHash = History.getHashByState(discardedState);
 
@@ -156,7 +156,7 @@
 		 * @return {true}
 		 */
 		History.discardHash = function(discardedHash,forwardState,backState){
-			History.debug('History.discardState', arguments);
+			//History.debug('History.discardState', arguments);
 			// Create Discard Object
 			var discardObject = {
 				'discardedHash': discardedHash,
@@ -211,7 +211,7 @@
 		 * @return {true}
 		 */
 		History.recycleState = function(State){
-			History.debug('History.recycleState', arguments);
+			//History.debug('History.recycleState', arguments);
 			// Prepare
 			var StateHash = History.getHashByState(State);
 
@@ -292,7 +292,7 @@
 
 							// Create a history entry in the iframe
 							if ( iframeHash !== documentHash ) {
-								History.debug('hashchange.checker: iframe hash change', 'documentHash (new):', documentHash, 'iframeHash (old):', iframeHash);
+								//History.debug('hashchange.checker: iframe hash change', 'documentHash (new):', documentHash, 'iframeHash (old):', iframeHash);
 
 								// Equalise
 								lastIframeHash = iframeHash = documentHash;
@@ -311,7 +311,7 @@
 
 						// The iFrame Hash has changed (back button caused)
 						else if ( iframeHash !== lastIframeHash ) {
-							History.debug('hashchange.checker: iframe hash out of sync', 'iframeHash (new):', iframeHash, 'documentHash (old):', documentHash);
+							//History.debug('hashchange.checker: iframe hash out of sync', 'iframeHash (new):', iframeHash, 'documentHash (old):', documentHash);
 
 							// Equalise
 							lastIframeHash = iframeHash;
@@ -376,7 +376,7 @@
 			 * Trigger HTML5's window.onpopstate via HTML4 HashChange Support
 			 */
 			History.onHashChange = function(event){
-				History.debug('History.onHashChange', arguments);
+				//History.debug('History.onHashChange', arguments);
 
 				// Prepare
 				var
@@ -389,7 +389,7 @@
 				// Check if we are the same state
 				if ( History.isLastHash(currentHash) ) {
 					// There has been no change (just the page's hash has finally propagated)
-					History.debug('History.onHashChange: no change');
+					//History.debug('History.onHashChange: no change');
 					History.busy(false);
 					return false;
 				}
@@ -403,7 +403,7 @@
 				// Expand Hash
 				currentState = History.extractState(currentHash||document.location.href);
 				if ( !currentState ) {
-					History.debug('History.onHashChange: traditional anchor', currentHash);
+					//History.debug('History.onHashChange: traditional anchor', currentHash);
 					// Traditional Anchor Hash
 					History.Adapter.trigger(window,'anchorchange');
 					History.busy(false);
@@ -412,7 +412,7 @@
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(currentState) ) {
-					History.debug('History.onHashChange: no change');
+					//History.debug('History.onHashChange: no change');
 					// There has been no change (just the page's hash has finally propagated)
 					History.busy(false);
 					return false;
@@ -427,11 +427,11 @@
 					// Ignore this state as it has been discarded and go back to the state before it
 					if ( History.getHashByIndex(-2) === History.getHashByState(discardObject.forwardState) ) {
 						// We are going backwards
-						History.debug('History.onHashChange: go backwards');
+						//History.debug('History.onHashChange: go backwards');
 						History.back(false);
 					} else {
 						// We are going forwards
-						History.debug('History.onHashChange: go forwards');
+						//History.debug('History.onHashChange: go forwards');
 						History.forward(false);
 					}
 					History.busy(false);
@@ -439,7 +439,7 @@
 				}
 
 				// Push the new HTML5 State
-				History.debug('History.onHashChange: success hashchange');
+				//History.debug('History.onHashChange: success hashchange');
 				History.pushState(currentState.data,currentState.title,currentState.url,false);
 
 				// End onHashChange closure
@@ -457,7 +457,7 @@
 			 * @return {true}
 			 */
 			History.pushState = function(data,title,url,queue){
-				History.debug('History.pushState: called', arguments);
+				//History.debug('History.pushState: called', arguments);
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
@@ -467,7 +467,7 @@
 				// Handle Queueing
 				if ( queue !== false && History.busy() ) {
 					// Wait + Push to Queue
-					History.debug('History.pushState: we must wait', arguments);
+					//History.debug('History.pushState: we must wait', arguments);
 					History.pushQueue({
 						scope: History,
 						callback: History.pushState,
@@ -500,14 +500,14 @@
 
 				// Check if we are the same State
 				if ( newStateHash === oldStateHash ) {
-					History.debug('History.pushState: no change', newStateHash);
+					//History.debug('History.pushState: no change', newStateHash);
 					History.busy(false);
 					return false;
 				}
 
 				// Update HTML4 Hash
 				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
-					History.debug('History.pushState: update hash', newStateHash, html4Hash);
+					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
 					return false;
 				}
@@ -516,7 +516,7 @@
 				History.saveState(newState);
 
 				// Fire HTML5 Event
-				History.debug('History.pushState: trigger popstate');
+				//History.debug('History.pushState: trigger popstate');
 				History.Adapter.trigger(window,'statechange');
 				History.busy(false);
 
@@ -534,7 +534,7 @@
 			 * @return {true}
 			 */
 			History.replaceState = function(data,title,url,queue){
-				History.debug('History.replaceState: called', arguments);
+				//History.debug('History.replaceState: called', arguments);
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
@@ -544,7 +544,7 @@
 				// Handle Queueing
 				if ( queue !== false && History.busy() ) {
 					// Wait + Push to Queue
-					History.debug('History.replaceState: we must wait', arguments);
+					//History.debug('History.replaceState: we must wait', arguments);
 					History.pushQueue({
 						scope: History,
 						callback: History.replaceState,

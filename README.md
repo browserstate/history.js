@@ -206,7 +206,6 @@ Thanks! every bit of help really does make a difference. Again thank you.
 		- Old browsers like MSIE 6,7 and Firefox 2 do not have a `onhashchange` event
 		- MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
 		- Non-Opera HTML4 browsers sometimes do not apply the hash when the hash is not `urlencoded`
-- State data must not contain the key `_state`, as it is reserved for History.js
 - State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
 - State titles (if set) will always be applied to the `document.title`
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call

@@ -104,7 +104,7 @@ var checkState = function(){
 	});
 
 	// Image Load to Stress Safari
-	// (new Image()).src = "image.php";
+	(new Image()).src = "image.php";
 };
 
 // Check the Initial State
