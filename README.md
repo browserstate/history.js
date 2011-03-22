@@ -1,4 +1,4 @@
-Welcome to History.js (v1.6.0 - March ?? 2011)
+Welcome to History.js (v1.6.0 - March 22 2011)
 ==================
 
 
@@ -66,7 +66,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 > Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states into their HTML5 equivalents so the user won't even notice :-)
 >
-> Note 2: These urls will be automatically url-encoded in IE6 and partially encoded in Firefox 3 and IE7+ which is necessary to prevent certain browser-specific bugs.
+> Note 2: These urls will be automatically url-encoded in IE6 to prevent certain browser-specific bugs.
 >
 > Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
@@ -217,7 +217,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ## Changelog
 
-- v1.6.0 - March ?? 2011
+- v1.6.0 - March 22 2011
 	- Added Zepto adapter thanks to [Matt Garrett](http://twitter.com/#!/matthewgarrett)
 	- The readme now references the supported versions of the libraries we use
 	- Updated vendors to the most recent versions. jQuery 1.5.1 and Mootools 1.3.1

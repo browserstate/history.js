@@ -96,7 +96,7 @@
 		 * History.options.debug
 		 * If true will enable debug messages to be logged
 		 */
-		History.options.debug = History.options.debug || false;
+		History.options.debug = History.options.debug || true;
 
 		/**
 		 * History.options.initialTitle
@@ -709,16 +709,19 @@
 		 * History.extractState
 		 * Get a State by it's URL or Hash
 		 */
-		History.extractState = function(url_or_hash){
+		History.extractState = function(url_or_hash,create){
 			// Prepare
 			var State = null;
+			create = create||false;
 
 			// Fetch SUID
 			var id = History.extractId(url_or_hash);
 			if ( id ) {
 				State = History.getStateById(id);
 			}
-			else {
+
+			// Fetch SUID returned no State
+			if ( !State ) {
 				// Fetch URL
 				var url = History.getFullUrl(url_or_hash);
 
@@ -726,6 +729,10 @@
 				id = History.getIdByUrl(url)||false;
 				if ( id ) {
 					State = History.getStateById(id);
+				}
+				// Create State
+				else if ( create && /\//.test(url_or_hash) ) {
+					State = History.createStateObject(null,null,url.replace(/\&_suid.*/,''));
 				}
 			}
 
@@ -941,7 +948,7 @@
 			History.busy(true);
 
 			// Check if hash is a state
-			var State = History.extractState(hash);
+			var State = History.extractState(hash,true);
 			if ( State && !History.emulated.pushState ) {
 				// Hash is a state so skip the setHash
 				History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',arguments);
@@ -1427,7 +1434,7 @@
 				var currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					var currentState = History.extractState(currentHash||document.location.href);
+					var currentState = History.extractState(currentHash||document.location.href,true);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
