@@ -66,7 +66,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 > Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states into their HTML5 equivalents so the user won't even notice :-)
 >
-> Note 2: These urls will be url-encoded in all HTML4 Browsers except Opera as it does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work (the hashes won't actually apply). There is nothing we can do about this.
+> Note 2: These urls will be automatically url-encoded in IE6 and partially encoded in Firefox 3 and IE7+ which is necessary to prevent certain browser-specific bugs.
 >
 > Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
@@ -160,7 +160,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ### HTML4 Browsers
 
-- IE 6,7,8
+- IE 6,7,8,9
 - Firefox 3
 - Opera 10,11
 - Safari 4
@@ -208,9 +208,8 @@ Thanks! every bit of help really does make a difference. Again thank you.
 		- Non-Opera HTML4 browsers sometimes do not apply the hash when the hash is not `urlencoded`
 - State data must not contain the key `_state`, as it is reserved for History.js
 - State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
-- State titles will always be applied to the `document.title` if set
+- State titles (if set) will always be applied to the `document.title`
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
-- HTML4 Browsers on initial page load will have a hash inserted into the url; this is to ensure correct cross-compatibility between HTML4 browsers (as IE will refresh the page if the anchor is lost)
 - Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
 	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states

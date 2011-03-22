@@ -240,6 +240,10 @@
 				// Define our Checker Function
 				History.checkerFunction = null;
 
+				// Define some variables that will help in our checker function
+				var
+					lastDocumentHash = '';
+
 				// Handle depending on the browser
 				if ( History.isInternetExplorer() ) {
 					// IE6 and IE7
@@ -263,7 +267,6 @@
 
 					// Define some variables that will help in our checker function
 					var
-						lastDocumentHash = '',
 						lastIframeHash = '',
 						checkerRunning = false;
 
@@ -271,7 +274,6 @@
 					History.checkerFunction = function(){
 						// Check Running
 						if ( checkerRunning ) {
-							// History.debug('hashchange.checker: checker is running');
 							return false;
 						}
 
@@ -399,10 +401,10 @@
 				History.saveHash(currentHash);
 
 				// Expand Hash
-				currentState = History.getStateByHash(currentHash);
+				currentState = History.extractState(currentHash||document.location.href);
 				if ( !currentState ) {
-					// Traditional Anchor Hash
 					History.debug('History.onHashChange: traditional anchor', currentHash);
+					// Traditional Anchor Hash
 					History.Adapter.trigger(window,'anchorchange');
 					History.busy(false);
 					return false;
@@ -410,8 +412,8 @@
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(currentState) ) {
-					// There has been no change (just the page's hash has finally propagated)
 					History.debug('History.onHashChange: no change');
+					// There has been no change (just the page's hash has finally propagated)
 					History.busy(false);
 					return false;
 				}
@@ -488,6 +490,7 @@
 
 				// Store the newState
 				History.storeState(newState);
+				History.expectedStateId = newState.id;
 
 				// Recycle the State
 				History.recycleState(newState);

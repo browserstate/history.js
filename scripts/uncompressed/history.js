@@ -125,7 +125,7 @@
 		History.log = function(){
 			// Prepare
 			var
-				consoleExists = (typeof console !== 'undefined' && typeof console.apply !== 'undefined'),
+				consoleExists = (typeof console !== 'undefined' && typeof console.log !== 'undefined' && typeof console.log.apply !== 'undefined'),
 				textarea = document.getElementById('log'),
 				message,
 				i,n
@@ -224,7 +224,7 @@
 		History.emulated = {
 			pushState: !Boolean(
 				window.history && window.history.pushState && window.history.replaceState
-				&& !/ Mobile\/(7W367a|8A400|8B117|8C134) /.test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+				&& !(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
 			),
 			hashChange: Boolean(
 				!(('onhashchange' in window) || ('onhashchange' in document))
@@ -443,34 +443,22 @@
 		// State Storage
 
 		/**
-		 * History.idsToStates
-		 * State IDs to States
+		 * History.idToState
+		 * 1-1: State ID to State Object
 		 */
-		History.idsToStates = {};
+		History.idToState = {};
 
 		/**
-		 * History.stateToIds
-		 * State Strings to State IDs
+		 * History.stateToId
+		 * 1-1: State String to State ID
 		 */
-		History.stateToIds = {};
+		History.stateToId = {};
 
 		/**
-		 * History.urlsToIds
-		 * State URLs to State IDs
+		 * History.urlToId
+		 * 1-1: State URL to State ID
 		 */
-		History.urlsToIds = {};
-
-		/**
-		 * History.hashesToIds
-		 * State Hashes to State IDs
-		 */
-		History.hashesToIds = {};
-
-		/**
-		 * History.conflictedUrls
-		 * Which urls have duplicate states (indexed by url)
-		 */
-		History.conflictedUrls = {};
+		History.urlToId = {};
 
 		/**
 		 * History.storedStates
@@ -499,11 +487,46 @@
 			// Adjust
 			if ( friendly ) {
 				State = History.cloneObject(State);
-				delete State.data._state;
+				State.url = State.cleanUrl||State.url;
 			}
 
 			// Return
 			return State;
+		};
+
+		/**
+		 * History.getIdByState(State)
+		 * Gets a ID for a State
+		 * @param {State} newState
+		 * @return {String} id
+		 */
+		History.getIdByState = function(newState){
+
+			// Fetch ID
+			var id = History.extractId(newState.url);
+			if ( !id ) {
+				// Find ID via State String
+				var str = History.getStateString(newState);
+				if ( typeof History.stateToId[str] !== 'undefined' ) {
+					id = History.stateToId[str];
+				}
+				else {
+					// Generate a new ID
+					while ( true ) {
+						id = String(Math.floor(Math.random()*1000));
+						if ( typeof History.idToState[id] === 'undefined' ) {
+							break;
+						}
+					}
+
+					// Apply the new State to the ID
+					History.stateToId[str] = id;
+					History.idToState[id] = newState;
+				}
+			}
+
+			// Return ID
+			return id;
 		};
 
 		/**
@@ -527,81 +550,47 @@
 			if ( !oldState.data || (typeof oldState.data !== 'object') ) {
 				oldState.data = {};
 			}
-			if ( !oldState.data._state || (typeof oldState.data._state !== 'object') ) {
-				oldState.data._state = {};
-			}
+
+			// ----------------------------------------------------------------------
 
 			// Create
 			var newState = {};
 			newState.normalized = true;
-			newState.title = oldState.title||oldState.data._state.title||'';
-			newState.url = History.getFullUrl(oldState.url||oldState.data._state.url||document.location.href);
+			newState.title = oldState.title||'';
+			newState.url = History.getFullUrl(oldState.url||document.location.href);
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
-			// Data State
-			newState.data._state = {};
-			newState.data._state.title	= newState.title;
-			newState.data._state.url		= newState.url;
-
 			// Fetch ID
-			var id = History.getIdByHash(newState.url);
+			newState.id = History.getIdByState(newState);
 
-			// Handle ID
-			if ( id ) {
-				// An ID existed in the url
-				newState.id = id;
-			}
-			else {
-				// Find ID via State String
-				var str = History.getStateString(newState);
-				if ( typeof History.stateToIds[str] !== 'undefined' ) {
-					id = History.stateToIds[str];
-				}
-				else {
-					// Generate a new ID
-					while ( true ) {
-						id = String(Math.floor(Math.random()*1000));
-						if ( typeof History.idsToStates[id] === 'undefined' ) {
-							break;
-						}
-					}
+			// ----------------------------------------------------------------------
 
-					// Apply the new State to the ID
-					History.stateToIds[str] = id;
-					History.idsToStates[id] = newState;
-				}
+			// Check to see if we have more than just a url
+			var dataNotEmpty = !History.isEmptyObject(newState.data);
 
-				// Add ID
-				newState.id = id;
-			}
-
-			// Add ID if Necessary
-			var addId = History.bugs.safariPoll;
-			if ( !addId ) {
-				// Check to see if we have more than just a url
-				var dataClone = History.cloneObject(newState.data);
-				delete dataClone._state;
-
-				// Check
-				var dataNotEmpty = !History.isEmptyObject(dataClone);
-
-				// Apply
-				if ( newState.title || dataNotEmpty ) {
-					addId = true;
-				}
-			}
-
-			// Extras
-			if ( addId && !/(.*)\&_suid=([0-9]+)$/.test(newState.url) ) {
-				// Extract Hash
-				newState.hash = History.getShortUrl(newState.url);
+			// Apply
+			if ( newState.title || dataNotEmpty ) {
+				// Add ID to Hash
+				newState.hash = History.getShortUrl(newState.url).replace(/\&_suid.*/,'');
 				if ( !/\?/.test(newState.hash) ) {
 					newState.hash += '?';
 				}
 				newState.hash += '&_suid='+newState.id;
 			}
+
+			// Create the Hashed URL
 			newState.hashedUrl = History.getFullUrl(newState.hash);
+			newState.cleanUrl = newState.url.replace(/\&_suid.*/,'');
+
+			// ----------------------------------------------------------------------
+
+			// Update the URL if we have a duplicate
+			if ( History.hasUrlDuplicate(newState) ) {
+				newState.url = newState.hashedUrl;
+			}
+
+			// ----------------------------------------------------------------------
 
 			// Return
 			return newState;
@@ -637,7 +626,7 @@
 		 */
 		History.getStateById = function(id){
 			id = String(id);
-			var State = History.idsToStates[id]||undefined;
+			var State = History.idToState[id]||undefined;
 			return State;
 		};
 
@@ -651,7 +640,9 @@
 
 			// Clean
 			var cleanedState = {
-				data: State.data
+				data: State.data,
+				title: passedState.title,
+				url: passedState.url
 			};
 
 			// Fetch
@@ -685,9 +676,7 @@
 		 */
 		History.getHashByState = function(passedState){
 			// Prepare
-			var
-				hash,
-				State = History.normalizeState(passedState);
+			var hash, State = History.normalizeState(passedState);
 
 			// Fetch
 			hash = State.hash;
@@ -697,69 +686,60 @@
 		};
 
 		/**
-		 * History.getIdByHash(hash)
-		 * Gets a State ID from a State Hash
-		 * @param {string} hash
+		 * History.extractId(url_or_hash)
+		 * Get a State ID by it's URL or Hash
+		 * @param {string} url_or_hash
 		 * @return {string} id
 		 */
-		History.getIdByHash = function(hash){
+		History.extractId = function ( url_or_hash ) {
 			// Prepare
 			var id;
 
-			// Lookup
-			id = History.hashesToIds[hash]||'';
-
 			// Extract
-			if ( !id ) {
-				var parts,url;
-				parts = /(.*)\&_suid=([0-9]+)$/.exec(hash);
-				url = parts ? (parts[1]||hash) : hash;
-				id = parts ? String(parts[2]||'') : '';
-			}
+			var parts,url;
+			parts = /(.*)\&_suid=([0-9]+)$/.exec(url_or_hash);
+			url = parts ? (parts[1]||url_or_hash) : url_or_hash;
+			id = parts ? String(parts[2]||'') : '';
 
 			// Return
-			return id;
+			return id||false;
 		};
 
 		/**
-		 * History.getStateByHash(hash)
-		 * Expands a Hash into a State if possible
-		 * @param {string} hash
-		 * @return {Object|null} State
+		 * History.extractState
+		 * Get a State by it's URL or Hash
 		 */
-		History.getStateByHash = function(hash){
+		History.extractState = function(url_or_hash){
 			// Prepare
 			var State = null;
 
-			// Check
-			if ( hash === '' ) {
-				State = History.createStateObject();
+			// Fetch SUID
+			var id = History.extractId(url_or_hash);
+			if ( id ) {
+				State = History.getStateById(id);
 			}
 			else {
-				// Extract ID from Hash
-				var id = History.getIdByHash(hash);
+				// Fetch URL
+				var url = History.getFullUrl(url_or_hash);
 
-				// Have ID
+				// Check URL
+				id = History.getIdByUrl(url)||false;
 				if ( id ) {
-					State = History.getStateById(id)||null;
-				}
-
-				// State Failed
-				if ( !State && /\//.test(hash) ) {
-					// Is a URL
-					var expandedUrl = History.getFullUrl(hash);
-					State = History.createStateObject(null,null,expandedUrl);
-				}
-				else {
-					// Non State Hash
+					State = History.getStateById(id);
 				}
 			}
 
-			// Normalise
-			State = State;
-
-			// Return State
+			// Return
 			return State;
+		};
+
+		/**
+		 * History.getIdByUrl()
+		 * Get a State ID by a State URL
+		 */
+		History.getIdByUrl = function(url){
+			var id = History.urlToId[url]||false;
+			return id;
 		};
 
 		/**
@@ -781,23 +761,23 @@
 		};
 
 		/**
-		 * History.getStateByUrl
-		 * Get a state by it's url
-		 * @param {string} url
+		 * History.hasUrlDuplicate
+		 * Checks if a Url will have a url conflict
+		 * @param {Object} newState
+		 * @return {Boolean} hasDuplicate
 		 */
-		History.getStateByUrl = function(url){
+		History.hasUrlDuplicate = function(newState) {
 			// Prepare
-			var
-				stateUrl = History.getFullUrl(url),
-				stateHash = History.getShortUrl(url);
+			var hasDuplicate = false;
 
 			// Fetch
-			var
-				id = History.urlsToIds[stateUrl]||undefined,
-				State = History.getStateById(id)||History.getStateByHash(stateHash);
+			var oldState = History.extractState(newState.url);
+
+			// Check
+			hasDuplicate = oldState && oldState.id !== newState.id;
 
 			// Return
-			return State;
+			return hasDuplicate;
 		};
 
 		/**
@@ -807,43 +787,14 @@
 		 * @return {Object} newState
 		 */
 		History.storeState = function(newState){
-			// Prepare
-			var
-				newStateHash = History.getHashByState(newState),
-				hasDuplicate = History.hasUrlDuplicate(newState);
-
-			// Store duplicate status
-			if ( hasDuplicate ) {
-				History.conflictedUrls[newState.url] = true;
-			}
-
 			// Store the State
-			History.hashesToIds[newState.hash] = History.urlsToIds[newState.url] = newState.id;
+			History.urlToId[newState.url] = newState.id;
 
 			// Push the State
 			History.storedStates.push(History.cloneObject(newState));
 
 			// Return newState
 			return newState;
-		};
-
-		/**
-		 * History.isLastStoredState(newState)
-		 * Tests to see if the state is the last state
-		 * @param {Object} newState
-		 * @return {boolean} isLast
-		 */
-		History.isLastStoredState = function(newState){
-			// Prepare
-			var
-				newStateHash = History.getHashByState(newState),
-				oldStateHash = History.getHashByState(History.getLastStoredState());
-
-			// Check
-			var isLast = History.storedStates.length && newStateHash === oldStateHash;
-
-			// Return isLast
-			return isLast;
 		};
 
 		/**
@@ -854,14 +805,20 @@
 		 */
 		History.isLastSavedState = function(newState){
 			// Prepare
-			var
-				newStateHash = History.getHashByState(newState),
-				oldStateHash = History.getHashByState(History.getLastSavedState());
+			var isLast = false;
 
 			// Check
-			var isLast = History.savedStates.length && newStateHash === oldStateHash;
+			if ( History.savedStates.length ) {
+				var
+					newId = newState.id,
+					oldState = History.getLastSavedState(),
+					oldId = oldState.id;
 
-			// Return isLast
+				// Check
+				isLast = (newId === oldId);
+			}
+
+			// Return
 			return isLast;
 		};
 
@@ -912,60 +869,6 @@
 			return State;
 		};
 
-		/**
-		 * History.stateUrlExists
-		 * Checks if the State Url Exists
-		 * @param {string} stateUrl
-		 * @return {boolean} exists
-		 */
-		History.stateUrlExists = function(stateUrl){
-			// Prepare
-			var exists = typeof History.urlsToIds[stateUrl] !== 'undefined';
-
-			// Return exists
-			return exists;
-		};
-
-		/**
-		 * History.hasUrlDuplicate
-		 * Checks if a Url will have a url conflict
-		 * @param {Object} newState
-		 * @return {Boolean} hasConflict
-		 */
-		History.hasUrlDuplicate = function(newState) {
-			// Prepare
-			var
-				newStateHash = History.getHashByState(newState),
-				oldState = History.getStateByUrl(newState.url),
-				hasConflict = false;
-
-			// Check for Conflict
-			if ( typeof oldState !== 'undefined' ) {
-				// Compare Hashes
-				var oldStateHash = History.getHashByState(oldState);
-				if ( oldStateHash !== newStateHash ) {
-					// We have a conflict
-					hasConflict = true;
-				}
-			}
-
-			// Return
-			return hasConflict;
-		};
-
-		/**
-		 * History.hasUrlConflict
-		 * Check if the url has multiple states associated to it
-		 * @param {string} stateUrl
-		 * @return {boolean} exists
-		 */
-		History.hasUrlConflict = function(stateUrl){
-			stateUrl = History.getFullUrl(stateUrl);
-			var exists = typeof History.conflictedUrls[stateUrl] !== 'undefined';
-			return exists;
-		};
-
-
 		// ----------------------------------------------------------------------
 		// Hash Helpers
 
@@ -988,7 +891,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			if ( /[\%[^2][^5]/.test(result) ) {
+			if ( /\%[^2][^5]/.test(result) ) {
 				result = window.unescape(result);
 			}
 
@@ -1038,7 +941,7 @@
 			History.busy(true);
 
 			// Check if hash is a state
-			var State = History.getStateByHash(hash);
+			var State = History.extractState(hash);
 			if ( State && !History.emulated.pushState ) {
 				// Hash is a state so skip the setHash
 				History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',arguments);
@@ -1174,8 +1077,6 @@
 		 * @return {boolean} busy
 		 */
 		History.busy = function(value){
-			// History.debug('History.busy: called: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues);
-
 			// Apply
 			if ( typeof value !== 'undefined' ) {
 				History.debug('History.busy: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues.length);
@@ -1196,7 +1097,6 @@
 						var queue = History.queues[i];
 						if ( queue.length === 0 ) continue;
 						var item = queue.shift();
-						// History.debug('History.busy: firing', item);
 						History.fireQueueItem(item);
 						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
 					}
@@ -1224,8 +1124,6 @@
 		 * @param {Object} item [scope,callback,args,queue]
 		 */
 		History.pushQueue = function(item){
-			// History.debug('History.pushQueue: called', arguments);
-
 			// Prepare the queue
 			History.queues[item.queue||0] = History.queues[item.queue||0]||[];
 
@@ -1365,7 +1263,7 @@
 
 			// Get the Last State which has the new URL
 			var
-				urlState = History.getStateByUrl(document.location.href),
+				urlState = History.extractState(document.location.href),
 				newState;
 
 			// Check for a difference
@@ -1522,8 +1420,6 @@
 			 * Refresh the Current State
 			 */
 			History.onPopState = function(event){
-				// History.debug('History.onPopState', arguments);
-
 				// Reset the double check
 				History.doubleCheckComplete();
 
@@ -1531,7 +1427,7 @@
 				var currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					var currentState = History.getStateByHash(currentHash);
+					var currentState = History.extractState(currentHash||document.location.href);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
@@ -1546,79 +1442,45 @@
 					}
 
 					// We don't care for hashes
+					History.expectedStateId = false;
 					return false;
 				}
 
 				// Prepare
-				var
-					currentStateHashExits				= null,
-					stateData										= {},
-					stateTitle									= null,
-					stateUrl										= null,
-					newState										= null,
-					newStateUrl                 = null,
-					oldState                    = null;
+				var newState = null;
 
 				// Prepare
 				event = event||{};
 				if ( typeof event.state === 'undefined' ) {
 					// jQuery
 					if ( typeof event.originalEvent !== 'undefined' && typeof event.originalEvent.state !== 'undefined' ) {
-						event.state = event.originalEvent.state;
+						event.state = event.originalEvent.state||false;
 					}
 					// MooTools
 					else if ( typeof event.event !== 'undefined' && typeof event.event.state !== 'undefined' ) {
-						event.state = event.event.state;
+						event.state = event.event.state||false;
 					}
 				}
 
-				// Fetch Data
-				if ( typeof event.state !== 'undefined' ) {
+				// Ensure
+				event.state = (event.state||false);
+
+				// Fetch State
+				if ( event.state ) {
 					// Vanilla: Back/forward button was used
-
-					// Browser Fix
-					if ( false ) {
-						// Use the way that should work
-						stateData = event.state;
-					}
-					else {
-						// Using Chrome Fix
-						newStateUrl = document.location.href;
-						oldState = History.getStateByUrl(newStateUrl);
-						var urlConflict = History.hasUrlConflict(newStateUrl);
-
-						// Does oldState Exist?
-						if ( typeof oldState !== 'undefined' && !urlConflict ) {
-							stateData = oldState.data;
-						}
-						else {
-							stateData = event.state;
-						}
-					}
-
+					newState = History.getStateById(event.state);
+				}
+				else if ( History.expectedStateId ) {
+					// Vanilla: A new state was pushed, and popstate was called manually
+					newState = History.getStateById(History.expectedStateId);
 				}
 				else {
-					// Vanilla: A new state was pushed, and popstate was called manually
-
-					// Get State object from the last state
-					newStateUrl = History.getFullUrl(document.location.href);
-					oldState = History.getStateByUrl(newStateUrl);
-
-					// Check if the URLs match
-					if ( oldState && (newStateUrl === oldState.url) ) {
-						stateData = oldState.data;
-					}
-					else {
-						stateData = null;
-					}
+					// Initial State
+					newState = History.extractState(document.location.href);
 				}
 
-				// Resolve newState
-				stateData					= (typeof stateData !== 'object' || stateData === null) ? {} : stateData;
-				stateData._state	= (typeof stateData._state !== 'object' || stateData._state === null) ? {} : stateData._state;
-				stateTitle				=	stateData._state.title||'';
-				stateUrl					=	stateData._state.url||document.location.href;
-				newState					=	History.createStateObject(stateData,stateTitle,stateUrl);
+				// Clean
+				History.expectedStateId = false;
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(newState) ) {
@@ -1688,14 +1550,15 @@
 				else {
 					// Store the newState
 					History.storeState(newState);
+					History.expectedStateId = newState.id;
 
 					// Push the newState
 					var pushUrl =
 						(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
 						? newState.hashedUrl
 						: newState.url;
-					alert(pushUrl);
-					history.pushState(newState.data,newState.title,pushUrl);
+					//alert(pushUrl+"\n"+History.bugs.safariPoll+"\n"+History.hasUrlDuplicate(newState));
+					history.pushState(newState.id,newState.title,pushUrl);
 
 					// Fire HTML5 Event
 					History.Adapter.trigger(window,'popstate');
@@ -1749,14 +1612,14 @@
 				else {
 					// Store the newState
 					History.storeState(newState);
+					History.expectedStateId = newState.id;
 
 					// Push the newState
 					var pushUrl =
 						(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
 						? newState.hashedUrl
 						: newState.url;
-					alert(pushUrl);
-					history.replaceState(newState.data,newState.title,pushUrl);
+					history.replaceState(newState.id,newState.title,pushUrl);
 
 					// Fire HTML5 Event
 					History.Adapter.trigger(window,'popstate');

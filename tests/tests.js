@@ -5,7 +5,7 @@ var
 	document = window.document;
 
 // Prepare
-History.options.debug = true;
+History.options.debug = false;
 
 // Variables
 var
@@ -104,7 +104,7 @@ var checkState = function(){
 	});
 
 	// Image Load to Stress Safari
-	(new Image()).src = "image.php";
+	// (new Image()).src = "image.php";
 };
 
 // Check the Initial State
@@ -153,7 +153,6 @@ History.Adapter.onDomLoad(function(){
 	addLog('Test 5',History.queues.length,History.busy.flag);
 	History.pushState(States[4].data, States[4].title, States[4].url);
 
-return;
 	// ----------------------------------------------------------------------
 	// Test State Functionality: Traversing
 

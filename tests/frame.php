@@ -28,10 +28,18 @@
 	$Adapter = ucwords($adapter);
 	$Dir = ucwords($dir);
 	$title = "History.js ${Dir} ${Support} ${Adapter} Test Suite";
+
+	# No Chache
+	header("Cache-Control: no-store, no-cache, must-revalidate");
+	header("Cache-Control: post-check=0, pre-check=0", false);
+	header("Pragma: no-cache");
 ?><!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Expires" CONTENT="Mon, 06 Jan 1990 00:00:01 GMT" />
+	<meta http-equiv="PRAGMA" CONTENT="NO-CACHE" />
+	<meta http-equiv="CACHE-CONTROL" CONTENT="NO-CACHE" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<title><?=$title?></title>
 	<base href="<?=$tests_url?>" />
 
