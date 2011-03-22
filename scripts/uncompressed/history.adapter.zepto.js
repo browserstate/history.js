@@ -1,5 +1,5 @@
 /**
- * History.js jQuery Adapter
+ * History.js Zepto Adapter
  * @author Benjamin Arthur Lupton <contact@balupton.com>
  * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
@@ -10,7 +10,7 @@
 	// Localise Globals
 	var
 		History = window.History = window.History||{},
-		jQuery = window.jQuery;
+		Zepto = window.Zepto;
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -27,7 +27,7 @@
 		 * @return
 		 */
 		bind: function(el,event,callback){
-			jQuery(el).bind(event,callback);
+			Zepto(el).bind(event,callback);
 		},
 
 		/**
@@ -37,7 +37,7 @@
 		 * @return
 		 */
 		trigger: function(el,event){
-			jQuery(el).trigger(event);
+			Zepto(el).trigger(event);
 		},
 
 		/**
@@ -46,7 +46,7 @@
 		 * @return
 		 */
 		onDomLoad: function(callback) {
-			jQuery(callback);
+			Zepto(callback);
 		}
 	};
 

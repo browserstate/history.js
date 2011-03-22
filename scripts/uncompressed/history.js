@@ -1,75 +1,122 @@
 /**
- * History.js HTML5 Support
+ * History.js Core
  * @author Benjamin Arthur Lupton <contact@balupton.com>
  * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
  */
 
 (function(window,undefined){
+	"use strict";
 
 	// --------------------------------------------------------------------------
 	// Initialise
-
-	// History Object
-	window.History = window.History||{};
-	window._History = window._History||{};
 
 	// Localise Globals
 	var
 		console = window.console||undefined, // Prevent a JSLint complain
 		document = window.document, // Make sure we are using the correct document
-		_History = window._History, // Private History Object
-		History = window.History, // Public History Object
+		navigator = window.navigator, // Make sure we are using the correct navigator
+		History = window.History = window.History||{}, // Public History Object
 		history = window.history; // Old History Object
 
-	// Check Existence of History.js
-	if ( typeof History.initHtml5 !== 'undefined' ) {
-		throw new Error('History.js HTML5 Support has already been loaded...');
+	// Check Existence
+	if ( typeof History.init !== 'undefined' ) {
+		throw new Error('History.js Core has already been loaded...');
 	}
 
-	// Initialise
-	History.initHtml5 = function(){
-
-		// ----------------------------------------------------------------------
-		// Check Status
-
+	// Initialise History
+	History.init = function(){
+		// Check Load Status of Adapter
 		if ( typeof History.Adapter === 'undefined' ) {
 			return false;
 		}
 
+		// Check Load Status of Core
+		if ( typeof History.initCore !== 'undefined' ) {
+			History.initCore();
+		}
+
+		// Check Load Status of HTML4 Support
+		if ( typeof History.initHtml4 !== 'undefined' ) {
+			History.initHtml4();
+		}
+
+		// Return true
+		return true;
+	};
+
+	// --------------------------------------------------------------------------
+	// Initialise Core
+
+	// Initialise Core
+	History.initCore = function(){
+		// Initialise
+		if ( typeof History.initCore.initialized !== 'undefined' ) {
+			// Already Loaded
+			return false;
+		}
+		else {
+			History.initCore.initialized = true;
+		}
+
 		// ----------------------------------------------------------------------
-		// Debug Helpers
+		// Options
 
 		/**
 		 * History.options
 		 * Configurable options
 		 */
-		History.options = {
-			/**
-			 * History.options.hashChangeCheckerDelay
-			 * How long should the interval be before hashchange checks
-			 */
-			hashChangeCheckerDelay: 100,
-			/**
-			 * History.options.busyDelay
-			 * How long should we wait between busy events
-			 */
-			busyDelay: 250
-		};
+		History.options = History.options||{};
+
+		/**
+		 * History.options.hashChangeInterval
+		 * How long should the interval be before hashchange checks
+		 */
+		History.options.hashChangeInterval = History.options.hashChangeInterval || 100;
+
+		/**
+		 * History.options.safariPollInterval
+		 * How long should the interval be before safari poll checks
+		 */
+		History.options.safariPollInterval = History.options.safariPollInterval || 500;
+
+		/**
+		 * History.options.doubleCheckInterval
+		 * How long should the interval be before we perform a double check
+		 */
+		History.options.doubleCheckInterval = History.options.doubleCheckInterval || 500;
+
+		/**
+		 * History.options.busyDelay
+		 * How long should we wait between busy events
+		 */
+		History.options.busyDelay = History.options.busyDelay || 250;
+
+		/**
+		 * History.options.debug
+		 * If true will enable debug messages to be logged
+		 */
+		History.options.debug = History.options.debug || true;
+
+		/**
+		 * History.options.initialTitle
+		 * What is the title of the initial state
+		 */
+		History.options.initialTitle = History.options.initialTitle || document.title;
+
 
 		// ----------------------------------------------------------------------
-		// Debug Helpers
+		// Debug
 
 		/**
 		 * History.debug(message,...)
 		 * Logs the passed arguments if debug enabled
 		 */
 		History.debug = function(){
-			if ( (History.debug.enable||false) ) {
+			if ( (History.options.debug||false) ) {
 				History.log.apply(History,arguments);
 			}
 		};
-		History.debug.enable = false;
 
 		/**
 		 * History.log(message,...)
@@ -78,23 +125,25 @@
 		History.log = function(){
 			// Prepare
 			var
-				consoleExists = (typeof console !== 'undefined'),
+				consoleExists = (typeof console !== 'undefined' && typeof console.log !== 'undefined' && typeof console.log.apply !== 'undefined'),
 				textarea = document.getElementById('log'),
-				message = ("\n"+arguments[0]+"\n"),
-				i
+				message,
+				i,n
 				;
 
 			// Write to Console
 			if ( consoleExists ) {
-				var
-					args = Array.prototype.slice.call(arguments),
-					message = args.shift();
+				var args = Array.prototype.slice.call(arguments);
+				message = args.shift();
 				if ( typeof console.debug !== 'undefined' ) {
 					console.debug.apply(console,[message,args]);
 				}
 				else {
 					console.log.apply(console,[message,args]);
 				}
+			}
+			else {
+				message = ("\n"+arguments[0]+"\n");
 			}
 
 			// Write to log
@@ -129,44 +178,41 @@
 		// Emulated Status
 
 		/**
-		 * _History.getInternetExplorerMajorVersion()
+		 * History.getInternetExplorerMajorVersion()
 		 * Get's the major version of Internet Explorer
 		 * @return {integer}
 		 * @license Public Domain
 		 * @author Benjamin Arthur Lupton <contact@balupton.com>
 		 * @author James Padolsey <https://gist.github.com/527683>
 		 */
-		_History.getInternetExplorerMajorVersion = function(){
-			var result = _History.getInternetExplorerMajorVersion.cached =
-					(typeof _History.getInternetExplorerMajorVersion.cached !== 'undefined')
-				?	_History.getInternetExplorerMajorVersion.cached
+		History.getInternetExplorerMajorVersion = function(){
+			var result = History.getInternetExplorerMajorVersion.cached =
+					(typeof History.getInternetExplorerMajorVersion.cached !== 'undefined')
+				?	History.getInternetExplorerMajorVersion.cached
 				:	(function(){
-						var undef,
-								v = 3,
+						var v = 3,
 								div = document.createElement('div'),
 								all = div.getElementsByTagName('i');
-						while (
-								div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
-								all[0]
-						);
-						return v > 4 ? v : undef;
+						while ( (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->') && all[0] ) {}
+						return (v > 4) ? v : false;
 					})()
 				;
 			return result;
 		};
 
 		/**
-		 * _History.isInternetExplorer()
+		 * History.isInternetExplorer()
 		 * Are we using Internet Explorer?
 		 * @return {boolean}
 		 * @license Public Domain
 		 * @author Benjamin Arthur Lupton <contact@balupton.com>
 		 */
-		_History.isInternetExplorer = function(){
-			var result = _History.isInternetExplorer.cached =
-					(typeof _History.isInternetExplorer.cached !== 'undefined')
-				?	_History.isInternetExplorer.cached
-				:	(_History.getInternetExplorerMajorVersion() !== 0)
+		History.isInternetExplorer = function(){
+			var result =
+				History.isInternetExplorer.cached =
+				(typeof History.isInternetExplorer.cached !== 'undefined')
+					?	History.isInternetExplorer.cached
+					:	Boolean(History.getInternetExplorerMajorVersion())
 				;
 			return result;
 		};
@@ -176,32 +222,65 @@
 		 * Which features require emulating?
 		 */
 		History.emulated = {
-			pushState: !Boolean(window.history && window.history.pushState && window.history.replaceState)
+			pushState: !Boolean(
+				window.history && window.history.pushState && window.history.replaceState
+				&& !(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+			),
+			hashChange: Boolean(
+				!(('onhashchange' in window) || ('onhashchange' in document))
+				||
+				(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8)
+			)
 		};
 
 		/**
-		 * _History.isEmptyObject(obj)
+		 * History.bugs
+		 * Which bugs are present
+		 */
+		History.bugs = {
+			/**
+			 * Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call
+			 * https://bugs.webkit.org/show_bug.cgi?id=56249
+			 */
+			setHash: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2][0-9]|3[0-3])/.test(navigator.userAgent)),
+
+			/**
+			 * Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions
+			 * https://bugs.webkit.org/show_bug.cgi?id=42940
+			 */
+			safariPoll: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2][0-9]|3[0-3])/.test(navigator.userAgent)),
+
+			/**
+			 * MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
+			 */
+			ieDoubleCheck: Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8),
+
+			/**
+			 * MSIE 6 requires the entire hash to be encoded for the hashes to trigger the onHashChange event
+			 */
+			hashEscape: Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 7)
+		};
+
+		/**
+		 * History.isEmptyObject(obj)
 		 * Checks to see if the Object is Empty
 		 * @param {Object} obj
 		 * @return {boolean}
 		 */
-		_History.isEmptyObject = function(obj) {
-			for ( var key in obj ) {
-				if ( !this.hasOwnProperty(key) ) {
-					continue;
-				}
+		History.isEmptyObject = function(obj) {
+			for ( var name in obj ) {
 				return false;
 			}
 			return true;
 		};
 
 		/**
-		 * _History.cloneObject(obj)
+		 * History.cloneObject(obj)
 		 * Clones a object
 		 * @param {Object} obj
 		 * @return {Object}
 		 */
-		_History.cloneObject = function(obj) {
+		History.cloneObject = function(obj) {
 			var hash,newObj;
 			if ( obj ) {
 				hash = JSON.stringify(obj);
@@ -214,125 +293,306 @@
 		};
 
 		// ----------------------------------------------------------------------
-		// State Object Helpers
+		// URL Helpers
 
 		/**
-		 * History.contractUrl(url)
+		 * History.getRootUrl()
+		 * Turns "http://mysite.com/dir/page.html?asd" into "http://mysite.com"
+		 * @return {String} rootUrl
+		 */
+		History.getRootUrl = function(){
+			// Create
+			var rootUrl = document.location.protocol+'//'+(document.location.hostname||document.location.host);
+			if ( document.location.port||false ) {
+				rootUrl += ':'+document.location.port;
+			}
+			rootUrl += '/';
+
+			// Return
+			return rootUrl;
+		};
+
+		/**
+		 * History.getBaseHref()
+		 * Fetches the `href` attribute of the `<base href="...">` element if it exists
+		 * @return {String} baseHref
+		 */
+		History.getBaseHref = function(){
+			// Create
+			var
+				baseElements = document.getElementsByTagName('base'),
+				baseElement = null,
+				baseHref = '';
+
+			// Test for Base Element
+			if ( baseElements.length === 1 ) {
+				// Prepare for Base Element
+				baseElement = baseElements[0];
+				baseHref = baseElement.href.replace(/[^\/]+$/,'');
+			}
+
+			// Adjust trailing slash
+			baseHref = baseHref.replace(/\/+$/,'');
+			if ( baseHref ) baseHref += '/';
+
+			// Return
+			return baseHref;
+		};
+
+		/**
+		 * History.getBaseUrl()
+		 * Fetches the baseHref or basePageUrl or rootUrl (whichever one exists first)
+		 * @return {String} baseUrl
+		 */
+		History.getBaseUrl = function(){
+			// Create
+			var baseUrl = History.getBaseHref()||History.getBasePageUrl()||History.getRootUrl();
+
+			// Return
+			return baseUrl;
+		};
+
+		/**
+		 * History.getPageUrl()
+		 * Fetches the URL of the current page
+		 * @return {String} pageUrl
+		 */
+		History.getPageUrl = function(){
+			// Fetch
+			var
+				State = History.getState(),
+				stateUrl = State.url||document.location.href;
+
+			// Create
+			var pageUrl = stateUrl.replace(/\/+$/,'').replace(/[^\/]+$/,function(part,index,string){
+				return (/\./).test(part) ? part : part+'/';
+			});
+
+			// Return
+			return pageUrl;
+		};
+
+		/**
+		 * History.getBasePageUrl()
+		 * Fetches the Url of the directory of the current page
+		 * @return {String} basePageUrl
+		 */
+		History.getBasePageUrl = function(){
+			// Create
+			var basePageUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+				return (/\./).test(part) ? '' : part;
+			}).replace(/\/+$/,'')+'/';
+
+			// Return
+			return basePageUrl;
+		};
+
+		/**
+		 * History.getFullUrl(url)
+		 * Ensures that we have an absolute URL and not a relative URL
+		 * @param {string} url
+		 * @return {string} fullUrl
+		 */
+		History.getFullUrl = function(url){
+			// Prepare
+			var fullUrl = url, firstChar = url.substring(0,1);
+
+			// Check
+			if ( /[a-z]+\:\/\//.test(url) ) {
+				// Full URL
+			}
+			else if ( firstChar === '/' ) {
+				// Root URL
+				fullUrl = History.getRootUrl()+url.replace(/^\/+/,'');
+			}
+			else if ( firstChar === '#' ) {
+				// Anchor URL
+				fullUrl = History.getPageUrl().replace(/#.*/,'')+url;
+			}
+			else if ( firstChar === '?' ) {
+				// Query URL
+				fullUrl = History.getPageUrl().replace(/[\?#].*/,'')+url;
+			}
+			else {
+				// Relative URL
+				fullUrl = History.getBaseUrl()+url;
+			}
+
+			// Return
+			return fullUrl.replace(/\#$/,'');
+		};
+
+		/**
+		 * History.getShortUrl(url)
 		 * Ensures that we have a relative URL and not a absolute URL
 		 * @param {string} url
 		 * @return {string} url
 		 */
-		History.contractUrl = function(url){
+		History.getShortUrl = function(url){
 			// Prepare
-			url = History.expandUrl(url);
+			var shortUrl, rootUrl = History.getRootUrl(); // History.getBaseHref()||History.getBasePageUrl()
 
-			// Prepare for Base Domain
-			var baseDomain = document.location.protocol+'//'+(document.location.hostname||document.location.host);
-			if ( document.location.port||false ) {
-				baseDomain += ':'+document.location.port;
-			}
-			baseDomain += '/';
+			// Adjust
+			shortUrl = url.replace(rootUrl,'/');
 
-			// Adjust for Base Domain
-			url = url.replace(baseDomain,'/');
-
-			// Return url
-			return url;
+			// Return
+			return shortUrl.replace(/\#$/,'');
 		};
 
+		// ----------------------------------------------------------------------
+		// State Storage
+
 		/**
-		 * History.expandUrl(url)
-		 * Ensures that we have an absolute URL and not a relative URL
-		 * @param {string} url
-		 * @return {string} url
+		 * History.idToState
+		 * 1-1: State ID to State Object
 		 */
-		History.expandUrl = function(url){
+		History.idToState = {};
+
+		/**
+		 * History.stateToId
+		 * 1-1: State String to State ID
+		 */
+		History.stateToId = {};
+
+		/**
+		 * History.urlToId
+		 * 1-1: State URL to State ID
+		 */
+		History.urlToId = {};
+
+		/**
+		 * History.storedStates
+		 * Store the states in an array
+		 */
+		History.storedStates = [];
+
+		/**
+		 * History.savedStates
+		 * Saved the states in an array
+		 */
+		History.savedStates = [];
+
+		/**
+		 * History.getState()
+		 * Get an object containing the data, title and url of the current state
+		 * @return {Object} State
+		 */
+		History.getState = function(friendly){
 			// Prepare
-			url = url||'';
+			if ( typeof friendly === 'undefined' ) { friendly = true; }
 
-			// Test for Full URL
-			if ( /[a-z]+\:\/\//.test(url) ) {
-				// We have a Full URL
+			// Fetch
+			var State = History.getLastSavedState()||History.createStateObject();
+
+			// Adjust
+			if ( friendly ) {
+				State = History.cloneObject(State);
+				State.url = State.cleanUrl||State.url;
 			}
 
-			// Relative URL
-			else {
-				// Test for Base Page
-				if ( url.length === 0 || url.substring(0,1) === '?' ) {
-					// Fetch Base Page
-					var basePage = document.location.href.replace(/[#\?].*/,'');
-
-					// Adjust Page
-					url = basePage+url;
-				}
-
-				// No Base Page
-				else {
-
-					// Prepare for Base Element
-					var
-						baseElements = document.getElementsByTagName('base'),
-						baseElement = null,
-						baseHref = '';
-
-					// Test for Base Element
-					if ( baseElements.length === 1 ) {
-						// Prepare for Base Element
-						baseElement = baseElements[0];
-						baseHref = baseElement.href;
-						if ( baseHref[baseHref.length-1] !== '/' ) baseHref += '/';
-
-						// Adjust for Base Element
-						url = baseHref+url.replace(/^\//,'');
-					}
-
-					// No Base Element
-					else {
-						// Test for Base URL
-						if ( url.substring(0,1) === '.' ) {
-							// Prepare for Base URL
-							var baseUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,'');
-							if ( baseUrl[baseUrl.length-1] !== '/' ) baseUrl += '/';
-
-							// Adjust for Base URL
-							url = baseUrl + url;
-						}
-
-						// No Base URL
-						else {
-							// Prepare for Base Domain
-							var baseDomain = document.location.protocol+'//'+(document.location.hostname||document.location.host);
-							if ( document.location.port||false ) {
-								baseDomain += ':'+document.location.port;
-							}
-							baseDomain += '/';
-
-							// Adjust for Base Domain
-							url = baseDomain+url.replace(/^\//,'');
-						}
-					}
-				}
-			}
-
-			// Return url
-			return url;
+			// Return
+			return State;
 		};
 
 		/**
-		 * History.expandState(State)
+		 * History.getIdByState(State)
+		 * Gets a ID for a State
+		 * @param {State} newState
+		 * @return {String} id
+		 */
+		History.getIdByState = function(newState){
+
+			// Fetch ID
+			var id = History.extractId(newState.url);
+			if ( !id ) {
+				// Find ID via State String
+				var str = History.getStateString(newState);
+				if ( typeof History.stateToId[str] !== 'undefined' ) {
+					id = History.stateToId[str];
+				}
+				else {
+					// Generate a new ID
+					while ( true ) {
+						id = String(Math.floor(Math.random()*1000));
+						if ( typeof History.idToState[id] === 'undefined' ) {
+							break;
+						}
+					}
+
+					// Apply the new State to the ID
+					History.stateToId[str] = id;
+					History.idToState[id] = newState;
+				}
+			}
+
+			// Return ID
+			return id;
+		};
+
+		/**
+		 * History.normalizeState(State)
 		 * Expands a State Object
 		 * @param {object} State
 		 * @return {object}
 		 */
-		History.expandState = function(oldState){
-			oldState = oldState||{};
-			var newState = {
-				'data': oldState.data||{},
-				'url': History.expandUrl(oldState.url||''),
-				'title': oldState.title||''
-			};
-			newState.data.title = newState.data.title||newState.title;
-			newState.data.url = newState.data.url||newState.url;
+		History.normalizeState = function(oldState){
+			// Prepare
+			if ( !oldState || (typeof oldState !== 'object') ) {
+				oldState = {};
+			}
+
+			// Check
+			if ( typeof oldState.normalized !== 'undefined' ) {
+				return oldState;
+			}
+
+			// Adjust
+			if ( !oldState.data || (typeof oldState.data !== 'object') ) {
+				oldState.data = {};
+			}
+
+			// ----------------------------------------------------------------------
+
+			// Create
+			var newState = {};
+			newState.normalized = true;
+			newState.title = oldState.title||'';
+			newState.url = History.getFullUrl(oldState.url||document.location.href);
+			newState.hash = History.getShortUrl(newState.url);
+			newState.data = History.cloneObject(oldState.data);
+
+			// Fetch ID
+			newState.id = History.getIdByState(newState);
+
+			// ----------------------------------------------------------------------
+
+			// Check to see if we have more than just a url
+			var dataNotEmpty = !History.isEmptyObject(newState.data);
+
+			// Apply
+			if ( newState.title || dataNotEmpty ) {
+				// Add ID to Hash
+				newState.hash = History.getShortUrl(newState.url).replace(/\&_suid.*/,'');
+				if ( !/\?/.test(newState.hash) ) {
+					newState.hash += '?';
+				}
+				newState.hash += '&_suid='+newState.id;
+			}
+
+			// Create the Hashed URL
+			newState.hashedUrl = History.getFullUrl(newState.hash);
+			newState.cleanUrl = newState.url.replace(/\&_suid.*/,'');
+
+			// ----------------------------------------------------------------------
+
+			// Update the URL if we have a duplicate
+			if ( History.hasUrlDuplicate(newState) ) {
+				newState.url = newState.hashedUrl;
+			}
+
+			// ----------------------------------------------------------------------
+
+			// Return
 			return newState;
 		};
 
@@ -353,322 +613,268 @@
 			};
 
 			// Expand the State
-			State = History.expandState(State);
+			State = History.normalizeState(State);
 
 			// Return object
 			return State;
 		};
 
 		/**
-		 * History.expandHash(hash)
-		 * Expands a Hash into a StateHash if applicable
-		 * @param {string} hash
-		 * @return {Object|null} State
+		 * History.getStateById(id)
+		 * Get a state by it's UID
+		 * @param {String} id
 		 */
-		History.expandHash = function(hash){
-			// Prepare
-			var State = null;
-
-			// JSON
-			try {
-				State = JSON.parse(hash);
-			}
-			catch ( Exception ) {
-				var
-					parts = /(.*)\/uid=([0-9]+)$/.exec(hash),
-					url = parts ? (parts[1]||hash) : hash,
-					uid = parts ? String(parts[2]||'') : '';
-
-				if ( uid ) {
-					State = _History.getStateByUid(uid)||null;
-				}
-
-				if ( !State && /\//.test(hash) ) {
-					// Is a URL
-					var expandedUrl = History.expandUrl(hash);
-					State = History.createStateObject(null,null,expandedUrl);
-				}
-				else {
-					// Non State Hash
-					// do nothing
-				}
-			}
-
-			// Expand
-			State = State ? History.expandState(State) : null;
-
-			// Return State
+		History.getStateById = function(id){
+			id = String(id);
+			var State = History.idToState[id]||undefined;
 			return State;
 		};
 
 		/**
-		 * History.contractState(State)
-		 * Creates a Hash for the State Object
-		 * @param {object} passedState
-		 * @return {string} hash
+		 * Get a State's String
+		 * @param {State} passedState
 		 */
-		History.contractState = function(passedState){
-			// Check
-			if ( !passedState ) {
-				return null;
-			}
-
+		History.getStateString = function(passedState){
 			// Prepare
-			var
-				hash = null,
-				State = _History.cloneObject(passedState);
+			var State = History.normalizeState(passedState);
 
-			// Ensure State
-			if ( State ) {
-				// Clean
-				State.data = State.data||{};
-				delete State.data.title;
-				delete State.data.url;
+			// Clean
+			var cleanedState = {
+				data: State.data,
+				title: passedState.title,
+				url: passedState.url
+			};
 
-				// Handle
-				if ( _History.isEmptyObject(State) && !State.title ) {
-					hash = History.contractUrl(State.url);
-				}
-				else {
-					// Serialised Hash
-					hash = JSON.stringify(State);
+			// Fetch
+			var str = JSON.stringify(cleanedState);
 
-					// Has it been associated with a UID?
-					var uid;
-					if ( typeof _History.hashesToUids[hash] !== 'undefined' ) {
-						uid = _History.hashesToUids[hash];
-					}
-					else {
-						while ( true ) {
-							uid = String(Math.floor(Math.random()*1000));
-							if ( typeof _History.uidsToStates[uid] === 'undefined' ) {
-								break;
-							}
-						}
-					}
+			// Return
+			return str;
+		};
 
-					// Associate UID with Hash
-					_History.hashesToUids[hash] = uid;
-					_History.uidsToStates[uid] = State;
+		/**
+		 * Get a State's ID
+		 * @param {State} passedState
+		 * @return {String} id
+		 */
+		History.getStateId = function(passedState){
+			// Prepare
+			var State = History.normalizeState(passedState);
 
-					// Simplified Hash
-					hash = History.contractUrl(State.url)+'/uid='+uid;
-				}
-			}
+			// Fetch
+			var id = State.id;
 
-			// Return hash
+			// Return
+			return id;
+		};
+
+		/**
+		 * History.getHashByState(State)
+		 * Creates a Hash for the State Object
+		 * @param {State} passedState
+		 * @return {String} hash
+		 */
+		History.getHashByState = function(passedState){
+			// Prepare
+			var hash, State = History.normalizeState(passedState);
+
+			// Fetch
+			hash = State.hash;
+
+			// Return
 			return hash;
 		};
 
 		/**
-		 * _History.uidsToStates
-		 * UIDs to States
+		 * History.extractId(url_or_hash)
+		 * Get a State ID by it's URL or Hash
+		 * @param {string} url_or_hash
+		 * @return {string} id
 		 */
-		_History.uidsToStates = {};
-
-		/**
-		 * _History.hashesToUids
-		 * Serialised States to UIDs
-		 */
-		_History.hashesToUids = {};
-
-		/**
-		 * _History.getStateByUid(uid)
-		 * Get a state by it's UID
-		 * @param {string} uid
-		 */
-		_History.getStateByUid = function(uid){
-			uid = String(uid);
-			var State = _History.uidsToStates[uid]||undefined;
-			return State;
-		};
-
-
-		// ----------------------------------------------------------------------
-		// State Storage
-
-		/**
-		 * _History.statesByUrl
-		 * Store the states indexed by their URLs
-		 */
-		_History.statesByUrl = {};
-
-		/**
-		 * _History.duplicateStateUrls
-		 * Which urls have duplicate states (indexed by url)
-		 */
-		_History.duplicateStateUrls = {};
-
-		/**
-		 * _History.statesByHash
-		 * Store the states indexed by their Hashes
-		 */
-		_History.statesByHash = {};
-
-		/**
-		 * _History.savedStates
-		 * Store the states in an array
-		 */
-		_History.savedStates = [];
-
-		/**
-		 * History.getState()
-		 * Get an object containing the data, title and url of the current state
-		 * @return {Object} State
-		 */
-		History.getState = function(){
-			return _History.getStateByIndex();
-		};
-
-		/**
-		 * History.getStateHash()
-		 * Get the hash of the current state
-		 * @return {string} hash
-		 */
-		History.getStateHash = function(){
-			return History.contractState(History.getState());
-		};
-
-		/**
-		 * _History.getStateByUrl
-		 * Get a state by it's url
-		 * @param {string} stateUrl
-		 */
-		_History.getStateByUrl = function(stateUrl){
-			var State = _History.statesByUrl[stateUrl]||undefined;
-			return State;
-		};
-
-		/**
-		 * _History.getStateByHash
-		 * Get a state by it's hash
-		 * @param {string} stateHash
-		 */
-		_History.getStateByHash = function(stateHash){
-			var State = _History.statesByHash[stateHash]||undefined;
-			return State;
-		};
-
-		/**
-		 * _History.storeState
-		 * Store a State
-		 * @param {object} State
-		 * @return {boolean} true
-		 */
-		_History.storeState = function(newState){
+		History.extractId = function ( url_or_hash ) {
 			// Prepare
-			var
-				newStateHash = History.contractState(newState),
-				oldState = _History.getStateByUrl(newState.url);
+			var id;
 
-			// Check for Conflict
-			if ( typeof oldState !== 'undefined' ) {
-				// Compare Hashes
-				var oldStateHash = History.contractState(oldState);
-				if ( oldStateHash !== newStateHash ) {
-					// We have a conflict
-					_History.duplicateStateUrls[newState.url] = true;
+			// Extract
+			var parts,url;
+			parts = /(.*)\&_suid=([0-9]+)$/.exec(url_or_hash);
+			url = parts ? (parts[1]||url_or_hash) : url_or_hash;
+			id = parts ? String(parts[2]||'') : '';
+
+			// Return
+			return id||false;
+		};
+
+		/**
+		 * History.extractState
+		 * Get a State by it's URL or Hash
+		 */
+		History.extractState = function(url_or_hash,create){
+			// Prepare
+			var State = null;
+			create = create||false;
+
+			// Fetch SUID
+			var id = History.extractId(url_or_hash);
+			if ( id ) {
+				State = History.getStateById(id);
+			}
+
+			// Fetch SUID returned no State
+			if ( !State ) {
+				// Fetch URL
+				var url = History.getFullUrl(url_or_hash);
+
+				// Check URL
+				id = History.getIdByUrl(url)||false;
+				if ( id ) {
+					State = History.getStateById(id);
+				}
+				// Create State
+				else if ( create && /\//.test(url_or_hash) ) {
+					State = History.createStateObject(null,null,url.replace(/\&_suid.*/,''));
 				}
 			}
 
-			// Store the State
-			_History.statesByUrl[newState.url] = _History.statesByHash[newStateHash] = newState;
-
-			// Return true
-			return true;
+			// Return
+			return State;
 		};
 
 		/**
-		 * _History.isLastState(newState)
+		 * History.getIdByUrl()
+		 * Get a State ID by a State URL
+		 */
+		History.getIdByUrl = function(url){
+			var id = History.urlToId[url]||false;
+			return id;
+		};
+
+		/**
+		 * History.getLastSavedState()
+		 * Get an object containing the data, title and url of the current state
+		 * @return {Object} State
+		 */
+		History.getLastSavedState = function(){
+			return History.savedStates[History.savedStates.length-1]||undefined;
+		};
+
+		/**
+		 * History.getLastStoredState()
+		 * Get an object containing the data, title and url of the current state
+		 * @return {Object} State
+		 */
+		History.getLastStoredState = function(){
+			return History.storedStates[History.storedStates.length-1]||undefined;
+		};
+
+		/**
+		 * History.hasUrlDuplicate
+		 * Checks if a Url will have a url conflict
+		 * @param {Object} newState
+		 * @return {Boolean} hasDuplicate
+		 */
+		History.hasUrlDuplicate = function(newState) {
+			// Prepare
+			var hasDuplicate = false;
+
+			// Fetch
+			var oldState = History.extractState(newState.url);
+
+			// Check
+			hasDuplicate = oldState && oldState.id !== newState.id;
+
+			// Return
+			return hasDuplicate;
+		};
+
+		/**
+		 * History.storeState
+		 * Store a State
+		 * @param {Object} newState
+		 * @return {Object} newState
+		 */
+		History.storeState = function(newState){
+			// Store the State
+			History.urlToId[newState.url] = newState.id;
+
+			// Push the State
+			History.storedStates.push(History.cloneObject(newState));
+
+			// Return newState
+			return newState;
+		};
+
+		/**
+		 * History.isLastSavedState(newState)
 		 * Tests to see if the state is the last state
 		 * @param {Object} newState
 		 * @return {boolean} isLast
 		 */
-		_History.isLastState = function(newState){
+		History.isLastSavedState = function(newState){
 			// Prepare
-			var
-				newStateHash = History.contractState(newState),
-				oldStateHash = History.getStateHash();
+			var isLast = false;
 
 			// Check
-			var isLast = _History.savedStates.length && newStateHash === oldStateHash;
+			if ( History.savedStates.length ) {
+				var
+					newId = newState.id,
+					oldState = History.getLastSavedState(),
+					oldId = oldState.id;
 
-			// Return isLast
+				// Check
+				isLast = (newId === oldId);
+			}
+
+			// Return
 			return isLast;
 		};
 
 		/**
-		 * _History.saveState
+		 * History.saveState
 		 * Push a State
 		 * @param {Object} newState
 		 * @return {boolean} changed
 		 */
-		_History.saveState = function(newState){
+		History.saveState = function(newState){
 			// Check Hash
-			if ( _History.isLastState(newState) ) {
+			if ( History.isLastSavedState(newState) ) {
 				return false;
 			}
 
 			// Push the State
-			_History.savedStates.push(newState);
+			History.savedStates.push(History.cloneObject(newState));
 
 			// Return true
 			return true;
 		};
 
 		/**
-		 * _History.getStateByIndex()
+		 * History.getStateByIndex()
 		 * Gets a state by the index
 		 * @param {integer} index
 		 * @return {Object}
 		 */
-		_History.getStateByIndex = function(index){
+		History.getStateByIndex = function(index){
 			// Prepare
 			var State = null;
 
 			// Handle
 			if ( typeof index === 'undefined' ) {
 				// Get the last inserted
-				State = _History.savedStates[_History.savedStates.length-1];
+				State = History.savedStates[History.savedStates.length-1];
 			}
 			else if ( index < 0 ) {
 				// Get from the end
-				State = _History.savedStates[_History.savedStates.length+index];
+				State = History.savedStates[History.savedStates.length+index];
 			}
 			else {
 				// Get from the beginning
-				State = _History.savedStates[index];
+				State = History.savedStates[index];
 			}
 
 			// Return State
 			return State;
 		};
-
-		/**
-		 * _History.stateUrlExists
-		 * Checks if the State Url Exists
-		 * @param {string} stateUrl
-		 * @return {boolean} exists
-		 */
-		_History.stateUrlExists = function(stateUrl){
-			// Prepare
-			var exists = typeof _History.statesByUrl[stateUrl] !== 'undefined';
-
-			// Return exists
-			return exists;
-		};
-
-		/**
-		 * _History.urlDuplicateExists
-		 * Check if the url has multiple states associated to it
-		 * @param {string} stateUrl
-		 * @return {boolean} exists
-		 */
-		_History.urlDuplicateExists = function(stateUrl){
-			var exists = typeof _History.duplicateStateUrls[stateUrl] !== 'undefined';
-			return exists;
-		};
-
 
 		// ----------------------------------------------------------------------
 		// Hash Helpers
@@ -679,21 +885,21 @@
 		 * @return {string}
 		 */
 		History.getHash = function(){
-			var hash = _History.unescapeHash(document.location.hash);
+			var hash = History.unescapeHash(document.location.hash);
 			return hash;
 		};
 
 		/**
-		 * _History.unescapeHash()
-		 * Normalise and Unescape a Hash
+		 * History.unescapeHash()
+		 * normalize and Unescape a Hash
 		 * @return {string}
 		 */
-		_History.unescapeHash = function(hash){
-			var result = _History.normalizeHash(hash);
+		History.unescapeHash = function(hash){
+			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			if ( /[\%]/.test(result) ) {
-				result = unescape(result);
+			if ( /\%[^2][^5]/.test(result) ) {
+				result = window.unescape(result);
 			}
 
 			// Return result
@@ -701,11 +907,11 @@
 		};
 
 		/**
-		 * _History.normalizeHash()
-		 * Normalise a hash across browsers
+		 * History.normalizeHash()
+		 * normalize a hash across browsers
 		 * @return {string}
 		 */
-		_History.normalizeHash = function(hash){
+		History.normalizeHash = function(hash){
 			var result = hash.replace(/[^#]*#/,'').replace(/#.*/, '');
 
 			// Return result
@@ -716,7 +922,7 @@
 		 * History.setHash(hash)
 		 * Sets the document hash
 		 * @param {string} hash
-		 * @return {string}
+		 * @return {History}
 		 */
 		History.setHash = function(hash,queue){
 			// Handle Queueing
@@ -732,33 +938,66 @@
 				return false;
 			}
 
-			// Prepare
-			var adjustedHash = _History.escapeHash(hash);
+			// Log
+			History.debug('History.setHash: called',hash);
 
-			// Log hash
-			History.debug('History.setHash',this,arguments,'hash:',hash,'adjustedHash:',adjustedHash,'oldHash:',document.location.hash);
+			// Prepare
+			var adjustedHash = History.escapeHash(hash);
 
 			// Make Busy + Continue
 			History.busy(true);
 
-			// Apply hash
-			document.location.hash = adjustedHash;
+			// Check if hash is a state
+			var State = History.extractState(hash,true);
+			if ( State && !History.emulated.pushState ) {
+				// Hash is a state so skip the setHash
+				History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',arguments);
 
-			// Return hash
-			return hash;
+				// PushState
+				History.pushState(State.data,State.title,State.url,false);
+			}
+			else if ( document.location.hash !== adjustedHash ) {
+				// Hash is a proper hash, so apply it
+
+				// Handle browser bugs
+				if ( History.bugs.setHash ) {
+					// Fix Safari Bug https://bugs.webkit.org/show_bug.cgi?id=56249
+
+					// Fetch the base page
+					var pageUrl = History.getPageUrl();
+
+					// Safari hash apply
+					History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
+				}
+				else {
+					// Normal hash apply
+					document.location.hash = adjustedHash;
+				}
+			}
+
+			// Chain
+			return History;
 		};
 
 		/**
-		 * _History.escape()
-		 * Normalise and Escape a Hash
+		 * History.escape()
+		 * normalize and Escape a Hash
 		 * @return {string}
 		 */
-		_History.escapeHash = function(hash){
-			var result = _History.normalizeHash(hash);
+		History.escapeHash = function(hash){
+			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			if ( /[^a-zA-Z0-9\/\-\_\%\.]/.test(result) ) {
-				result = escape(result);
+			result = window.escape(result);
+
+			// IE6 Escape Bug
+			if ( !History.bugs.hashEscape ) {
+				// Restore common parts
+				result = result
+					.replace('%21','!')
+					.replace('%26','&')
+					.replace('%3D','=')
+					.replace('%3F','?');
 			}
 
 			// Return result
@@ -766,19 +1005,19 @@
 		};
 
 		/**
-		 * History.extractHashFromUrl(url)
+		 * History.getHashByUrl(url)
 		 * Extracts the Hash from a URL
 		 * @param {string} url
 		 * @return {string} url
 		 */
-		History.extractHashFromUrl = function(url){
+		History.getHashByUrl = function(url){
 			// Extract the hash
 			var hash = String(url)
 				.replace(/([^#]*)#?([^#]*)#?(.*)/, '$2')
 				;
 
 			// Unescape hash
-			hash = _History.unescapeHash(hash);
+			hash = History.unescapeHash(hash);
 
 			// Return hash
 			return hash;
@@ -792,12 +1031,41 @@
 		 */
 		History.isTraditionalAnchor = function(url){
 			var
-				hash = History.extractHashFromUrl(url),
+				hash = History.getHashByUrl(url),
 				el = document.getElementById(hash),
 				isTraditionalAnchor = typeof el !== 'undefined';
 
 			// Return isTraditionalAnchor
 			return isTraditionalAnchor;
+		};
+
+		/**
+		 * History.setTitle(title)
+		 * Applies the title to the document
+		 * @param {State} newState
+		 * @return {Boolean}
+		 */
+		History.setTitle = function(newState){
+			// Prepare
+			var title = newState.title;
+
+			// Initial
+			if ( !title ) {
+				var firstState = History.getStateByIndex(0);
+				if ( firstState && firstState.url === newState.url ) {
+					title = firstState.title||History.options.initialTitle;
+				}
+			}
+
+			// Apply
+			try {
+				document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
+			}
+			catch ( Exception ) { }
+			document.title = title;
+
+			// Chain
+			return History;
 		};
 
 		// ----------------------------------------------------------------------
@@ -816,10 +1084,9 @@
 		 * @return {boolean} busy
 		 */
 		History.busy = function(value){
-			History.debug('History.busy: called: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues);
-
 			// Apply
 			if ( typeof value !== 'undefined' ) {
+				History.debug('History.busy: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues.length);
 				History.busy.flag = value;
 			}
 			// Default
@@ -837,7 +1104,6 @@
 						var queue = History.queues[i];
 						if ( queue.length === 0 ) continue;
 						var item = queue.shift();
-						History.debug('History.busy: firing', item);
 						History.fireQueueItem(item);
 						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
 					}
@@ -865,16 +1131,14 @@
 		 * @param {Object} item [scope,callback,args,queue]
 		 */
 		History.pushQueue = function(item){
-			History.debug('History.pushQueue: called', arguments);
-
 			// Prepare the queue
 			History.queues[item.queue||0] = History.queues[item.queue||0]||[];
 
 			// Add to the queue
 			History.queues[item.queue||0].push(item);
 
-			// End pushQueue closure
-			return true;
+			// Chain
+			return History;
 		};
 
 		/**
@@ -899,10 +1163,138 @@
 				History.fireQueueItem(item);
 			}
 
-			// End queue closure
-			return true;
+			// Chain
+			return History;
 		};
 
+		/**
+		 * History.clearQueue()
+		 * Clears the Queue
+		 */
+		History.clearQueue = function(){
+			History.busy.flag = false;
+			History.queues = [];
+			return History;
+		};
+
+
+		// ----------------------------------------------------------------------
+		// IE Bug Fix
+
+		/**
+		 * History.stateChanged
+		 * States whether or not the state has changed since the last double check was initialised
+		 */
+		History.stateChanged = false;
+
+		/**
+		 * History.doubleChecker
+		 * Contains the timeout used for the double checks
+		 */
+		History.doubleChecker = false;
+
+		/**
+		 * History.doubleCheckComplete()
+		 * Complete a double check
+		 * @return {History}
+		 */
+		History.doubleCheckComplete = function(){
+			// Update
+			History.stateChanged = true;
+
+			// Clear
+			History.doubleCheckClear();
+
+			// Chain
+			return History;
+		};
+
+		/**
+		 * History.doubleCheckClear()
+		 * Clear a double check
+		 * @return {History}
+		 */
+		History.doubleCheckClear = function(){
+			// Clear
+			if ( History.doubleChecker ) {
+				clearTimeout(History.doubleChecker);
+				History.doubleChecker = false;
+			}
+
+			// Chain
+			return History;
+		};
+
+		/**
+		 * History.doubleCheck()
+		 * Create a double check
+		 * @return {History}
+		 */
+		History.doubleCheck = function(tryAgain){
+			// Reset
+			History.stateChanged = false;
+			History.doubleCheckClear();
+
+			// Fix IE6,IE7 bug where calling history.back or history.forward does not actually change the hash (whereas doing it manually does)
+			// Fix Safari 5 bug where sometimes the state does not change: https://bugs.webkit.org/show_bug.cgi?id=42940
+			if ( History.bugs.ieDoubleCheck ) {
+				// Apply Check
+				History.doubleChecker = setTimeout(
+					function(){
+						History.doubleCheckClear();
+						if ( !History.stateChanged ) {
+							History.debug('History.doubleCheck: State has not yet changed, trying again', arguments);
+							// Re-Attempt
+							tryAgain();
+						}
+						return true;
+					},
+					History.options.doubleCheckInterval
+				);
+			}
+
+			// Chain
+			return History;
+		};
+
+		// ----------------------------------------------------------------------
+		// Safari Bug Fix
+
+		/**
+		 * History.safariStatePoll()
+		 * Poll the current state
+		 * @return {History}
+		 */
+		History.safariStatePoll = function(){
+			// Poll the URL
+
+			// Get the Last State which has the new URL
+			var
+				urlState = History.extractState(document.location.href),
+				newState;
+
+			// Check for a difference
+			if ( !History.isLastSavedState(urlState) ) {
+				newState = urlState;
+			}
+			else {
+				return;
+			}
+
+			// Check if we have a state with that url
+			// If not create it
+			if ( !newState ) {
+				History.debug('History.safariStatePoll: new');
+				newState = History.createStateObject();
+			}
+
+			// Apply the New State
+			History.debug('History.safariStatePoll: trigger');
+			History.Adapter.trigger(window,'popstate');
+
+			// Chain
+			return History;
+		};
 
 		// ----------------------------------------------------------------------
 		// State Aliases
@@ -931,22 +1323,10 @@
 			// Make Busy + Continue
 			History.busy(true);
 
-			// Fix a bug in IE6,IE7
-			if ( History.emulated.hashChange && _History.isInternetExplorer() ) {
-				// Prepare
-				var currentHash = History.getHash();
-
-				// Apply Check
-				setTimeout(function(){
-					var newHash = History.getHash();
-					if ( newHash === currentHash ) {
-						// No change occurred, try again
-						History.debug('History.back: trying again');
-						return History.back(false);
-					}
-					return true;
-				},History.options.hashChangeCheckerDelay*5);
-			}
+			// Fix certain browser bugs that prevent the state from changing
+			History.doubleCheck(function(){
+				History.back(false);
+			});
 
 			// Go back
 			history.go(-1);
@@ -979,22 +1359,10 @@
 			// Make Busy + Continue
 			History.busy(true);
 
-			// Fix a bug in IE6,IE7
-			if ( History.emulated.hashChange && _History.isInternetExplorer() ) {
-				// Prepare
-				var currentHash = History.getHash();
-
-				// Apply Check
-				setTimeout(function(){
-					var newHash = History.getHash();
-					if ( newHash === currentHash ) {
-						// No change occurred, try again
-						History.debug('History.forward: trying again');
-						return History.forward(false);
-					}
-					return true;
-				},History.options.hashChangeCheckerDelay*5);
-			}
+			// Fix certain browser bugs that prevent the state from changing
+			History.doubleCheck(function(){
+				History.forward(false);
+			});
 
 			// Go forward
 			history.go(1);
@@ -1011,16 +1379,19 @@
 		History.go = function(index,queue){
 			History.debug('History.go: called', arguments);
 
+			// Prepare
+			var i;
+
 			// Handle
 			if ( index > 0 ) {
 				// Forward
-				for ( var i=1; i<=index; ++i ) {
+				for ( i=1; i<=index; ++i ) {
 					History.forward(queue);
 				}
 			}
 			else if ( index < 0 ) {
 				// Backward
-				for ( var i=-1; i>=index; --i ) {
+				for ( i=-1; i>=index; --i ) {
 					History.back(queue);
 				}
 			}
@@ -1028,141 +1399,110 @@
 				throw new Error('History.go: History.go requires a positive or negative integer passed.');
 			}
 
-			// End go closure
-			return true;
+			// Chain
+			return History;
 		};
 
 
 		// ----------------------------------------------------------------------
 		// HTML5 State Support
 
-		if ( !History.emulated.pushState ) {
+		if ( History.emulated.pushState ) {
+			/*
+			 * Provide Skeleton for HTML4 Browsers
+			 */
+
+			// Prepare
+			var emptyFunction = function(){};
+			History.pushState = History.pushState||emptyFunction;
+			History.replaceState = History.replaceState||emptyFunction;
+		}
+		else {
 			/*
 			 * Use native HTML5 History API Implementation
 			 */
 
 			/**
-			 * _History.onPopState(event,extra)
+			 * History.onPopState(event,extra)
 			 * Refresh the Current State
 			 */
-			_History.onPopState = function(event){
-				History.debug('_History.onPopState',this,arguments);
+			History.onPopState = function(event){
+				// Reset the double check
+				History.doubleCheckComplete();
 
 				// Check for a Hash, and handle apporiatly
-				var currentHash	= unescape(History.getHash());
+				var currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					var currentState = History.expandHash(currentHash);
+					var currentState = History.extractState(currentHash||document.location.href,true);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
-						History.debug('_History.onPopState: state anchor', currentHash, currentState);
-						History.replaceState(currentState.data, currentState.tite, currentState.url, false);
+						History.debug('History.onPopState: state anchor', currentHash, currentState);
+						History.replaceState(currentState.data, currentState.title, currentState.url, false);
 					}
 					else {
 						// Traditional Anchor
-						History.debug('_History.onPopState: traditional anchor', currentHash);
+						History.debug('History.onPopState: traditional anchor', currentHash);
 						History.Adapter.trigger(window,'anchorchange');
 						History.busy(false);
 					}
 
 					// We don't care for hashes
+					History.expectedStateId = false;
 					return false;
 				}
 
 				// Prepare
-				var
-					currentStateHashExits				= null,
-					stateData										= {},
-					stateTitle									= null,
-					stateUrl										= null,
-					newState										= null;
+				var newState = null;
 
 				// Prepare
 				event = event||{};
 				if ( typeof event.state === 'undefined' ) {
 					// jQuery
 					if ( typeof event.originalEvent !== 'undefined' && typeof event.originalEvent.state !== 'undefined' ) {
-						event.state = event.originalEvent.state;
+						event.state = event.originalEvent.state||false;
 					}
 					// MooTools
 					else if ( typeof event.event !== 'undefined' && typeof event.event.state !== 'undefined' ) {
-						event.state = event.event.state;
+						event.state = event.event.state||false;
 					}
 				}
 
-				// Fetch Data
-				if ( event.state === null ) {
-					// Vanilla: State has no data (new state, not pushed)
-					stateData = event.state;
-				}
-				else if ( typeof event.state !== 'undefined' ) {
+				// Ensure
+				event.state = (event.state||false);
+
+				// Fetch State
+				if ( event.state ) {
 					// Vanilla: Back/forward button was used
-
-					// Using Chrome Fix
-					var
-						newStateUrl = History.expandUrl(document.location.href),
-						oldState = _History.getStateByUrl(newStateUrl),
-						duplicateExists = _History.urlDuplicateExists(newStateUrl);
-
-					// Does oldState Exist?
-					if ( typeof oldState !== 'undefined' && !duplicateExists ) {
-						stateData = oldState.data;
-					}
-					else {
-						stateData = event.state;
-					}
-
-					// Use the way that should work
-					// stateData = event.state;
+					newState = History.getStateById(event.state);
+				}
+				else if ( History.expectedStateId ) {
+					// Vanilla: A new state was pushed, and popstate was called manually
+					newState = History.getStateById(History.expectedStateId);
 				}
 				else {
-					// Vanilla: A new state was pushed, and popstate was called manually
-
-					// Get State object from the last state
-					var
-						newStateUrl = History.expandUrl(document.location.href),
-						oldState = _History.getStateByUrl(newStateUrl);
-
-					// Check if the URLs match
-					if ( oldState && newStateUrl == oldState.url ) {
-						stateData = oldState.data;
-					}
-					else {
-						throw new Error('Unknown state');
-					}
+					// Initial State
+					newState = History.extractState(document.location.href);
 				}
 
-				// Resolve newState
-				stateData		= (typeof stateData !== 'object' || stateData === null) ? {} : stateData;
-				stateTitle	=	stateData.title||'',
-				stateUrl		=	stateData.url||document.location.href,
-				newState		=	History.createStateObject(stateData,stateTitle,stateUrl);
+				// Clean
+				History.expectedStateId = false;
 
 				// Check if we are the same state
-				if ( _History.isLastState(newState) ) {
+				if ( History.isLastSavedState(newState) ) {
 					// There has been no change (just the page's hash has finally propagated)
-					History.debug('_History.onPopState: no change', newState, _History.savedStates);
+					History.debug('History.onPopState: no change', newState, History.savedStates);
 					History.busy(false);
 					return false;
 				}
 
-				// Log
-				History.debug(
-					'_History.onPopState',
-					'newState:', newState,
-					'oldState:', _History.getStateByUrl(History.expandUrl(document.location.href)),
-					'duplicateExists:', _History.urlDuplicateExists(History.expandUrl(document.location.href))
-				);
-
 				// Store the State
-				_History.storeState(newState);
-				_History.saveState(newState);
+				History.storeState(newState);
+				History.saveState(newState);
 
 				// Force update of the title
-				if ( newState.title ) {
-					document.title = newState.title
-				}
+				History.setTitle(newState);
 
 				// Fire Our Event
 				History.Adapter.trigger(window,'statechange');
@@ -1171,7 +1511,7 @@
 				// Return true
 				return true;
 			};
-			History.Adapter.bind(window,'popstate',_History.onPopState);
+			History.Adapter.bind(window,'popstate',History.onPopState);
 
 			/**
 			 * History.pushState(data,title,url)
@@ -1183,8 +1523,10 @@
 			 * @return {true}
 			 */
 			History.pushState = function(data,title,url,queue){
+				History.debug('History.pushState: called', arguments);
+
 				// Check the State
-				if ( History.extractHashFromUrl(url) ) {
+				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
 				}
 
@@ -1207,18 +1549,31 @@
 				// Create the newState
 				var newState = History.createStateObject(data,title,url);
 
-				// Store the newState
-				_History.storeState(newState);
+				// Check it
+				if ( History.isLastSavedState(newState) ) {
+					// Won't be a change
+					History.busy(false);
+				}
+				else {
+					// Store the newState
+					History.storeState(newState);
+					History.expectedStateId = newState.id;
 
-				// Push the newState
-				history.pushState(newState.data,newState.title,newState.url);
+					// Push the newState
+					var pushUrl =
+						(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
+						? newState.hashedUrl
+						: newState.url;
+					//alert(pushUrl+"\n"+History.bugs.safariPoll+"\n"+History.hasUrlDuplicate(newState));
+					history.pushState(newState.id,newState.title,pushUrl);
 
-				// Fire HTML5 Event
-				History.Adapter.trigger(window,'popstate');
+					// Fire HTML5 Event
+					History.Adapter.trigger(window,'popstate');
+				}
 
 				// End pushState closure
 				return true;
-			}
+			};
 
 			/**
 			 * History.replaceState(data,title,url)
@@ -1230,8 +1585,10 @@
 			 * @return {true}
 			 */
 			History.replaceState = function(data,title,url,queue){
+				History.debug('History.replaceState: called', arguments);
+
 				// Check the State
-				if ( History.extractHashFromUrl(url) ) {
+				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
 				}
 
@@ -1254,44 +1611,69 @@
 				// Create the newState
 				var newState = History.createStateObject(data,title,url);
 
-				// Store the newState
-				_History.storeState(newState);
+				// Check it
+				if ( History.isLastSavedState(newState) ) {
+					// Won't be a change
+					History.busy(false);
+				}
+				else {
+					// Store the newState
+					History.storeState(newState);
+					History.expectedStateId = newState.id;
 
-				// Push the newState
-				history.replaceState(newState.data,newState.title,newState.url);
+					// Push the newState
+					var pushUrl =
+						(History.bugs.safariPoll && History.hasUrlDuplicate(newState))
+						? newState.hashedUrl
+						: newState.url;
+					history.replaceState(newState.id,newState.title,pushUrl);
 
-				// Fire HTML5 Event
-				History.Adapter.trigger(window,'popstate');
+					// Fire HTML5 Event
+					History.Adapter.trigger(window,'popstate');
+				}
 
 				// End replaceState closure
 				return true;
-			}
+			};
 
+			/**
+			 * Create the initial State
+			 */
+			History.saveState(History.storeState(History.createStateObject({},'',document.location.href)));
+
+			/**
+			 * Setup Safari Fix
+			 */
+			if ( History.bugs.safariPoll ) {
+				setInterval(History.safariStatePoll, History.options.safariPollInterval);
+			}
 
 			/**
 			 * Ensure Cross Browser Compatibility
 			 */
-			if ( navigator.vendor === 'Apple Computer, Inc.' ) {
-				/**
-				 * Fix Safari Initial State Issue
-				 */
-				History.Adapter.onDomLoad(function(){
-					History.debug('Safari Initial State Change Fix');
-					var currentState = History.createStateObject({},'',document.location.href);
-					History.pushState(currentState.data,currentState.title,currentState.url);
-				});
-
+			if ( navigator.vendor === 'Apple Computer, Inc.' || (navigator.appCodeName||'') === 'Mozilla' ) {
 				/**
 				 * Fix Safari HashChange Issue
 				 */
+
+				// Setup Alias
 				History.Adapter.bind(window,'hashchange',function(){
 					History.Adapter.trigger(window,'popstate');
 				});
-			}
-		}
-	}; // init
 
-	// Try Load HTML5 Support
-	History.initHtml5();
+				// Initialise Alias
+				if ( History.getHash() ) {
+					History.Adapter.onDomLoad(function(){
+						History.Adapter.trigger(window,'hashchange');
+					});
+				}
+			}
+
+		} // !History.emulated.pushState
+
+	}; // History.initCore
+
+	// Try and Initialise History
+	History.init();
 
 })(window);

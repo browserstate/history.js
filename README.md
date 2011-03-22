@@ -1,10 +1,10 @@
-Welcome to History.js (v1.5.0 - February 12 2011)
+Welcome to History.js (v1.6.0 - March 22 2011)
 ==================
 
 
 This project is the successor of [jQuery History](http://balupton.com/projects/jquery-history), it aims to:
 
-- Follow the [HTML5 History/State APIs](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
+- Follow the [HTML5 History API](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
@@ -55,25 +55,25 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 ### How would they look in a HTML4 Browser?
 
 1. www.mysite.com
-1. www.mysite.com#?state=1/uid=1
-1. www.mysite.com#?state=2/uid=2
-1. www.mysite.com#?state=3/uid=3
+1. www.mysite.com#?state=1&_suid=1
+1. www.mysite.com#?state=2&_suid=2
+1. www.mysite.com#?state=3&_suid=3
 1. www.mysite.com#?state=4
-1. www.mysite.com#?state=3/uid=3
-1. www.mysite.com#?state=1/uid=1
+1. www.mysite.com#?state=3&_suid=3
+1. www.mysite.com#?state=1&_suid=1
 1. www.mysite.com
-1. www.mysite.com#?state=3/uid=3
+1. www.mysite.com#?state=3&_suid=3
 
 > Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states into their HTML5 equivalents so the user won't even notice :-)
 >
-> Note 2: These urls will be url-encoded in all HTML4 Browsers except Opera as it does not url-encode the urls. The url-encoding is necessary for these browsers as otherwise it won't work (the hashes won't actually apply). There is nothing we can do about this.
+> Note 2: These urls will be automatically url-encoded in IE6 to prevent certain browser-specific bugs.
 >
 > Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
-### What's the deal with the UIDs used in the HTML4 States?
+### What's the deal with the SUIDs used in the HTML4 States?
 
-- UIDs are used when we utilise a `title` and/or `data` in our state. Adding a UID allows us to associate particular states with data and titles while keeping the urls as simple as possible (don't worry it's all tested, working and a lot smarter than I'm making it out to be).
-- If you aren't utilising `title` or `data` then we don't even include a UID (as there is no need for it) - as seen by State 4 above :-)
+- SUIDs (State Unique Identifiers) are used when we utilise a `title` and/or `data` in our state. Adding a SUID allows us to associate particular states with data and titles while keeping the urls as simple as possible (don't worry it's all tested, working and a lot smarter than I'm making it out to be).
+- If you aren't utilising `title` or `data` then we don't even include a SUID (as there is no need for it) - as seen by State 4 above :-)
 - We also shrink the urls to make sure that the smallest url will be used. For instance we will adjust `http://www.mysite.com/#http://www.mysite.com/projects/History.js` to become `http://www.mysite.com/#/projects/History.js` automatically. (again tested, working, and smarter).
 - It works with domains, subdomains, subdirectories, whatever - doesn't matter where you put it. It's smart.
 
@@ -89,38 +89,33 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 2. Include [JSON2](http://www.json.org/js.html) for HTML4 Browsers Only *(replace www.yourwebsite.com)*
 
-		<script type="text/javascript">
-			if ( typeof JSON === 'undefined' ) {
-				var
-					url = 'http://www.yourwebsite.com/history.js/scripts/compressed/json2.js',
-					scriptEl = document.createElement('script');
-				scriptEl.type = 'text/javascript';
-				scriptEl.src = url;
-				document.body.appendChild(scriptEl);
-			}
-		</script>
+		<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
 
 3. Include the Adapter for your Framework:
 
-	- [jQuery](http://jquery.com/)
+	- [jQuery](http://jquery.com/) v1.4+
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
 
-	- [Mootools](http://mootools.net/)
+	- [Mootools](http://mootools.net/) v1.3+
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
 
-	- [Prototype](http://www.prototypejs.org/)
+	- [Prototype](http://www.prototypejs.org/) v1.7+
 
-			<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
+
+	- [Zepto](http://www.prototypejs.org/) v0.5+
+
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.zepto.js"></script>
 
 	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
 
 4. Include History.js
 
-		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
-		<script type="text/javascript" src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
 
 > Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just remove the `history.html4.js` include in step #4 file and the JSON2 include in step #2 [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
@@ -144,7 +139,7 @@ History.js is an actively developed, supported and maintained project. You can g
 
 If you'd love to give some support back and make a difference; here are a few great ways you can give back!
 
-- Give it your honest rating on its [jQuery Plugin Page](http://plugins.jquery.com/project/history-js)
+- Give it your honest rating on it's [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js) and its [Ohloh Page](https://www.ohloh.net/p/history-js)
 - If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/History.js/issues) - so that I can ensure you get the best experience!
 - Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
 - Donate via the donation form at the bottom right of [balupton.com](http://balupton.com) - every cent truly does help!
@@ -158,16 +153,18 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ### HTML5 Browsers
 
-- Chrome 8,9
+- Chrome 8,9,10
 - Firefox 4
 - Safari 5
-- Safari iOS 4.2.1
+- Safari iOS 4.3
 
 ### HTML4 Browsers
 
-- Opera 10,11
+- IE 6,7,8,9
 - Firefox 3
-- IE 6,7,8
+- Opera 10,11
+- Safari 4
+- Safari iOS prior to version 4.3
 
 
 ## Exposed API
@@ -189,28 +186,49 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ### Events
 
-- `window.onstatechange` <br/> Fired when the state of the page changes (does not include hashchanges)
+- `window.onstatechange` <br/> Fired when the state of the page changes (does not include hash changes)
 - `window.onanchorchange` <br/> Fired when the anchor of the page changes (does not include state hashes)
 
 
 ## Notes on Compatibility
 
-- History.js resolves the following browser bugs:
-	- Chrome does not retrieve the correct state data when traversing back to the start page
-	- Safari 5 and Safari iOS 4.2.1 do not fire the `onpopstate` event on page load or when the hash has changed
-	- MSIE 6 and 7 sometimes do not actually apply hash-changes
-	- Non-Opera HTML4 browsers sometimes fail when the hash is not `urlencoded`
-- State data will always contain the State's title and url at: `data.title` and `data.url`
+- History.js **solves** the following browser bugs:
+	- HTML5 Browsers
+		- Chrome 8 sometimes does not contain the correct state data when traversing back to the initial state
+		- Safari 5, Safari iOS 4 and Firefox 3 and 4 do not fire the `onhashchange` event when the page is loaded with a hash
+		- Safari 5 and Safari iOS 4 do not fire the `onpopstate` event when the hash has changed unlike the other browsers
+		- Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call / [bug report](https://bugs.webkit.org/show_bug.cgi?id=56249)
+		- Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions / [bug report](https://bugs.webkit.org/show_bug.cgi?id=42940)
+		- Google Chrome 8,9,10 and Firefox 4 prior to the RC will always fire `onpopstate` once the page has loaded / [change recommendation](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/)
+		- Safari iOS 4.0, 4.1, 4.2 have a working HTML5 History API - although the actual back buttons of the browsers do not work, therefore we treat them as HTML4 browsers
+		- None of the HTML5 browsers actually utilise the `title` argument to the `pushState` and `replaceState` calls
+	- HTML4 Browsers
+		- Old browsers like MSIE 6,7 and Firefox 2 do not have a `onhashchange` event
+		- MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
+		- Non-Opera HTML4 browsers sometimes do not apply the hash when the hash is not `urlencoded`
+- State data must not contain the key `_state`, as it is reserved for History.js
 - State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
-- State titles will always be applied to the `document.title` if set
+- State titles (if set) will always be applied to the `document.title`
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
-- HTML4 Browsers on initial page load will have a hash inserted into the url; this is to ensure correct cross-compatibility between HTML4 browsers (as IE will refresh the page if the anchor is lost)
 - Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
-	- `window.onstatechange`: this is the same as onpopstate except does not fire for traditional anchors
-	- `window.onanchorchange`: this is the same as onhashchange except does not fire for states
+	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
+	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
 
 
 ## Changelog
+
+- v1.6.0 - March 22 2011
+	- Added Zepto adapter thanks to [Matt Garrett](http://twitter.com/#!/matthewgarrett)
+	- The readme now references the supported versions of the libraries we use
+	- Updated vendors to the most recent versions. jQuery 1.5.1 and Mootools 1.3.1
+	- Reverted versions of Safari iOS prior to version 4.3 to be HTML4 browsers, Safari iOS 4.3 is a HTML5 browser
+	- Refined code in History.js and its adapters
+	- Fixed issue with extra state being inserted on Safari 5 requiring an extra click on the back button to go home - [Reported](https://github.com/balupton/history.js/issues#issue/17) by [Rob Madole](http://robmadole.com/)
+	- Fixed issue with Safari 5 and Safari iOS 4 sometimes failing to apply the state change under busy conditions - Solution conceived with [Matt Garrett](http://twitter.com/matthewgarrett)
+	- Fixed issue with HTML4 browsers requiring a query-string in the urls of states - [Reported](https://github.com/balupton/history.js/issues#issue/26) by [azago](https://github.com/azago)
+	- Fixed issue with HTML4 browsers requiring title in the states in order to use state data - [Reported](https://github.com/balupton/history.js/issues#issue/25) by [Jonathan McLaughlin](http://system-werks.com/)
+	- Fixed issue with HTML4 browsers failing is a state is pushed/replaced twice in a row - [Reported](https://github.com/balupton/history.js/issues#issue/17) by [Joey Baker](http://byjoeybaker.com/)
+	- **B/C BREAK:** The `statechange` event now only fires if the state has changed; it no longer fires on page initialisation. This is following the [Firefox 4 History API Changes](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/) which we agree with - this breaks standard, but makes more sense.
 
 - v1.5.0 - February 12 2011
 	- Moved to UglifyJS instead of Google Closure

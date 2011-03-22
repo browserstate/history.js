@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>
+		Navigator Output
+	</title>
+	<style>
+		label { font-weight:bold; }
+		label:after { content: ":"; margin-right:5px; }
+	</style>
+</head>
+<body>
+	<div id="nav"></div>
+	<script>
+		var nav = document.getElementById('nav'), i,v;
+		for ( i in navigator ) {
+			var v = navigator[i];
+			nav.innerHTML += '<div><label>'+i+'</label>'+v+'</div>';
+		}
+	</script>
+</body>
+</html>

@@ -1,27 +1,19 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>
-		History.js &lt; BrowserState Suite
+		History.js
 	</title>
 </head>
 <body style="padding-bottom:40px">
 	<!-- Scripts -->
-	<script type="text/javascript">
-		if ( typeof JSON === 'undefined' ) {
-			var
-				url = '../scripts/uncompressed/json2.js',
-				scriptEl = document.createElement('script');
-			scriptEl.type = 'text/javascript';
-			scriptEl.src = url;
-			document.body.appendChild(scriptEl,document.body.firstChild);
-		}
-	</script>
-	<script type="text/javascript" src="../vendor/jquery.js"></script>
-	<script type="text/javascript" src="../scripts/compressed/history.adapter.jquery.js"></script>
-	<script type="text/javascript" src="../scripts/compressed/history.js"></script>
-	<script type="text/javascript" src="../scripts/compressed/history.html4.js"></script>
+	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
+	<script src="../vendor/jquery.js"></script>
+	<script src="../scripts/uncompressed/history.adapter.jquery.js"></script>
+	<script src="../scripts/uncompressed/history.js"></script>
+	<script src="../scripts/uncompressed/history.html4.js"></script>
 
 	<!-- HTML -->
 	<div id="wrap">
@@ -52,13 +44,22 @@
 		</form>
 
 		<!-- Our Script -->
-		<script type="text/javascript">
+		<script>
 			(function(window,undefined){
+
+				// Check Location
+				if ( document.location.protocol === 'file:' ) {
+					alert('The HTML5 History API (and thus History.js) do not work on files, please upload it to a server.');
+				}
 
 				// Establish Variables
 				var
-					History = window.History // Note: We are using a capital H instead of a lower h
-					;
+					History = window.History, // Note: We are using a capital H instead of a lower h
+					State = History.getState(),
+					$log = $('#log');
+
+				// Log Initial State
+				History.log('initial:', State.data, State.title, State.url);
 
 				// Bind to State Change
 				History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate

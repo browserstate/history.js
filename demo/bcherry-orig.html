@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+
+  <title>WebKit is Dropping HTML5 "popstate" Events</title>
+
+  <link rel="stylesheet" href="/static/lib/css/blueprint/blueprint.min.css" media="screen, projection" />
+  <link rel="stylesheet" href="/static/lib/css/blueprint/print.min.css" media="print" />
+  <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/static/lib/css/blueprint/ie.min.css" media="screen, projection">
+  <![endif]-->
+  <link href="/static/lib/css/bcherry.css" rel="stylesheet" media="screen" />
+  <style>
+    #n {
+      font-size: 48px;
+    }
+    p {
+      padding: 0 20px;
+    }
+  </style>
+
+  <script type="text/javascript" src="../vendor/jquery.js"></script>
+	<script type="text/javascript" src="../scripts/uncompressed/history.adapter.jquery.js"></script>
+	<script type="text/javascript" src="../scripts/uncompressed/history.js"></script>
+
+</head>
+<body>
+  <div id="n"></div>
+  <p>There's a bug in the HTML5 "popstate" event, as implemented in WebKit (Safari and Chrome).  View this page in one of those browsers.  Your browser has had history entries added from #0 to #19 (you should start at #19).  Hitting back/forward will navigate through these.  On each URL, the large number above should reflect the hash value.  If you hit back/forward quickly, you'll notice that your number gets out of sync with the URL.  This is because WebKit is dropping popstate events (they are not firing).  It seems to happen when outbound network requests are in progress when the user navigates in their browser happens.  In this case, your browser is downloading an image that takes 1s to serve on every popstate, so you'll have to wait 1s between backs/forwards to have the feature work correctly.  You could also cause constant network traffic by putting an image download in a setInterval, in which case your popstate events will never fire. This implementation simulates an AJAX application that makes a network request when you navigate between URLs using pushState/popstate.  View the source for more info.</p>
+  <p>This was filed as <a href="https://bugs.webkit.org/show_bug.cgi?id=42940">Bug 42940</a> with WebKit on July 24, 2010. The Firefox 4 beta does not have this bug, which is good news.</p>
+  <p>This is put together by <a href="http://www.adequatelygood.com">Ben Cherry</a>.  Ben is a front-end engineer at <a href="http://twitter.com/">Twitter</a>, and you can follow him at <a href="http://twitter.com/bcherry">@bcherry</a>.</p>
+  <script>
+    // Bind to popstate
+    $(window).bind("popstate", function(e) {
+    	var State = e.state;
+
+      // log that this event was fired, and the current URL
+      if (window.console && window.console.log) {
+        console.log("popstate", State, window.location.href);
+      }
+      // update the page
+      $("#n").text(typeof State.n !== 'undefined' ? State.n : document.location.href);
+
+      // Make an outbound image request that will take 1s. This request seems to be the cause of dropped popstates.
+      // Removing this, or replacing it with something else, avoids the issue.  Even if it's replaced with slow, blocking code (i.e. 1s of execution) events are not dropped.
+      (new Image()).src = "http://www.bcherry.net/playground/pushstate.jpg";
+    });
+
+    // Seed the browser history
+    for (var i = 0; i < 20; i++) {
+      window.history.pushState({n:i}, i, "?" + i);
+      $("#n").text(i);
+    }
+  </script>
+</body>
+</html>

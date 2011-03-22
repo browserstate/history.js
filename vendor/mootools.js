@@ -33,8 +33,8 @@ provides: [Core, MooTools, Type, typeOf, instanceOf, Native]
 (function(){
 
 this.MooTools = {
-	version: '1.3',
-	build: 'a3eed692dd85050d80168ec2c708efe901bb7db3'
+	version: '1.3.1',
+	build: 'af48c8d589f43f32212f9bb8ff68a127e6a3ba6c'
 };
 
 // typeOf, instanceOf
@@ -167,7 +167,7 @@ var Type = this.Type = function(name, object){
 			object.prototype.$family = (function(){
 				return lower;
 			}).hide();
-			
+
 		}
 	}
 
@@ -194,7 +194,7 @@ var hooksOf = function(object){
 };
 
 var implement = function(name, method){
-	if (method && method.$hidden) return this;
+	if (method && method.$hidden) return;
 
 	var hooks = hooksOf(this);
 
@@ -203,22 +203,19 @@ var implement = function(name, method){
 		if (typeOf(hook) == 'type') implement.call(hook, name, method);
 		else hook.call(this, name, method);
 	}
-	
+
 	var previous = this.prototype[name];
 	if (previous == null || !previous.$protected) this.prototype[name] = method;
 
 	if (this[name] == null && typeOf(method) == 'function') extend.call(this, name, function(item){
 		return method.apply(item, slice.call(arguments, 1));
 	});
-
-	return this;
 };
 
 var extend = function(name, method){
-	if (method && method.$hidden) return this;
+	if (method && method.$hidden) return;
 	var previous = this[name];
 	if (previous == null || !previous.$protected) this[name] = method;
-	return this;
 };
 
 Type.implement({
@@ -306,9 +303,10 @@ Number.extend('random', function(min, max){
 
 // forEach, each
 
+var hasOwnProperty = Object.prototype.hasOwnProperty;
 Object.extend('forEach', function(object, fn, bind){
 	for (var key in object){
-		if (object.hasOwnProperty(key)) fn.call(bind, object[key], key, object);
+		if (hasOwnProperty.call(object, key)) fn.call(bind, object[key], key, object);
 	}
 });
 
@@ -400,7 +398,7 @@ String.extend('uniqueID', function(){
 
 
 
-})();
+}).call(this);
 
 
 /*
@@ -746,14 +744,14 @@ Function.implement({
 		try {
 			return this.apply(bind, Array.from(args));
 		} catch (e){}
-		
+
 		return null;
 	},
 
 	bind: function(bind){
 		var self = this,
 			args = (arguments.length > 1) ? Array.slice(arguments, 1) : null;
-		
+
 		return function(){
 			if (!args && !arguments.length) return self.call(bind);
 			if (args && arguments.length) return self.apply(bind, args.concat(Array.from(arguments)));
@@ -770,11 +768,11 @@ Function.implement({
 	},
 
 	delay: function(delay, bind, args){
-		return setTimeout(this.pass(args, bind), delay);
+		return setTimeout(this.pass((args == null ? [] : args), bind), delay);
 	},
 
 	periodical: function(periodical, bind, args){
-		return setInterval(this.pass(args, bind), periodical);
+		return setInterval(this.pass((args == null ? [] : args), bind), periodical);
 	}
 
 });
@@ -798,6 +796,9 @@ provides: [Object, Hash]
 ...
 */
 
+(function(){
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
 
 Object.extend({
 
@@ -813,7 +814,7 @@ Object.extend({
 	map: function(object, fn, bind){
 		var results = {};
 		for (var key in object){
-			if (object.hasOwnProperty(key)) results[key] = fn.call(bind, object[key], key, object);
+			if (hasOwnProperty.call(object, key)) results[key] = fn.call(bind, object[key], key, object);
 		}
 		return results;
 	},
@@ -828,14 +829,14 @@ Object.extend({
 
 	every: function(object, fn, bind){
 		for (var key in object){
-			if (object.hasOwnProperty(key) && !fn.call(bind, object[key], key)) return false;
+			if (hasOwnProperty.call(object, key) && !fn.call(bind, object[key], key)) return false;
 		}
 		return true;
 	},
 
 	some: function(object, fn, bind){
 		for (var key in object){
-			if (object.hasOwnProperty(key) && fn.call(bind, object[key], key)) return true;
+			if (hasOwnProperty.call(object, key) && fn.call(bind, object[key], key)) return true;
 		}
 		return false;
 	},
@@ -843,7 +844,7 @@ Object.extend({
 	keys: function(object){
 		var keys = [];
 		for (var key in object){
-			if (object.hasOwnProperty(key)) keys.push(key);
+			if (hasOwnProperty.call(object, key)) keys.push(key);
 		}
 		return keys;
 	},
@@ -851,7 +852,7 @@ Object.extend({
 	values: function(object){
 		var values = [];
 		for (var key in object){
-			if (object.hasOwnProperty(key)) values.push(object[key]);
+			if (hasOwnProperty.call(object, key)) values.push(object[key]);
 		}
 		return values;
 	},
@@ -862,7 +863,7 @@ Object.extend({
 
 	keyOf: function(object, value){
 		for (var key in object){
-			if (object.hasOwnProperty(key) && object[key] === value) return key;
+			if (hasOwnProperty.call(object, key) && object[key] === value) return key;
 		}
 		return null;
 	},
@@ -896,6 +897,7 @@ Object.extend({
 
 });
 
+})();
 
 
 
@@ -1101,7 +1103,7 @@ try {
 
 
 
-})();
+}).call(this);
 
 
 /*
@@ -1129,18 +1131,20 @@ var Event = new Type('Event', function(event, win){
 	var type = event.type,
 		target = event.target || event.srcElement,
 		page = {},
-		client = {};
+		client = {},
+		related = null,
+		rightClick, wheel, code, key;
 	while (target && target.nodeType == 3) target = target.parentNode;
 
 	if (type.indexOf('key') != -1){
-		var code = event.which || event.keyCode;
-		var key = Object.keyOf(Event.Keys, code);
+		code = event.which || event.keyCode;
+		key = Object.keyOf(Event.Keys, code);
 		if (type == 'keydown'){
 			var fKey = code - 111;
 			if (fKey > 0 && fKey < 13) key = 'f' + fKey;
 		}
 		if (!key) key = String.fromCharCode(code).toLowerCase();
-	} else if (type.test(/click|mouse|menu/i)){
+	} else if ((/click|mouse|menu/i).test(type)){
 		doc = (!doc.compatMode || doc.compatMode == 'CSS1Compat') ? doc.html : doc.body;
 		page = {
 			x: (event.pageX != null) ? event.pageX : event.clientX + doc.scrollLeft,
@@ -1150,12 +1154,11 @@ var Event = new Type('Event', function(event, win){
 			x: (event.pageX != null) ? event.pageX - win.pageXOffset : event.clientX,
 			y: (event.pageY != null) ? event.pageY - win.pageYOffset : event.clientY
 		};
-		if (type.test(/DOMMouseScroll|mousewheel/)){
-			var wheel = (event.wheelDelta) ? event.wheelDelta / 120 : -(event.detail || 0) / 3;
+		if ((/DOMMouseScroll|mousewheel/).test(type)){
+			wheel = (event.wheelDelta) ? event.wheelDelta / 120 : -(event.detail || 0) / 3;
 		}
-		var rightClick = (event.which == 3) || (event.button == 2),
-			related = null;
-		if (type.test(/over|out/)){
+		rightClick = (event.which == 3) || (event.button == 2);
+		if ((/over|out/).test(type)){
 			related = event.relatedTarget || event[(type == 'mouseover' ? 'from' : 'to') + 'Element'];
 			var testRelated = function(){
 				while (related && related.nodeType == 3) related = related.parentNode;
@@ -1164,7 +1167,7 @@ var Event = new Type('Event', function(event, win){
 			var hasRelated = (Browser.firefox2) ? testRelated.attempt() : testRelated();
 			related = (hasRelated) ? related : null;
 		}
-	} else if (type.test(/gesture|touch/i)){
+	} else if ((/gesture|touch/i).test(type)){
 		this.rotation = event.rotation;
 		this.scale = event.scale;
 		this.targetTouches = event.targetTouches;
@@ -1350,7 +1353,7 @@ Class.Mutators = {
 	}
 };
 
-})();
+}).call(this);
 
 
 /*
@@ -1404,7 +1407,7 @@ this.Events = new Class({
 	addEvent: function(type, fn, internal){
 		type = removeOn(type);
 
-		
+
 
 		this.$events[type] = (this.$events[type] || []).include(fn);
 		if (internal) fn.internal = true;
@@ -1427,7 +1430,7 @@ this.Events = new Class({
 		}, this);
 		return this;
 	},
-	
+
 	removeEvent: function(type, fn){
 		type = removeOn(type);
 		var events = this.$events[type];
@@ -1448,7 +1451,9 @@ this.Events = new Class({
 		for (type in this.$events){
 			if (events && events != type) continue;
 			var fns = this.$events[type];
-			for (var i = fns.length; i--;) this.removeEvent(type, fns[i]);
+			for (var i = fns.length; i--;) if (i in fns){
+				this.removeEvent(type, fns[i]);
+			}
 		}
 		return this;
 	}
@@ -1459,8 +1464,7 @@ this.Options = new Class({
 
 	setOptions: function(){
 		var options = this.options = Object.merge.apply(null, [{}, this.options].append(arguments));
-		if (!this.addEvent) return this;
-		for (var option in options){
+		if (this.addEvent) for (var option in options){
 			if (typeOf(options[option]) != 'function' || !(/^on[A-Z]/).test(option)) continue;
 			this.addEvent(option, options[option]);
 			delete options[option];
@@ -1470,7 +1474,7 @@ this.Options = new Class({
 
 });
 
-})();
+}).call(this);
 
 
 /*
@@ -1481,7 +1485,7 @@ provides: Slick.Parser
 ...
 */
 
-(function(){
+;(function(){
 
 var parsed,
 	separatorIndex,
@@ -1498,13 +1502,18 @@ var parse = function(expression, isReversed){
 	reversed = !!isReversed;
 	var currentCache = (reversed) ? reverseCache : cache;
 	if (currentCache[expression]) return currentCache[expression];
-	parsed = {Slick: true, expressions: [], raw: expression, reverse: function(){
-		return parse(this.raw, true);
-	}};
+	parsed = {
+		Slick: true,
+		expressions: [],
+		raw: expression,
+		reverse: function(){
+			return parse(this.raw, true);
+		}
+	};
 	separatorIndex = -1;
 	while (expression != (expression = expression.replace(regexp, parser)));
 	parsed.length = parsed.expressions.length;
-	return currentCache[expression] = (reversed) ? reverse(parsed) : parsed;
+	return currentCache[parsed.raw] = (reversed) ? reverse(parsed) : parsed;
 };
 
 var reverseCombinator = function(combinator){
@@ -1533,7 +1542,9 @@ var reverse = function(expression){
 };
 
 var escapeRegExp = function(string){// Credit: XRegExp 0.6.1 (c) 2007-2008 Steven Levithan <http://stevenlevithan.com/regex/xregexp/> MIT License
-	return string.replace(/[-[\]{}()*+?.\\^$|,#\s]/g, "\\$&");
+	return string.replace(/[-[\]{}()*+?.\\^$|,#\s]/g, function(match){
+		return '\\' + match;
+	});
 };
 
 var regexp = new RegExp(
@@ -1565,7 +1576,7 @@ __END__
 	)?\
 	)"
 */
-	"^(?:\\s*(,)\\s*|\\s*(<combinator>+)\\s*|(\\s+)|(<unicode>+|\\*)|\\#(<unicode>+)|\\.(<unicode>+)|\\[\\s*(<unicode1>+)(?:\\s*([*^$!~|]?=)(?:\\s*(?:([\"']?)(.*?)\\9)))?\\s*\\](?!\\])|:+(<unicode>+)(?:\\((?:(?:([\"'])([^\\12]*)\\12)|((?:\\([^)]+\\)|[^()]*)+))\\))?)"
+	"^(?:\\s*(,)\\s*|\\s*(<combinator>+)\\s*|(\\s+)|(<unicode>+|\\*)|\\#(<unicode>+)|\\.(<unicode>+)|\\[\\s*(<unicode1>+)(?:\\s*([*^$!~|]?=)(?:\\s*(?:([\"']?)(.*?)\\9)))?\\s*\\](?!\\])|(:+)(<unicode>+)(?:\\((?:(?:([\"'])([^\\13]*)\\13)|((?:\\([^)]+\\)|[^()]*)+))\\))?)"
 	.replace(/<combinator>/, '[' + escapeRegExp(">+~`!@$%^&={}\\;</") + ']')
 	.replace(/<unicode>/g, '(?:[\\w\\u00a1-\\uFFFF-]|\\\\[^\\s0-9a-f])')
 	.replace(/<unicode1>/g, '(?:[:\\w\\u00a1-\\uFFFF-]|\\\\[^\\s0-9a-f])')
@@ -1587,6 +1598,7 @@ function parser(
 	attributeQuote,
 	attributeValue,
 
+	pseudoMarker,
 	pseudoClass,
 	pseudoQuote,
 	pseudoClassQuotedValue,
@@ -1632,7 +1644,8 @@ function parser(
 		if (!currentParsed.pseudos) currentParsed.pseudos = [];
 		currentParsed.pseudos.push({
 			key: pseudoClass.replace(reUnescape, ''),
-			value: pseudoClassValue
+			value: pseudoClassValue,
+			type: pseudoMarker.length == 1 ? 'class' : 'element'
 		});
 
 	} else if (attributeKey){
@@ -1705,9 +1718,11 @@ requires: Slick.Parser
 ...
 */
 
-(function(){
+;(function(){
 
-var local = {};
+var local = {},
+	featuresCache = {},
+	toString = Object.prototype.toString;
 
 // Feature / Bug detection
 
@@ -1716,16 +1731,16 @@ local.isNativeCode = function(fn){
 };
 
 local.isXML = function(document){
-	return (!!document.xmlVersion) || (!!document.xml) || (Object.prototype.toString.call(document) === '[object XMLDocument]') ||
-	(document.nodeType === 9 && document.documentElement.nodeName !== 'HTML');
+	return (!!document.xmlVersion) || (!!document.xml) || (toString.call(document) == '[object XMLDocument]') ||
+	(document.nodeType == 9 && document.documentElement.nodeName != 'HTML');
 };
 
 local.setDocument = function(document){
 
 	// convert elements / window arguments to document. if document cannot be extrapolated, the function returns.
-
-	if (document.nodeType === 9); // document
-	else if (document.ownerDocument) document = document.ownerDocument; // node
+	var nodeType = document.nodeType;
+	if (nodeType == 9); // document
+	else if (nodeType) document = document.ownerDocument; // node
 	else if (document.navigator) document = document.document; // window
 	else return;
 
@@ -1733,106 +1748,166 @@ local.setDocument = function(document){
 
 	if (this.document === document) return;
 	this.document = document;
-	var root = this.root = document.documentElement;
 
-	this.isXMLDocument = this.isXML(document);
+	// check if we have done feature detection on this document before
 
-	this.brokenStarGEBTN
-	= this.starSelectsClosedQSA
-	= this.idGetsName
-	= this.brokenMixedCaseQSA
-	= this.brokenGEBCN
-	= this.brokenCheckedQSA
-	= this.brokenEmptyAttributeQSA
-	= this.isHTMLDocument
+	var root = document.documentElement,
+		rootUid = this.getUIDXML(root),
+		features = featuresCache[rootUid],
+		feature;
+
+	if (features){
+		for (feature in features){
+			this[feature] = features[feature];
+		}
+		return;
+	}
+
+	features = featuresCache[rootUid] = {};
+
+	features.root = root;
+	features.isXMLDocument = this.isXML(document);
+
+	features.brokenStarGEBTN
+	= features.starSelectsClosedQSA
+	= features.idGetsName
+	= features.brokenMixedCaseQSA
+	= features.brokenGEBCN
+	= features.brokenCheckedQSA
+	= features.brokenEmptyAttributeQSA
+	= features.isHTMLDocument
+	= features.nativeMatchesSelector
 	= false;
 
 	var starSelectsClosed, starSelectsComments,
-		brokenSecondClassNameGEBCN, cachedGetElementsByClassName;
+		brokenSecondClassNameGEBCN, cachedGetElementsByClassName,
+		brokenFormAttributeGetter;
 
-	var selected, id;
+	var selected, id = 'slick_uniqueid';
 	var testNode = document.createElement('div');
-	root.appendChild(testNode);
+
+	var testRoot = document.body || document.getElementsByTagName('body')[0] || root;
+	testRoot.appendChild(testNode);
 
 	// on non-HTML documents innerHTML and getElementsById doesnt work properly
 	try {
-		id = 'slick_getbyid_test';
 		testNode.innerHTML = '<a id="'+id+'"></a>';
-		this.isHTMLDocument = !!document.getElementById(id);
+		features.isHTMLDocument = !!document.getElementById(id);
 	} catch(e){};
 
-	if (this.isHTMLDocument){
-		
+	if (features.isHTMLDocument){
+
 		testNode.style.display = 'none';
-		
+
 		// IE returns comment nodes for getElementsByTagName('*') for some documents
 		testNode.appendChild(document.createComment(''));
-		starSelectsComments = (testNode.getElementsByTagName('*').length > 0);
+		starSelectsComments = (testNode.getElementsByTagName('*').length > 1);
 
 		// IE returns closed nodes (EG:"</foo>") for getElementsByTagName('*') for some documents
 		try {
 			testNode.innerHTML = 'foo</foo>';
 			selected = testNode.getElementsByTagName('*');
-			starSelectsClosed = (selected && selected.length && selected[0].nodeName.charAt(0) == '/');
+			starSelectsClosed = (selected && !!selected.length && selected[0].nodeName.charAt(0) == '/');
 		} catch(e){};
 
-		this.brokenStarGEBTN = starSelectsComments || starSelectsClosed;
-
-		// IE 8 returns closed nodes (EG:"</foo>") for querySelectorAll('*') for some documents
-		if (testNode.querySelectorAll) try {
-			testNode.innerHTML = 'foo</foo>';
-			selected = testNode.querySelectorAll('*');
-			this.starSelectsClosedQSA = (selected && selected.length && selected[0].nodeName.charAt(0) == '/');
-		} catch(e){};
+		features.brokenStarGEBTN = starSelectsComments || starSelectsClosed;
 
 		// IE returns elements with the name instead of just id for getElementsById for some documents
 		try {
-			id = 'slick_id_gets_name';
-			testNode.innerHTML = '<a name="'+id+'"></a><b id="'+id+'"></b>';
-			this.idGetsName = document.getElementById(id) === testNode.firstChild;
+			testNode.innerHTML = '<a name="'+ id +'"></a><b id="'+ id +'"></b>';
+			features.idGetsName = document.getElementById(id) === testNode.firstChild;
 		} catch(e){};
 
-		// Safari 3.2 querySelectorAll doesnt work with mixedcase on quirksmode
+		if (testNode.getElementsByClassName){
+
+			// Safari 3.2 getElementsByClassName caches results
+			try {
+				testNode.innerHTML = '<a class="f"></a><a class="b"></a>';
+				testNode.getElementsByClassName('b').length;
+				testNode.firstChild.className = 'b';
+				cachedGetElementsByClassName = (testNode.getElementsByClassName('b').length != 2);
+			} catch(e){};
+
+			// Opera 9.6 getElementsByClassName doesnt detects the class if its not the first one
+			try {
+				testNode.innerHTML = '<a class="a"></a><a class="f b a"></a>';
+				brokenSecondClassNameGEBCN = (testNode.getElementsByClassName('a').length != 2);
+			} catch(e){};
+
+			features.brokenGEBCN = cachedGetElementsByClassName || brokenSecondClassNameGEBCN;
+		}
+
+		if (testNode.querySelectorAll){
+			// IE 8 returns closed nodes (EG:"</foo>") for querySelectorAll('*') for some documents
+			try {
+				testNode.innerHTML = 'foo</foo>';
+				selected = testNode.querySelectorAll('*');
+				features.starSelectsClosedQSA = (selected && !!selected.length && selected[0].nodeName.charAt(0) == '/');
+			} catch(e){};
+
+			// Safari 3.2 querySelectorAll doesnt work with mixedcase on quirksmode
+			try {
+				testNode.innerHTML = '<a class="MiX"></a>';
+				features.brokenMixedCaseQSA = !testNode.querySelectorAll('.MiX').length;
+			} catch(e){};
+
+			// Webkit and Opera dont return selected options on querySelectorAll
+			try {
+				testNode.innerHTML = '<select><option selected="selected">a</option></select>';
+				features.brokenCheckedQSA = (testNode.querySelectorAll(':checked').length == 0);
+			} catch(e){};
+
+			// IE returns incorrect results for attr[*^$]="" selectors on querySelectorAll
+			try {
+				testNode.innerHTML = '<a class=""></a>';
+				features.brokenEmptyAttributeQSA = (testNode.querySelectorAll('[class*=""]').length != 0);
+			} catch(e){};
+
+		}
+
+		// IE6-7, if a form has an input of id x, form.getAttribute(x) returns a reference to the input
 		try {
-			testNode.innerHTML = '<a class="MiXedCaSe"></a>';
-			this.brokenMixedCaseQSA = !testNode.querySelectorAll('.MiXedCaSe').length;
+			testNode.innerHTML = '<form action="s"><input id="action"/></form>';
+			brokenFormAttributeGetter = (testNode.firstChild.getAttribute('action') != 's');
 		} catch(e){};
 
-		try {
-			testNode.innerHTML = '<a class="f"></a><a class="b"></a>';
-			testNode.getElementsByClassName('b').length;
-			testNode.firstChild.className = 'b';
-			cachedGetElementsByClassName = (testNode.getElementsByClassName('b').length != 2);
+		// native matchesSelector function
+
+		features.nativeMatchesSelector = root.matchesSelector || /*root.msMatchesSelector ||*/ root.mozMatchesSelector || root.webkitMatchesSelector;
+		if (features.nativeMatchesSelector) try {
+			// if matchesSelector trows errors on incorrect sintaxes we can use it
+			features.nativeMatchesSelector.call(root, ':slick');
+			features.nativeMatchesSelector = null;
 		} catch(e){};
 
-		// Opera 9.6 getElementsByClassName doesnt detects the class if its not the first one
-		try {
-			testNode.innerHTML = '<a class="a"></a><a class="f b a"></a>';
-			brokenSecondClassNameGEBCN = (testNode.getElementsByClassName('a').length != 2);
-		} catch(e){};
-
-		this.brokenGEBCN = cachedGetElementsByClassName || brokenSecondClassNameGEBCN;
-		
-		// Webkit dont return selected options on querySelectorAll
-		try {
-			testNode.innerHTML = '<select><option selected="selected">a</option></select>';
-			this.brokenCheckedQSA = (testNode.querySelectorAll(':checked').length == 0);
-		} catch(e){};
-		
-		// IE returns incorrect results for attr[*^$]="" selectors on querySelectorAll
-		try {
-			testNode.innerHTML = '<a class=""></a>';
-			this.brokenEmptyAttributeQSA = (testNode.querySelectorAll('[class*=""]').length != 0);
-		} catch(e){};
-		
 	}
 
-	root.removeChild(testNode);
-	testNode = null;
+	try {
+		root.slick_expando = 1;
+		delete root.slick_expando;
+		features.getUID = this.getUIDHTML;
+	} catch(e) {
+		features.getUID = this.getUIDXML;
+	}
+
+	testRoot.removeChild(testNode);
+	testNode = selected = testRoot = null;
+
+	// getAttribute
+
+	features.getAttribute = (features.isHTMLDocument && brokenFormAttributeGetter) ? function(node, name){
+		var method = this.attributeGetters[name];
+		if (method) return method.call(node);
+		var attributeNode = node.getAttributeNode(name);
+		return (attributeNode) ? attributeNode.nodeValue : null;
+	} : function(node, name){
+		var method = this.attributeGetters[name];
+		return (method) ? method.call(node) : node.getAttribute(name);
+	};
 
 	// hasAttribute
 
-	this.hasAttribute = (root && this.isNativeCode(root.hasAttribute)) ? function(node, attribute) {
+	features.hasAttribute = (root && this.isNativeCode(root.hasAttribute)) ? function(node, attribute) {
 		return node.hasAttribute(attribute);
 	} : function(node, attribute) {
 		node = node.getAttributeNode(attribute);
@@ -1841,7 +1916,7 @@ local.setDocument = function(document){
 
 	// contains
 	// FIXME: Add specs: local.contains should be different for xml and html documents?
-	this.contains = (root && this.isNativeCode(root.contains)) ? function(context, node){
+	features.contains = (root && this.isNativeCode(root.contains)) ? function(context, node){
 		return context.contains(node);
 	} : (root && root.compareDocumentPosition) ? function(context, node){
 		return context === node || !!(context.compareDocumentPosition(node) & 16);
@@ -1855,7 +1930,7 @@ local.setDocument = function(document){
 	// document order sorting
 	// credits to Sizzle (http://sizzlejs.com/)
 
-	this.documentSorter = (root.compareDocumentPosition) ? function(a, b){
+	features.documentSorter = (root.compareDocumentPosition) ? function(a, b){
 		if (!a.compareDocumentPosition || !b.compareDocumentPosition) return 0;
 		return a.compareDocumentPosition(b) & 4 ? -1 : a === b ? 0 : 1;
 	} : ('sourceIndex' in root) ? function(a, b){
@@ -1871,52 +1946,137 @@ local.setDocument = function(document){
 		return aRange.compareBoundaryPoints(Range.START_TO_END, bRange);
 	} : null ;
 
-	this.getUID = (this.isHTMLDocument) ? this.getUIDHTML : this.getUIDXML;
+	root = null;
 
+	for (feature in features){
+		this[feature] = features[feature];
+	}
 };
 
 // Main Method
+
+var reSimpleSelector = /^([#.]?)((?:[\w-]+|\*))$/,
+	reEmptyAttribute = /\[.+[*$^]=(?:""|'')?\]/,
+	qsaFailExpCache = {};
 
 local.search = function(context, expression, append, first){
 
 	var found = this.found = (first) ? null : (append || []);
 
-	// context checks
-
-	if (!context) return found; // No context
-	if (context.navigator) context = context.document; // Convert the node from a window to a document
-	else if (!context.nodeType) return found; // Reject misc junk input
+	if (!context) return found;
+	else if (context.navigator) context = context.document; // Convert the node from a window to a document
+	else if (!context.nodeType) return found;
 
 	// setup
 
-	var parsed, i;
+	var parsed, i,
+		uniques = this.uniques = {},
+		hasOthers = !!(append && append.length),
+		contextIsDocument = (context.nodeType == 9);
 
-	var uniques = this.uniques = {};
-
-	if (this.document !== (context.ownerDocument || context)) this.setDocument(context);
-
-	// should sort if there are nodes in append and if you pass multiple expressions.
-	// should remove duplicates if append already has items
-	var shouldUniques = !!(append && append.length);
+	if (this.document !== (contextIsDocument ? context : context.ownerDocument)) this.setDocument(context);
 
 	// avoid duplicating items already in the append array
-	if (shouldUniques) for (i = found.length; i--;) this.uniques[this.getUID(found[i])] = true;
+	if (hasOthers) for (i = found.length; i--;) uniques[this.getUID(found[i])] = true;
 
 	// expression checks
 
 	if (typeof expression == 'string'){ // expression is a string
 
-		// Overrides
+		/*<simple-selectors-override>*/
+		var simpleSelector = expression.match(reSimpleSelector);
+		simpleSelectors: if (simpleSelector) {
 
-		for (i = this.overrides.length; i--;){
-			var override = this.overrides[i];
-			if (override.regexp.test(expression)){
-				var result = override.method.call(context, expression, found, first);
-				if (result === false) continue;
-				if (result === true) return found;
-				return result;
+			var symbol = simpleSelector[1],
+				name = simpleSelector[2],
+				node, nodes;
+
+			if (!symbol){
+
+				if (name == '*' && this.brokenStarGEBTN) break simpleSelectors;
+				nodes = context.getElementsByTagName(name);
+				if (first) return nodes[0] || null;
+				for (i = 0; node = nodes[i++];){
+					if (!(hasOthers && uniques[this.getUID(node)])) found.push(node);
+				}
+
+			} else if (symbol == '#'){
+
+				if (!this.isHTMLDocument || !contextIsDocument) break simpleSelectors;
+				node = context.getElementById(name);
+				if (!node) return found;
+				if (this.idGetsName && node.getAttributeNode('id').nodeValue != name) break simpleSelectors;
+				if (first) return node || null;
+				if (!(hasOthers && uniques[this.getUID(node)])) found.push(node);
+
+			} else if (symbol == '.'){
+
+				if (!this.isHTMLDocument || ((!context.getElementsByClassName || this.brokenGEBCN) && context.querySelectorAll)) break simpleSelectors;
+				if (context.getElementsByClassName && !this.brokenGEBCN){
+					nodes = context.getElementsByClassName(name);
+					if (first) return nodes[0] || null;
+					for (i = 0; node = nodes[i++];){
+						if (!(hasOthers && uniques[this.getUID(node)])) found.push(node);
+					}
+				} else {
+					var matchClass = new RegExp('(^|\\s)'+ Slick.escapeRegExp(name) +'(\\s|$)');
+					nodes = context.getElementsByTagName('*');
+					for (i = 0; node = nodes[i++];){
+						className = node.className;
+						if (!(className && matchClass.test(className))) continue;
+						if (first) return node;
+						if (!(hasOthers && uniques[this.getUID(node)])) found.push(node);
+					}
+				}
+
 			}
+
+			if (hasOthers) this.sort(found);
+			return (first) ? null : found;
+
 		}
+		/*</simple-selectors-override>*/
+
+		/*<query-selector-override>*/
+		querySelector: if (context.querySelectorAll) {
+
+			if (!this.isHTMLDocument || this.brokenMixedCaseQSA || qsaFailExpCache[expression] ||
+			(this.brokenCheckedQSA && expression.indexOf(':checked') > -1) ||
+			(this.brokenEmptyAttributeQSA && reEmptyAttribute.test(expression)) || Slick.disableQSA) break querySelector;
+
+			var _expression = expression;
+			if (!contextIsDocument){
+				// non-document rooted QSA
+				// credits to Andrew Dupont
+				var currentId = context.getAttribute('id'), slickid = 'slickid__';
+				context.setAttribute('id', slickid);
+				_expression = '#' + slickid + ' ' + _expression;
+			}
+
+			try {
+				if (first) return context.querySelector(_expression) || null;
+				else nodes = context.querySelectorAll(_expression);
+			} catch(e) {
+				qsaFailExpCache[expression] = 1;
+				break querySelector;
+			} finally {
+				if (!contextIsDocument){
+					if (currentId) context.setAttribute('id', currentId);
+					else context.removeAttribute('id');
+				}
+			}
+
+			if (this.starSelectsClosedQSA) for (i = 0; node = nodes[i++];){
+				if (node.nodeName > '@' && !(hasOthers && uniques[this.getUID(node)])) found.push(node);
+			} else for (i = 0; node = nodes[i++];){
+				if (!(hasOthers && uniques[this.getUID(node)])) found.push(node);
+			}
+
+			if (hasOthers) this.sort(found);
+			return found;
+
+		}
+		/*</query-selector-override>*/
 
 		parsed = this.Slick.parse(expression);
 		if (!parsed.length) return found;
@@ -1931,9 +2091,9 @@ local.search = function(context, expression, append, first){
 		return found;
 	}
 
-	// cache elements for the nth selectors
-
 	/*<pseudo-selectors>*//*<nth-pseudo-selectors>*/
+
+	// cache elements for the nth selectors
 
 	this.posNTH = {};
 	this.posNTHLast = {};
@@ -1943,7 +2103,7 @@ local.search = function(context, expression, append, first){
 	/*</nth-pseudo-selectors>*//*</pseudo-selectors>*/
 
 	// if append is null and there is only a single selector with one expression use pushArray, else use pushUID
-	this.push = (!shouldUniques && (first || (parsed.length == 1 && parsed.expressions[0].length == 1))) ? this.pushArray : this.pushUID;
+	this.push = (!hasOthers && (first || (parsed.length == 1 && parsed.expressions[0].length == 1))) ? this.pushArray : this.pushUID;
 
 	if (found == null) found = [];
 
@@ -1989,7 +2149,8 @@ local.search = function(context, expression, append, first){
 		currentItems = this.found;
 	}
 
-	if (shouldUniques || (parsed.expressions.length > 1)) this.sort(found);
+	// should sort if there are nodes in append and if you pass multiple expressions.
+	if (hasOthers || (parsed.expressions.length > 1)) this.sort(found);
 
 	return (first) ? (found[0] || null) : found;
 };
@@ -1997,7 +2158,7 @@ local.search = function(context, expression, append, first){
 // Utils
 
 local.uidx = 1;
-local.uidk = 'slick:uniqueid';
+local.uidk = 'slick-uniqueid';
 
 local.getUIDXML = function(node){
 	var uid = node.getAttribute(this.uidk);
@@ -2051,12 +2212,12 @@ local.createNTHPseudo = function(child, sibling, positions, ofType){
 			if (ofType){
 				var nodeName = node.nodeName;
 				do {
-					if (el.nodeName !== nodeName) continue;
+					if (el.nodeName != nodeName) continue;
 					this[positions][this.getUID(el)] = count++;
 				} while ((el = el[sibling]));
 			} else {
 				do {
-					if (el.nodeType !== 1) continue;
+					if (el.nodeType != 1) continue;
 					this[positions][this.getUID(el)] = count++;
 				} while ((el = el[sibling]));
 			}
@@ -2090,17 +2251,29 @@ local.pushUID = function(node, tag, id, classes, attributes, pseudos){
 };
 
 local.matchNode = function(node, selector){
+	if (this.isHTMLDocument && this.nativeMatchesSelector){
+		try {
+			return this.nativeMatchesSelector.call(node, selector.replace(/\[([^=]+)=\s*([^'"\]]+?)\s*\]/g, '[$1="$2"]'));
+		} catch(matchError) {}
+	}
+
 	var parsed = this.Slick.parse(selector);
 	if (!parsed) return true;
 
 	// simple (single) selectors
-	if(parsed.length == 1 && parsed.expressions[0].length == 1){
-		var exp = parsed.expressions[0][0];
-		return this.matchSelector(node, (this.isXMLDocument) ? exp.tag : exp.tag.toUpperCase(), exp.id, exp.classes, exp.attributes, exp.pseudos);
+	var expressions = parsed.expressions, reversedExpressions, simpleExpCounter = 0, i;
+	for (i = 0; (currentExpression = expressions[i]); i++){
+		if (currentExpression.length == 1){
+			var exp = currentExpression[0];
+			if (this.matchSelector(node, (this.isXMLDocument) ? exp.tag : exp.tag.toUpperCase(), exp.id, exp.classes, exp.attributes, exp.pseudos)) return true;
+			simpleExpCounter++;
+		}
 	}
 
-	var nodes = this.search(this.document, parsed);
-	for (var i = 0, item; item = nodes[i++];){
+	if (simpleExpCounter == parsed.length) return false;
+
+	var nodes = this.search(this.document, parsed), item;
+	for (i = 0; item = nodes[i++];){
 		if (item === node) return true;
 	}
 	return false;
@@ -2115,10 +2288,11 @@ local.matchPseudo = function(node, name, argument){
 
 local.matchSelector = function(node, tag, id, classes, attributes, pseudos){
 	if (tag){
+		var nodeName = (this.isXMLDocument) ? node.nodeName : node.nodeName.toUpperCase();
 		if (tag == '*'){
-			if (node.nodeName < '@') return false; // Fix for comment nodes and closed nodes
+			if (nodeName < '@') return false; // Fix for comment nodes and closed nodes
 		} else {
-			if (node.nodeName != tag) return false;
+			if (nodeName != tag) return false;
 		}
 	}
 
@@ -2126,7 +2300,7 @@ local.matchSelector = function(node, tag, id, classes, attributes, pseudos){
 
 	var i, part, cls;
 	if (classes) for (i = classes.length; i--;){
-		cls = ('className' in node) ? node.className : node.getAttribute('class');
+		cls = node.getAttribute('class') || node.className;
 		if (!(cls && classes[i].regexp.test(cls))) return false;
 	}
 	if (attributes) for (i = attributes.length; i--;){
@@ -2155,15 +2329,18 @@ var combinators = {
 					children = node.all[id];
 					if (!children) return;
 					if (!children[0]) children = [children];
-					for (i = 0; item = children[i++];) if (item.getAttributeNode('id').nodeValue == id){
-						this.push(item, tag, null, classes, attributes, pseudos);
-						break;
-					} 
+					for (i = 0; item = children[i++];){
+						var idNode = item.getAttributeNode('id');
+						if (idNode && idNode.nodeValue == id){
+							this.push(item, tag, null, classes, attributes, pseudos);
+							break;
+						}
+					}
 					return;
 				}
 				if (!item){
 					// if the context is in the dom we return, else we will try GEBTN, breaking the getById label
-					if (this.contains(this.document.documentElement, node)) return;
+					if (this.contains(this.root, node)) return;
 					else break getById;
 				} else if (this.document !== node && !this.contains(node, item)) return;
 				this.push(item, tag, null, classes, attributes, pseudos);
@@ -2186,12 +2363,12 @@ var combinators = {
 
 	'>': function(node, tag, id, classes, attributes, pseudos){ // direct children
 		if ((node = node.firstChild)) do {
-			if (node.nodeType === 1) this.push(node, tag, id, classes, attributes, pseudos);
+			if (node.nodeType == 1) this.push(node, tag, id, classes, attributes, pseudos);
 		} while ((node = node.nextSibling));
 	},
 
 	'+': function(node, tag, id, classes, attributes, pseudos){ // next sibling
-		while ((node = node.nextSibling)) if (node.nodeType === 1){
+		while ((node = node.nextSibling)) if (node.nodeType == 1){
 			this.push(node, tag, id, classes, attributes, pseudos);
 			break;
 		}
@@ -2200,14 +2377,14 @@ var combinators = {
 	'^': function(node, tag, id, classes, attributes, pseudos){ // first child
 		node = node.firstChild;
 		if (node){
-			if (node.nodeType === 1) this.push(node, tag, id, classes, attributes, pseudos);
+			if (node.nodeType == 1) this.push(node, tag, id, classes, attributes, pseudos);
 			else this['combinator:+'](node, tag, id, classes, attributes, pseudos);
 		}
 	},
 
 	'~': function(node, tag, id, classes, attributes, pseudos){ // next siblings
 		while ((node = node.nextSibling)){
-			if (node.nodeType !== 1) continue;
+			if (node.nodeType != 1) continue;
 			var uid = this.getUID(node);
 			if (this.bitUniques[uid]) break;
 			this.bitUniques[uid] = true;
@@ -2225,7 +2402,7 @@ var combinators = {
 		this['combinator:!~'](node, tag, id, classes, attributes, pseudos);
 	},
 
-	'!': function(node, tag, id, classes, attributes, pseudos){  // all parent nodes up to document
+	'!': function(node, tag, id, classes, attributes, pseudos){ // all parent nodes up to document
 		while ((node = node.parentNode)) if (node !== this.document) this.push(node, tag, id, classes, attributes, pseudos);
 	},
 
@@ -2235,7 +2412,7 @@ var combinators = {
 	},
 
 	'!+': function(node, tag, id, classes, attributes, pseudos){ // previous sibling
-		while ((node = node.previousSibling)) if (node.nodeType === 1){
+		while ((node = node.previousSibling)) if (node.nodeType == 1){
 			this.push(node, tag, id, classes, attributes, pseudos);
 			break;
 		}
@@ -2244,14 +2421,14 @@ var combinators = {
 	'!^': function(node, tag, id, classes, attributes, pseudos){ // last child
 		node = node.lastChild;
 		if (node){
-			if (node.nodeType === 1) this.push(node, tag, id, classes, attributes, pseudos);
+			if (node.nodeType == 1) this.push(node, tag, id, classes, attributes, pseudos);
 			else this['combinator:!+'](node, tag, id, classes, attributes, pseudos);
 		}
 	},
 
 	'!~': function(node, tag, id, classes, attributes, pseudos){ // previous siblings
 		while ((node = node.previousSibling)){
-			if (node.nodeType !== 1) continue;
+			if (node.nodeType != 1) continue;
 			var uid = this.getUID(node);
 			if (this.bitUniques[uid]) break;
 			this.bitUniques[uid] = true;
@@ -2281,20 +2458,20 @@ var pseudos = {
 	},
 
 	'first-child': function(node){
-		while ((node = node.previousSibling)) if (node.nodeType === 1) return false;
+		while ((node = node.previousSibling)) if (node.nodeType == 1) return false;
 		return true;
 	},
 
 	'last-child': function(node){
-		while ((node = node.nextSibling)) if (node.nodeType === 1) return false;
+		while ((node = node.nextSibling)) if (node.nodeType == 1) return false;
 		return true;
 	},
 
 	'only-child': function(node){
 		var prev = node;
-		while ((prev = prev.previousSibling)) if (prev.nodeType === 1) return false;
+		while ((prev = prev.previousSibling)) if (prev.nodeType == 1) return false;
 		var next = node;
-		while ((next = next.nextSibling)) if (next.nodeType === 1) return false;
+		while ((next = next.nextSibling)) if (next.nodeType == 1) return false;
 		return true;
 	},
 
@@ -2312,11 +2489,11 @@ var pseudos = {
 		return this['pseudo:nth-child'](node, '' + index + 1);
 	},
 
-	'even': function(node, argument){
+	'even': function(node){
 		return this['pseudo:nth-child'](node, '2n');
 	},
 
-	'odd': function(node, argument){
+	'odd': function(node){
 		return this['pseudo:nth-child'](node, '2n+1');
 	},
 
@@ -2326,21 +2503,21 @@ var pseudos = {
 
 	'first-of-type': function(node){
 		var nodeName = node.nodeName;
-		while ((node = node.previousSibling)) if (node.nodeName === nodeName) return false;
+		while ((node = node.previousSibling)) if (node.nodeName == nodeName) return false;
 		return true;
 	},
 
 	'last-of-type': function(node){
 		var nodeName = node.nodeName;
-		while ((node = node.nextSibling)) if (node.nodeName === nodeName) return false;
+		while ((node = node.nextSibling)) if (node.nodeName == nodeName) return false;
 		return true;
 	},
 
 	'only-of-type': function(node){
 		var prev = node, nodeName = node.nodeName;
-		while ((prev = prev.previousSibling)) if (prev.nodeName === nodeName) return false;
+		while ((prev = prev.previousSibling)) if (prev.nodeName == nodeName) return false;
 		var next = node;
-		while ((next = next.nextSibling)) if (next.nodeName === nodeName) return false;
+		while ((next = next.nextSibling)) if (next.nodeName == nodeName) return false;
 		return true;
 	},
 
@@ -2349,11 +2526,11 @@ var pseudos = {
 	// custom pseudos
 
 	'enabled': function(node){
-		return (node.disabled === false);
+		return !node.disabled;
 	},
 
 	'disabled': function(node){
-		return (node.disabled === true);
+		return node.disabled;
 	},
 
 	'checked': function(node){
@@ -2367,7 +2544,7 @@ var pseudos = {
 	'root': function(node){
 		return (node === this.root);
 	},
-	
+
 	'selected': function(node){
 		return node.selected;
 	}
@@ -2382,7 +2559,7 @@ for (var p in pseudos) local['pseudo:' + p] = pseudos[p];
 local.attributeGetters = {
 
 	'class': function(){
-		return ('className' in this) ? this.className : this.getAttribute('class');
+		return this.getAttribute('class') || this.className;
 	},
 
 	'for': function(){
@@ -2395,139 +2572,24 @@ local.attributeGetters = {
 
 	'style': function(){
 		return (this.style) ? this.style.cssText : this.getAttribute('style');
+	},
+
+	'tabindex': function(){
+		var attributeNode = this.getAttributeNode('tabindex');
+		return (attributeNode && attributeNode.specified) ? attributeNode.nodeValue : null;
+	},
+
+	'type': function(){
+		return this.getAttribute('type');
 	}
 
 };
-
-local.getAttribute = function(node, name){
-	// FIXME: check if getAttribute() will get input elements on a form on this browser
-	// getAttribute is faster than getAttributeNode().nodeValue
-	var method = this.attributeGetters[name];
-	if (method) return method.call(node);
-	var attributeNode = node.getAttributeNode(name);
-	return attributeNode ? attributeNode.nodeValue : null;
-};
-
-// overrides
-
-local.overrides = [];
-
-local.override = function(regexp, method){
-	this.overrides.push({regexp: regexp, method: method});
-};
-
-/*<overrides>*/
-
-/*<query-selector-override>*/
-
-var reEmptyAttribute = /\[.*[*$^]=(?:["']{2})?\]/;
-
-local.override(/./, function(expression, found, first){ //querySelectorAll override
-
-	if (!this.querySelectorAll || this.nodeType != 9 || !local.isHTMLDocument || local.brokenMixedCaseQSA ||
-	(local.brokenCheckedQSA && expression.indexOf(':checked') > -1) ||
-	(local.brokenEmptyAttributeQSA && reEmptyAttribute.test(expression)) || Slick.disableQSA) return false;
-
-	var nodes, node;
-	try {
-		if (first) return this.querySelector(expression) || null;
-		else nodes = this.querySelectorAll(expression);
-	} catch(error){
-		return false;
-	}
-
-	var i, hasOthers = !!(found.length);
-
-	if (local.starSelectsClosedQSA) for (i = 0; node = nodes[i++];){
-		if (node.nodeName > '@' && (!hasOthers || !local.uniques[local.getUIDHTML(node)])) found.push(node);
-	} else for (i = 0; node = nodes[i++];){
-		if (!hasOthers || !local.uniques[local.getUIDHTML(node)]) found.push(node);
-	}
-
-	if (hasOthers) local.sort(found);
-
-	return true;
-
-});
-
-/*</query-selector-override>*/
-
-/*<tag-override>*/
-
-local.override(/^[\w-]+$|^\*$/, function(expression, found, first){ // tag override
-	var tag = expression;
-	if (tag == '*' && local.brokenStarGEBTN) return false;
-
-	var nodes = this.getElementsByTagName(tag);
-
-	if (first) return nodes[0] || null;
-	var i, node, hasOthers = !!(found.length);
-
-	for (i = 0; node = nodes[i++];){
-		if (!hasOthers || !local.uniques[local.getUID(node)]) found.push(node);
-	}
-
-	if (hasOthers) local.sort(found);
-
-	return true;
-});
-
-/*</tag-override>*/
-
-/*<class-override>*/
-
-local.override(/^\.[\w-]+$/, function(expression, found, first){ // class override
-	if (!local.isHTMLDocument || (!this.getElementsByClassName && this.querySelectorAll)) return false;
-
-	var nodes, node, i, hasOthers = !!(found && found.length), className = expression.substring(1);
-	if (this.getElementsByClassName && !local.brokenGEBCN){
-		nodes = this.getElementsByClassName(className);
-		if (first) return nodes[0] || null;
-		for (i = 0; node = nodes[i++];){
-			if (!hasOthers || !local.uniques[local.getUIDHTML(node)]) found.push(node);
-		}
-	} else {
-		var matchClass = new RegExp('(^|\\s)'+ Slick.escapeRegExp(className) +'(\\s|$)');
-		nodes = this.getElementsByTagName('*');
-		for (i = 0; node = nodes[i++];){
-			className = node.className;
-			if (!className || !matchClass.test(className)) continue;
-			if (first) return node;
-			if (!hasOthers || !local.uniques[local.getUIDHTML(node)]) found.push(node);
-		}
-	}
-	if (hasOthers) local.sort(found);
-	return (first) ? null : true;
-});
-
-/*</class-override>*/
-
-/*<id-override>*/
-
-local.override(/^#[\w-]+$/, function(expression, found, first){ // ID override
-	if (!local.isHTMLDocument || this.nodeType != 9) return false;
-
-	var id = expression.substring(1), el = this.getElementById(id);
-	if (!el) return found;
-	if (local.idGetsName && el.getAttributeNode('id').nodeValue != id) return false;
-	if (first) return el || null;
-	var hasOthers = !!(found.length);
-	if (!hasOthers || !local.uniques[local.getUIDHTML(el)]) found.push(el);
-	if (hasOthers) local.sort(found);
-	return true;
-});
-
-/*</id-override>*/
-
-/*</overrides>*/
-
-if (typeof document != 'undefined') local.setDocument(document);
 
 // Slick
 
 var Slick = local.Slick = (this.Slick || {});
 
-Slick.version = '0.9dev';
+Slick.version = '1.1.5';
 
 // Slick finder
 
@@ -2557,7 +2619,6 @@ Slick.getAttribute = function(node, name){
 Slick.match = function(node, selector){
 	if (!(node && selector)) return false;
 	if (!selector || selector === node) return true;
-	if (typeof selector != 'string') return false;
 	local.setDocument(node);
 	return local.matchNode(node, selector);
 };
@@ -2631,7 +2692,7 @@ var Element = function(tag, props){
 
 	if (!props) props = {};
 
-	if (!tag.test(/^[\w-]+$/)){
+	if (!(/^[\w-]+$/).test(tag)){
 		var parsed = Slick.parse(tag).expressions[0][0];
 		tag = (parsed.tag == '*') ? 'div' : parsed.tag;
 		if (parsed.id && props.id == null) props.id = parsed.id;
@@ -2699,7 +2760,7 @@ var IFrame = new Type('IFrame', function(){
 	var onLoad = function(){
 		onload.call(iframe.contentWindow);
 	};
-	
+
 	if (window.frames[props.id]) onLoad();
 	else iframe.addListener('load', onLoad);
 	return iframe;
@@ -2739,6 +2800,15 @@ new Type('Elements', Elements).implement({
 		return (this.length = length);
 	}.protect(),
 
+	unshift: function(){
+		var items = [];
+		for (var i = 0, l = arguments.length; i < l; i++){
+			var item = document.id(arguments[i]);
+			if (item) items.push(item);
+		}
+		return Array.prototype.unshift.apply(this, items);
+	}.protect(),
+
 	concat: function(){
 		var newElements = new Elements(this);
 		for (var i = 0, l = arguments.length; i < l; i++){
@@ -2760,6 +2830,8 @@ new Type('Elements', Elements).implement({
 	}.protect()
 
 });
+
+
 
 (function(){
 
@@ -2836,7 +2908,7 @@ Document.implement({
 
 			element: function(el, nocash){
 				$uid(el);
-				if (!nocash && !el.$family && !(/^object|embed$/i).test(el.tagName)){
+				if (!nocash && !el.$family && !(/^(?:object|embed)$/i).test(el.tagName)){
 					Object.append(el, Element.Prototype);
 				}
 				return el;
@@ -2904,16 +2976,16 @@ if (window.$$ == null) Window.implement('$$', function(selector){
 (function(){
 
 var collected = {}, storage = {};
-var props = {input: 'checked', option: 'selected', textarea: 'value'};
+var formProps = {input: 'checked', option: 'selected', textarea: 'value'};
 
 var get = function(uid){
 	return (storage[uid] || (storage[uid] = {}));
 };
 
 var clean = function(item){
+	var uid = item.uid;
 	if (item.removeEvents) item.removeEvents();
 	if (item.clearAttributes) item.clearAttributes();
-	var uid = item.uid;
 	if (uid != null){
 		delete collected[uid];
 		delete storage[uid];
@@ -2925,7 +2997,7 @@ var camels = ['defaultValue', 'accessKey', 'cellPadding', 'cellSpacing', 'colSpa
 	'rowSpan', 'tabIndex', 'useMap'
 ];
 var bools = ['compact', 'nowrap', 'ismap', 'declare', 'noshade', 'checked', 'disabled', 'readOnly', 'multiple', 'selected',
-	'noresize', 'defer'
+	'noresize', 'defer', 'defaultChecked'
 ];
  var attributes = {
 	'html': 'innerHTML',
@@ -2933,7 +3005,7 @@ var bools = ['compact', 'nowrap', 'ismap', 'declare', 'noshade', 'checked', 'dis
 	'for': 'htmlFor',
 	'text': (function(){
 		var temp = document.createElement('div');
-		return (temp.innerText == null) ? 'textContent' : 'innerText';
+		return (temp.textContent == null) ? 'innerText' : 'textContent';
 	})()
 };
 var readOnly = ['type'];
@@ -2975,7 +3047,7 @@ inserters.inside = inserters.bottom;
 var injectCombinator = function(expression, combinator){
 	if (!expression) return combinator;
 
-	expression = Slick.parse(expression);
+	expression = Object.clone(Slick.parse(expression));
 
 	var expressions = expression.expressions;
 	for (var i = expressions.length; i--;)
@@ -3178,41 +3250,6 @@ Element.implement({
 		return queryString.join('&');
 	},
 
-	clone: function(contents, keepid){
-		contents = contents !== false;
-		var clone = this.cloneNode(contents);
-		var clean = function(node, element){
-			if (!keepid) node.removeAttribute('id');
-			if (Browser.ie){
-				node.clearAttributes();
-				node.mergeAttributes(element);
-				node.removeAttribute('uid');
-				if (node.options){
-					var no = node.options, eo = element.options;
-					for (var j = no.length; j--;) no[j].selected = eo[j].selected;
-				}
-			}
-			var prop = props[element.tagName.toLowerCase()];
-			if (prop && element[prop]) node[prop] = element[prop];
-		};
-
-		var i;
-		if (contents){
-			var ce = clone.getElementsByTagName('*'), te = this.getElementsByTagName('*');
-			for (i = ce.length; i--;) clean(ce[i], te[i]);
-		}
-
-		clean(clone, this);
-		if (Browser.ie){
-			var ts = this.getElementsByTagName('object'),
-				cs = clone.getElementsByTagName('object'),
-				tl = ts.length, cl = cs.length;
-			for (i = 0; i < tl && i < cl; i++)
-				cs[i].outerHTML = ts[i].outerHTML;
-		}
-		return document.id(clone);
-	},
-
 	destroy: function(){
 		var children = clean(this).getElementsByTagName('*');
 		Array.each(children, clean);
@@ -3235,6 +3272,40 @@ Element.implement({
 
 });
 
+var cleanClone = function(node, element, keepid){
+	if (!keepid) node.setAttributeNode(document.createAttribute('id'));
+	if (node.clearAttributes){
+		node.clearAttributes();
+		node.mergeAttributes(element);
+		node.removeAttribute('uid');
+		if (node.options){
+			var no = node.options, eo = element.options;
+			for (var i = no.length; i--;) no[i].selected = eo[i].selected;
+		}
+	}
+
+	var prop = formProps[element.tagName.toLowerCase()];
+	if (prop && element[prop]) node[prop] = element[prop];
+};
+
+Element.implement('clone', function(contents, keepid){
+	contents = contents !== false;
+	var clone = this.cloneNode(contents), i;
+
+	if (contents){
+		var ce = clone.getElementsByTagName('*'), te = this.getElementsByTagName('*');
+		for (i = ce.length; i--;) cleanClone(ce[i], te[i], keepid);
+	}
+
+	cleanClone(clone, this, keepid);
+
+	if (Browser.ie){
+		var co = clone.getElementsByTagName('object'), to = this.getElementsByTagName('object');
+		for (i = co.length; i--;) co[i].outerHTML = to[i].outerHTML;
+	}
+	return document.id(clone);
+});
+
 var contains = {contains: function(element){
 	return Slick.contains(this, element);
 }};
@@ -3254,33 +3325,33 @@ if (!document.createElement('div').contains) Element.implement(contains);
 				old();
 			};
 		} else {
-			collected[this.uid] = this;
+			collected[$uid(this)] = this;
 		}
-		if (this.addEventListener) this.addEventListener(type, fn, false);
+		if (this.addEventListener) this.addEventListener(type, fn, !!arguments[2]);
 		else this.attachEvent('on' + type, fn);
 		return this;
 	},
 
 	removeListener: function(type, fn){
-		if (this.removeEventListener) this.removeEventListener(type, fn, false);
+		if (this.removeEventListener) this.removeEventListener(type, fn, !!arguments[2]);
 		else this.detachEvent('on' + type, fn);
 		return this;
 	},
 
 	retrieve: function(property, dflt){
-		var storage = get(this.uid), prop = storage[property];
+		var storage = get($uid(this)), prop = storage[property];
 		if (dflt != null && prop == null) prop = storage[property] = dflt;
 		return prop != null ? prop : null;
 	},
 
 	store: function(property, value){
-		var storage = get(this.uid);
+		var storage = get($uid(this));
 		storage[property] = value;
 		return this;
 	},
 
 	eliminate: function(property){
-		var storage = get(this.uid);
+		var storage = get($uid(this));
 		delete storage[property];
 		return this;
 	}
@@ -3404,7 +3475,7 @@ var setOpacity = function(element, opacity){
 	} else {
 		opacity = (opacity == 1) ? '' : 'alpha(opacity=' + opacity * 100 + ')';
 		var filter = element.style.filter || element.getComputedStyle('filter') || '';
-		element.style.filter = filter.test(reAlpha) ? filter.replace(reAlpha, opacity) : filter + opacity;
+		element.style.filter = reAlpha.test(filter) ? filter.replace(reAlpha, opacity) : filter + opacity;
 	}
 };
 
@@ -3490,7 +3561,7 @@ Element.implement({
 			if (color) result = result.replace(color[0], color[0].rgbToHex());
 		}
 		if (Browser.opera || (Browser.ie && isNaN(parseFloat(result)))){
-			if (property.test(/^(height|width)$/)){
+			if ((/^(height|width)$/).test(property)){
 				var values = (property == 'width') ? ['left', 'right'] : ['top', 'bottom'], size = 0;
 				values.each(function(value){
 					size += this.getStyle('border-' + value + '-width').toInt() + this.getStyle('padding-' + value).toInt();
@@ -3498,7 +3569,7 @@ Element.implement({
 				return this['offset' + property.capitalize()] - size + 'px';
 			}
 			if (Browser.opera && String(result).indexOf('px') != -1) return result;
-			if (property.test(/(border(.+)Width|margin|padding)/)) return '0px';
+			if ((/^border(.+)Width|margin|padding/).test(property)) return '0px';
 		}
 		return result;
 	},
@@ -3548,7 +3619,7 @@ Element.ShortStyles = {margin: {}, padding: {}, border: {}, borderWidth: {}, bor
 	Short.borderColor[bdc] = Short[bd][bdc] = All[bdc] = 'rgb(@, @, @)';
 });
 
-})();
+}).call(this);
 
 
 /*
@@ -3605,7 +3676,7 @@ Element.Properties.events = {set: function(events){
 					if (condition.call(self, event) === false) event.stop();
 				};
 			}
-			this.addListener(realType, defn);
+			this.addListener(realType, defn, arguments[2]);
 		}
 		events[type].values.push(defn);
 		return this;
@@ -3625,7 +3696,7 @@ Element.Properties.events = {set: function(events){
 			if (custom.onRemove) custom.onRemove.call(this, fn);
 			type = custom.base || type;
 		}
-		return (Element.NativeEvents[type]) ? this.removeListener(type, value) : this;
+		return (Element.NativeEvents[type]) ? this.removeListener(type, value, arguments[2]) : this;
 	},
 
 	addEvents: function(events){
@@ -3681,12 +3752,6 @@ Element.Properties.events = {set: function(events){
 
 });
 
-// IE9
-try {
-	if (typeof HTMLElement != 'undefined')
-		HTMLElement.prototype.fireEvent = Element.prototype.fireEvent;
-} catch(e){}
-
 Element.NativeEvents = {
 	click: 2, dblclick: 2, mouseup: 2, mousedown: 2, contextmenu: 2, //mouse buttons
 	mousewheel: 2, DOMMouseScroll: 2, //mouse wheel
@@ -3727,7 +3792,7 @@ Element.Events = {
 
 
 
-})();
+}).call(this);
 
 
 /*
@@ -3751,6 +3816,21 @@ provides: [Element.Dimensions]
 */
 
 (function(){
+
+var element = document.createElement('div'),
+	child = document.createElement('div');
+element.style.height = '0';
+element.appendChild(child);
+var brokenOffsetParent = (child.offsetParent === element);
+element = child = null;
+
+var isOffset = function(el){
+	return styleString(el, 'position') != 'static' || isBody(el);
+};
+
+var isOffsetStatic = function(el){
+	return isOffset(el) || (/^(?:table|td|th)$/i).test(el.tagName);
+};
 
 Element.implement({
 
@@ -3789,13 +3869,22 @@ Element.implement({
 		return position;
 	},
 
-	getOffsetParent: function(){
+	getOffsetParent: brokenOffsetParent ? function(){
 		var element = this;
-		if (isBody(element)) return null;
-		if (!Browser.ie) return element.offsetParent;
+		if (isBody(element) || styleString(element, 'position') == 'fixed') return null;
+
+		var isOffsetCheck = (styleString(element, 'position') == 'static') ? isOffsetStatic : isOffset;
 		while ((element = element.parentNode)){
-			if (styleString(element, 'position') != 'static' || isBody(element)) return element;
+			if (isOffsetCheck(element)) return element;
 		}
+		return null;
+	} : function(){
+		var element = this;
+		if (isBody(element) || styleString(element, 'position') == 'fixed') return null;
+
+		try {
+			return element.offsetParent;
+		} catch(e) {}
 		return null;
 	},
 
@@ -3852,7 +3941,7 @@ Element.implement({
 			x: offset.x - scroll.x,
 			y: offset.y - scroll.y
 		};
-		
+
 		if (relative && (relative = document.id(relative))){
 			var relativePosition = relative.getPosition();
 			return {x: position.x - relativePosition.x - leftBorder(relative), y: position.y - relativePosition.y - topBorder(relative)};
@@ -3926,30 +4015,30 @@ var styleString = Element.getComputedStyle;
 
 function styleNumber(element, style){
 	return styleString(element, style).toInt() || 0;
-};
+}
 
 function borderBox(element){
 	return styleString(element, '-moz-box-sizing') == 'border-box';
-};
+}
 
 function topBorder(element){
 	return styleNumber(element, 'border-top-width');
-};
+}
 
 function leftBorder(element){
 	return styleNumber(element, 'border-left-width');
-};
+}
 
 function isBody(element){
 	return (/^(?:body|html)$/i).test(element.tagName);
-};
+}
 
 function getCompatElement(element){
 	var doc = element.getDocument();
 	return (!doc.compatMode || doc.compatMode == 'CSS1Compat') ? doc.html : doc.body;
-};
+}
 
-})();
+}).call(this);
 
 //aliases
 Element.alias({position: 'setPosition'}); //compatability
@@ -4019,9 +4108,11 @@ var Fx = this.Fx = new Class({
 		onCancel: nil,
 		onComplete: nil,
 		*/
-		fps: 50,
+		fps: 60,
 		unit: false,
 		duration: 500,
+		frames: null,
+		frameSkip: true,
 		link: 'ignore'
 	},
 
@@ -4036,14 +4127,22 @@ var Fx = this.Fx = new Class({
 		};
 	},
 
-	step: function(){
-		var time = Date.now();
-		if (time < this.time + this.options.duration){
-			var delta = this.transition((time - this.time) / this.options.duration);
+	step: function(now){
+		if (this.options.frameSkip){
+			var diff = (this.time != null) ? (now - this.time) : 0, frames = diff / this.frameInterval;
+			this.time = now;
+			this.frame += frames;
+		} else {
+			this.frame++;
+		}
+
+		if (this.frame < this.frames){
+			var delta = this.transition(this.frame / this.frames);
 			this.set(this.compute(this.from, this.to, delta));
 		} else {
+			this.frame = this.frames;
 			this.set(this.compute(this.from, this.to, 1));
-			this.complete();
+			this.stop();
 		}
 	},
 
@@ -4056,7 +4155,7 @@ var Fx = this.Fx = new Class({
 	},
 
 	check: function(){
-		if (!this.timer) return true;
+		if (!this.isRunning()) return true;
 		switch (this.options.link){
 			case 'cancel': this.cancel(); return true;
 			case 'chain': this.chain(this.caller.pass(arguments, this)); return false;
@@ -4066,62 +4165,60 @@ var Fx = this.Fx = new Class({
 
 	start: function(from, to){
 		if (!this.check(from, to)) return this;
-		var duration = this.options.duration;
-		this.options.duration = Fx.Durations[duration] || duration.toInt();
 		this.from = from;
 		this.to = to;
-		this.time = 0;
+		this.frame = (this.options.frameSkip) ? 0 : -1;
+		this.time = null;
 		this.transition = this.getTransition();
-		this.startTimer();
-		this.onStart();
+		var frames = this.options.frames, fps = this.options.fps, duration = this.options.duration;
+		this.duration = Fx.Durations[duration] || duration.toInt();
+		this.frameInterval = 1000 / fps;
+		this.frames = frames || Math.round(this.duration / this.frameInterval);
+		this.fireEvent('start', this.subject);
+		pushInstance.call(this, fps);
 		return this;
 	},
 
-	complete: function(){
-		if (this.stopTimer()) this.onComplete();
+	stop: function(){
+		if (this.isRunning()){
+			this.time = null;
+			pullInstance.call(this, this.options.fps);
+			if (this.frames == this.frame){
+				this.fireEvent('complete', this.subject);
+				if (!this.callChain()) this.fireEvent('chainComplete', this.subject);
+			} else {
+				this.fireEvent('stop', this.subject);
+			}
+		}
 		return this;
 	},
 
 	cancel: function(){
-		if (this.stopTimer()) this.onCancel();
+		if (this.isRunning()){
+			this.time = null;
+			pullInstance.call(this, this.options.fps);
+			this.frame = this.frames;
+			this.fireEvent('cancel', this.subject).clearChain();
+		}
 		return this;
 	},
 
-	onStart: function(){
-		this.fireEvent('start', this.subject);
-	},
-
-	onComplete: function(){
-		this.fireEvent('complete', this.subject);
-		if (!this.callChain()) this.fireEvent('chainComplete', this.subject);
-	},
-
-	onCancel: function(){
-		this.fireEvent('cancel', this.subject).clearChain();
-	},
-
 	pause: function(){
-		this.stopTimer();
+		if (this.isRunning()){
+			this.time = null;
+			pullInstance.call(this, this.options.fps);
+		}
 		return this;
 	},
 
 	resume: function(){
-		this.startTimer();
+		if ((this.frame < this.frames) && !this.isRunning()) pushInstance.call(this, this.options.fps);
 		return this;
 	},
 
-	stopTimer: function(){
-		if (!this.timer) return false;
-		this.time = Date.now() - this.time;
-		this.timer = removeInstance(this);
-		return true;
-	},
-
-	startTimer: function(){
-		if (this.timer) return false;
-		this.time = Date.now() - this.time;
-		this.timer = addInstance(this);
-		return true;
+	isRunning: function(){
+		var list = instances[this.options.fps];
+		return list && list.contains(this);
 	}
 
 });
@@ -4137,28 +4234,31 @@ Fx.Durations = {'short': 250, 'normal': 500, 'long': 1000};
 var instances = {}, timers = {};
 
 var loop = function(){
+	var now = Date.now();
 	for (var i = this.length; i--;){
-		if (this[i]) this[i].step();
+		var instance = this[i];
+		if (instance) instance.step(now);
 	}
 };
 
-var addInstance = function(instance){
-	var fps = instance.options.fps,
-		list = instances[fps] || (instances[fps] = []);
-	list.push(instance);
+var pushInstance = function(fps){
+	var list = instances[fps] || (instances[fps] = []);
+	list.push(this);
 	if (!timers[fps]) timers[fps] = loop.periodical(Math.round(1000 / fps), list);
-	return true;
 };
 
-var removeInstance = function(instance){
-	var fps = instance.options.fps,
-		list = instances[fps] || [];
-	list.erase(instance);
-	if (!list.length && timers[fps]) timers[fps] = clearInterval(timers[fps]);
-	return false;
+var pullInstance = function(fps){
+	var list = instances[fps];
+	if (list){
+		list.erase(this);
+		if (!list.length && timers[fps]){
+			delete instances[fps];
+			timers[fps] = clearInterval(timers[fps]);
+		}
+	}
 };
 
-})();
+}).call(this);
 
 
 /*
@@ -4243,7 +4343,7 @@ Fx.CSS = new Class({
 
 	search: function(selector){
 		if (Fx.CSS.Cache[selector]) return Fx.CSS.Cache[selector];
-		var to = {};
+		var to = {}, selectorTest = new RegExp('^' + selector.escapeRegExp() + '$');
 		Array.each(document.styleSheets, function(sheet, j){
 			var href = sheet.href;
 			if (href && href.contains('://') && !href.contains(document.domain)) return;
@@ -4253,11 +4353,11 @@ Fx.CSS = new Class({
 				var selectorText = (rule.selectorText) ? rule.selectorText.replace(/^\w+/, function(m){
 					return m.toLowerCase();
 				}) : null;
-				if (!selectorText || !selectorText.test('^' + selector + '$')) return;
-				Element.Styles.each(function(value, style){
+				if (!selectorText || !selectorTest.test(selectorText)) return;
+				Object.each(Element.Styles, function(value, style){
 					if (!rule.style[style] || Element.ShortStyles[style]) return;
 					value = String(rule.style[style]);
-					to[style] = (value.test(/^rgb/)) ? value.rgbToHex() : value;
+					to[style] = ((/^rgb/).test(value)) ? value.rgbToHex() : value;
 				});
 			});
 		});
@@ -4528,15 +4628,16 @@ Fx.implement({
 
 Fx.Transition = function(transition, params){
 	params = Array.from(params);
-	return Object.append(transition, {
-		easeIn: function(pos){
-			return transition(pos, params);
-		},
+	var easeIn = function(pos){
+		return transition(pos, params);
+	};
+	return Object.append(easeIn, {
+		easeIn: easeIn,
 		easeOut: function(pos){
 			return 1 - transition(1 - pos, params);
 		},
 		easeInOut: function(pos){
-			return (pos <= 0.5) ? transition(2 * pos, params) / 2 : (2 - transition(2 * (1 - pos), params)) / 2;
+			return (pos <= 0.5 ? transition(2 * pos, params) : (2 - transition(2 * (1 - pos), params))) / 2;
 		}
 	});
 };
@@ -4570,7 +4671,7 @@ Fx.Transitions.extend({
 	},
 
 	Sine: function(p){
-		return 1 - Math.sin((1 - p) * Math.PI / 2);
+		return 1 - Math.cos(p * Math.PI / 2);
 	},
 
 	Back: function(p, x){
@@ -4597,7 +4698,7 @@ Fx.Transitions.extend({
 
 ['Quad', 'Cubic', 'Quart', 'Quint'].each(function(transition, i){
 	Fx.Transitions[transition] = new Fx.Transition(function(p){
-		return Math.pow(p, [i + 2]);
+		return Math.pow(p, i + 2);
 	});
 });
 
@@ -4620,7 +4721,8 @@ provides: Request
 
 (function(){
 
-var progressSupport = ('onprogress' in new Browser.Request);
+var empty = function(){},
+	progressSupport = ('onprogress' in new Browser.Request);
 
 var Request = this.Request = new Class({
 
@@ -4673,9 +4775,10 @@ var Request = this.Request = new Class({
 			var status = xhr.status;
 			this.status = (status == 1223) ? 204 : status;
 		}.bind(this));
-		xhr.onreadystatechange = function(){};
+		xhr.onreadystatechange = empty;
+		if (progressSupport) xhr.onprogress = xhr.onloadstart = empty;
 		clearTimeout(this.timer);
-		
+
 		this.response = {text: this.xhr.responseText || '', xml: this.xhr.responseXML};
 		if (this.options.isSuccess.call(this, this.status))
 			this.success(this.response.text, this.response.xml);
@@ -4712,15 +4815,15 @@ var Request = this.Request = new Class({
 	onFailure: function(){
 		this.fireEvent('complete').fireEvent('failure', this.xhr);
 	},
-	
+
 	loadstart: function(event){
 		this.fireEvent('loadstart', [event, this.xhr]);
 	},
-	
+
 	progress: function(event){
 		this.fireEvent('progress', [event, this.xhr]);
 	},
-	
+
 	timeout: function(){
 		this.fireEvent('timeout', this.xhr);
 	},
@@ -4744,7 +4847,7 @@ var Request = this.Request = new Class({
 		}
 		return false;
 	},
-	
+
 	send: function(options){
 		if (!this.check(options)) return this;
 
@@ -4780,7 +4883,7 @@ var Request = this.Request = new Class({
 		}
 
 		if (!url) url = document.location.pathname;
-		
+
 		var trimPosition = url.lastIndexOf('/');
 		if (trimPosition > -1 && (trimPosition = url.indexOf('#')) > -1) url = url.substr(0, trimPosition);
 
@@ -4800,7 +4903,7 @@ var Request = this.Request = new Class({
 
 		xhr.open(method.toUpperCase(), url, this.options.async, this.options.user, this.options.password);
 		if (this.options.user && 'withCredentials' in xhr) xhr.withCredentials = true;
-		
+
 		xhr.onreadystatechange = this.onStateChange.bind(this);
 
 		Object.each(this.headers, function(value, key){
@@ -4824,7 +4927,8 @@ var Request = this.Request = new Class({
 		var xhr = this.xhr;
 		xhr.abort();
 		clearTimeout(this.timer);
-		xhr.onreadystatechange = xhr.onprogress = xhr.onloadstart = function(){};
+		xhr.onreadystatechange = empty;
+		if (progressSupport) xhr.onprogress = xhr.onloadstart = empty;
 		this.xhr = new Browser.Request();
 		this.fireEvent('cancel');
 		return this;
@@ -4835,10 +4939,11 @@ var Request = this.Request = new Class({
 var methods = {};
 ['get', 'post', 'put', 'delete', 'GET', 'POST', 'PUT', 'DELETE'].each(function(method){
 	methods[method] = function(data){
-		return this.send({
-			data: data,
+		var object = {
 			method: method
-		});
+		};
+		if (data != null) object.data = data;
+		return this.send(object);
 	};
 });
 
@@ -4978,44 +5083,62 @@ provides: JSON
 ...
 */
 
-if (!this.JSON) this.JSON = {};
+if (typeof JSON == 'undefined') this.JSON = {};
 
 
 
-Object.append(JSON, {
+(function(){
 
-	$specialChars: {'\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f', '\r': '\\r', '"' : '\\"', '\\': '\\\\'},
+var special = {'\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f', '\r': '\\r', '"' : '\\"', '\\': '\\\\'};
 
-	$replaceChars: function(chr){
-		return JSON.$specialChars[chr] || '\\u00' + Math.floor(chr.charCodeAt() / 16).toString(16) + (chr.charCodeAt() % 16).toString(16);
-	},
+var escape = function(chr){
+	return special[chr] || '\\u' + ('0000' + chr.charCodeAt(0).toString(16)).slice(-4);
+};
 
-	encode: function(obj){
-		switch (typeOf(obj)){
-			case 'string':
-				return '"' + obj.replace(/[\x00-\x1f\\"]/g, JSON.$replaceChars) + '"';
-			case 'array':
-				return '[' + String(obj.map(JSON.encode).clean()) + ']';
-			case 'object': case 'hash':
-				var string = [];
-				Object.each(obj, function(value, key){
-					var json = JSON.encode(value);
-					if (json) string.push(JSON.encode(key) + ':' + json);
-				});
-				return '{' + string + '}';
-			case 'number': case 'boolean': return String(obj);
-			case 'null': return 'null';
-		}
-		return null;
-	},
+JSON.validate = function(string){
+	string = string.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+					replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+					replace(/(?:^|:|,)(?:\s*\[)+/g, '');
 
-	decode: function(string, secure){
-		if (typeOf(string) != 'string' || !string.length) return null;
-		if (secure && !(/^[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]*$/).test(string.replace(/\\./g, '@').replace(/"[^"\\\n\r]*"/g, ''))) return null;
-		return eval('(' + string + ')');
+	return (/^[\],:{}\s]*$/).test(string);
+};
+
+JSON.encode = JSON.stringify ? function(obj){
+	return JSON.stringify(obj);
+} : function(obj){
+	if (obj && obj.toJSON) obj = obj.toJSON();
+
+	switch (typeOf(obj)){
+		case 'string':
+			return '"' + obj.replace(/[\x00-\x1f\\"]/g, escape) + '"';
+		case 'array':
+			return '[' + obj.map(JSON.encode).clean() + ']';
+		case 'object': case 'hash':
+			var string = [];
+			Object.each(obj, function(value, key){
+				var json = JSON.encode(value);
+				if (json) string.push(JSON.encode(key) + ':' + json);
+			});
+			return '{' + string + '}';
+		case 'number': case 'boolean': return '' + obj;
+		case 'null': return 'null';
 	}
 
-});
+	return null;
+};
+
+JSON.decode = function(string, secure){
+	if (!string || typeOf(string) != 'string') return null;
+
+	if (secure || JSON.secure){
+		if (JSON.parse) return JSON.parse(string);
+		if (!JSON.validate(string)) throw new Error('JSON could not decode the input; security is enabled and the value is not secure.');
+	}
+
+	return eval('(' + string + ')');
+};
+
+}).call(this);
 
 
 /*
@@ -5039,6 +5162,7 @@ Request.JSON = new Class({
 	Extends: Request,
 
 	options: {
+		/*onError: function(text, error){},*/
 		secure: true
 	},
 
@@ -5051,11 +5175,13 @@ Request.JSON = new Class({
 	},
 
 	success: function(text){
-		var secure = this.options.secure;
-		var json = this.response.json = Function.attempt(function(){
-			return JSON.decode(text, secure);
-		});
-
+		var json;
+		try {
+			json = this.response.json = JSON.decode(text, this.options.secure);
+		} catch (error){
+			this.fireEvent('error', [text, error]);
+			return;
+		}
 		if (json == null) this.onFailure();
 		else this.onSuccess(json, text);
 	}
@@ -5075,7 +5201,7 @@ license: MIT-style license.
 credits:
   - Based on the functions by Peter-Paul Koch (http://quirksmode.org).
 
-requires: Options
+requires: [Options, Browser]
 
 provides: Cookie
 
@@ -5174,7 +5300,7 @@ var domready = function(){
 	if (ready) return;
 	Browser.loaded = ready = true;
 	document.removeListener('DOMContentLoaded', domready).removeListener('readystatechange', check);
-	
+
 	document.fireEvent('domready');
 	window.fireEvent('domready');
 };
@@ -5236,7 +5362,7 @@ Element.Events.load = {
 			domready();
 			delete Element.Events.load;
 		}
-		
+
 		return true;
 	}
 };
@@ -5261,7 +5387,7 @@ license: MIT-style license.
 credits:
   - Flash detection & Internet Explorer + Flash Player 9 fix inspired by SWFObject.
 
-requires: [Options, Object]
+requires: [Options, Object, Element]
 
 provides: Swiff
 
@@ -5269,8 +5395,6 @@ provides: Swiff
 */
 
 (function(){
-
-var id = 0;
 
 var Swiff = this.Swiff = new Class({
 
@@ -5297,7 +5421,7 @@ var Swiff = this.Swiff = new Class({
 	},
 
 	initialize: function(path, options){
-		this.instance = 'Swiff_' + id++;
+		this.instance = 'Swiff_' + String.uniqueID();
 
 		this.setOptions(options);
 		options = this.options;
@@ -5351,7 +5475,7 @@ var Swiff = this.Swiff = new Class({
 	},
 
 	remote: function(){
-		return Swiff.remote.apply(Swiff, [this.toElement()].extend(arguments));
+		return Swiff.remote.apply(Swiff, [this.toElement()].append(arguments));
 	}
 
 });
@@ -5363,5 +5487,5 @@ Swiff.remote = function(obj, fn){
 	return eval(rs);
 };
 
-})();
+}).call(this);
 
