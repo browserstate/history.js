@@ -93,7 +93,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 3. Include the Adapter for your Framework:
 
-	- [jQuery](http://jquery.com/) v1.4+
+	- [jQuery](http://jquery.com/) v1.3+
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
 
