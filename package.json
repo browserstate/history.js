@@ -1,0 +1,74 @@
+{
+	"name": "history.js",
+	"version": "1.6.0",
+	"description": "History.js gracefully supports the HTML5 History/State APIs (pushState, replaceState, onPopState) in all browsers. Including continued support for data, titles, replaceState. Supports jQuery, MooTools and Prototype.  For HTML5 browsers this means that you can modify the URL directly, without needing to use hashes anymore. For HTML4 browsers it will revert back to using the old onhashchange functionality.",
+	"homepage": "https://github.com/balupton/history.js",
+	"keywords": [
+		"javascript",
+		"html5 history api",
+		"hashchange",
+		"popstate",
+		"pushstate",
+		"replacestate",
+		"hashes",
+		"hashbang"
+	],
+	"author": {
+		"name": "Benjamin Lupton",
+		"email": "b@lupton.cc",
+		"web": "http://balupton.com"
+	},
+	"maintainers": [
+		{
+			"name": "Benjamin Lupton",
+			"email": "b@lupton.cc",
+			"web": "http://balupton.com"
+		}
+	],
+	"contributors": [
+		{
+			"name": "Benjamin Lupton",
+			"email": "b@lupton.cc",
+			"web": "http://balupton.com"
+		}
+	],
+	"bugs": {
+		"web": "https://github.com/balupton/history.js/issues"
+	},
+	"licenses": [
+		{
+			"type": "New-BSD",
+			"url": "http://creativecommons.org/licenses/BSD/"
+		}
+	],
+	"repository" : {
+		"type" : "git",
+		"url" : "http://github.com/balupton/history.js.git"
+	},
+	"dependencies": {
+	},
+	"engines" : {
+	},
+	"directories": {
+		"out": "./scripts/compressed",
+		"src": "./scripts/uncompressed"
+	},
+	"buildr": {
+		"compress": {
+			"js": true,
+			"css": false,
+			"img": false,
+			"html": false
+		},
+		"bundle": false,
+		"directories": {
+			"out": "./scripts/compressed",
+			"src": "./scripts/uncompressed"
+		},
+		"files": {
+			"js": true,
+			"css": false,
+			"img": false
+		}
+	}
+}
