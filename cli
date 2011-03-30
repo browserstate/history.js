@@ -176,58 +176,6 @@ class App
 	# Installers
 
 	def build
-		# Prepare Files
-		in_dir = 'scripts/uncompressed'
-		out_dir = 'scripts/compressed'
-
-		# Prepare Compressed Directory
-		`rm -Rf scripts/compressed/*`
-		`cp -Rf #{in_dir}/* #{out_dir}`
-
-		# Fetch Files
-		Dir.foreach(out_dir) do |file|
-			if file[0,1] == '.'
-				next
-			end
-
-			# Prepare Files
-			file_path = out_dir + '/' + file
-
-			# Check if if_file is a directory, if it is the create the out_file compiled of the dirs children
-			if File.directory? file_path
-				# Create In File
-				compiled_file = file.gsub(/\.js$/, '.all.js')
-				compiled_file_path = out_dir + '/' + compiled_file
-				compiled_file_handler = File.new(compiled_file_path, 'w+')
-
-				# Cycle through Children
-				Dir.foreach(file_path) do |child_file|
-					if child_file[0,1] == '.'
-						next
-					end
-
-					# Prepare Files
-					child_file_path = file_path + '/' + child_file
-
-					# Concat File to In File
-					child_file_handler = File.open(child_file_path, 'r')
-					child_file_handler.each {|child_file_str| compiled_file_handler.puts(child_file_str)}
-					child_file_handler.close
-
-					# Compress Child File
-					compressJavascriptFile(child_file_path,child_file_path)
-				end
-
-				# Write File
-				compiled_file_handler.close()
-
-				# Update file_path
-				file_path = compiled_file_path
-			end
-
-			# Compress File
-			compressJavascriptFile(file_path,file_path)
-		end
 
 	end
 

@@ -6,10 +6,13 @@
 	$tests_url = $base_url.'tests/';
 
 	# Dirs
-	$dirs = array('compressed','uncompressed');
+	$dirs = array('uncompressed','compressed');
 
 	# Support
 	$supports = array('html5','html4');
+
+	# Persist
+	$persists = array('persistant','non-persistant');
 
 	# Adapter
 	$adapters = array('jquery','mootools','prototype','zepto');

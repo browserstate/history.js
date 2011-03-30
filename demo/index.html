@@ -11,6 +11,7 @@
 	<!-- Scripts -->
 	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
 	<script src="../vendor/jquery.js"></script>
+	<script src="../scripts/uncompressed/amplify.store.js"></script>
 	<script src="../scripts/uncompressed/history.adapter.jquery.js"></script>
 	<script src="../scripts/uncompressed/history.js"></script>
 	<script src="../scripts/uncompressed/history.html4.js"></script>
@@ -72,9 +73,9 @@
 				var
 					buttons = document.getElementById('buttons'),
 					scripts = [
-						'History.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"',
-						'History.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"',
-						'History.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"',
+						'History.pushState({state:1,rand:Math.random()}, "State 1", "?state=1"); // logs {state:1,rand:"some random value"}, "State 1", "?state=1"',
+						'History.pushState({state:2,rand:Math.random()}, "State 2", "?state=2"); // logs {state:2,rand:"some random value"}, "State 2", "?state=2"',
+						'History.replaceState({state:3,rand:Math.random()}, "State 3", "?state=3"); // logs {state:3,rand:"some random value"}, "State 3", "?state=3"',
 						'History.pushState(null, null, "?state=4"); // logs {}, "", "?state=4"',
 						'History.back(); // logs {state:3}, "State 3", "?state=3"',
 						'History.back(); // logs {state:1}, "State 1", "?state=1"',

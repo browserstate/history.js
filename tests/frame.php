@@ -14,6 +14,12 @@
 		throw new Exception('Unknown adapter ['.$adapter.']');
 	}
 
+	# Persist
+	$persist = isset($_GET['persist']) ? $_GET['persist'] : null;
+	if ( !in_array($persist,$persists) ) {
+		throw new Exception('Unknown persist ['.$persist.']');
+	}
+
 	# Dir
 	$dir = isset($_GET['dir']) ? $_GET['dir'] : null;
 	if ( !in_array($dir,$dirs) ) {
@@ -21,13 +27,14 @@
 	}
 
 	# Url
-	$tests_full_url = $tests_url."${dir}/${support}/${adapter}/";
+	$tests_full_url = $tests_url."${dir}/${support}/${persist}/${adapter}/";
 
 	# Titles
 	$Support = strtoupper($support);
 	$Adapter = ucwords($adapter);
+	$Persist = ucwords($persist);
 	$Dir = ucwords($dir);
-	$title = "History.js ${Dir} ${Support} ${Adapter} Test Suite";
+	$title = "History.js ${Dir} ${Support} ${Persist} ${Adapter} Test Suite";
 
 	# No Chache
 	header("Cache-Control: no-store, no-cache, must-revalidate");
@@ -75,6 +82,9 @@
 	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
 
 	<!-- History.js -->
+	<?php if ( $persist === 'persistant' ) : ?>
+	<script src="../scripts/<?=$dir?>/amplify.store.js"></script>
+	<?php endif; ?>
 	<script src="../scripts/<?=$dir?>/history.adapter.<?=$adapter?>.js"></script>
 	<script src="../scripts/<?=$dir?>/history.js"></script>
 	<?php if ( $support === 'html4' ) : ?>

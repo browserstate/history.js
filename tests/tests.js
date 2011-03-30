@@ -18,7 +18,8 @@ var
 		// One
 		1: {
 			'data': {
-				'state': 1
+				'state': 1,
+				'rand': Math.random()
 			},
 			'title': 'State 1',
 			'url': '?state=1'
@@ -26,7 +27,8 @@ var
 		// Two
 		2: {
 			'data': {
-				'state': 2
+				'state': 2,
+				'rand': Math.random()
 			},
 			'title': 'State 2',
 			'url': '?state=2'
@@ -39,7 +41,8 @@ var
 		4: {
 			'data': {
 				'state': 4,
-				'trick': true
+				'trick': true,
+				'rand': Math.random()
 			},
 			'title': 'State 4',
 			'url': '?state=3'
@@ -51,7 +54,8 @@ var
 		// Six
 		6: {
 			'data': {
-				'state': 6
+				'state': 6,
+				'rand': Math.random()
 			},
 			'url': 'six.html'
 		},

@@ -1,4 +1,4 @@
-Welcome to History.js (v1.6.0 - March 22 2011)
+Welcome to History.js (v1.7.0 - ???)
 ==================
 
 
@@ -91,7 +91,13 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 		<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
 
-3. Include the Adapter for your Framework:
+3. Include Data Persistance Support (optional but recommended)
+
+	Data persistance allows for state data and titles to remain intact after the browser session has closed. This is useful in the case that someone navigates away from your website, then back to it. Without data persistance the state data and titles will be empty, with it they will be like they were before.
+
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/amplify.store.js"></script>
+
+4. Include the Adapter for your Framework:
 
 	- [jQuery](http://jquery.com/) v1.3+
 
@@ -111,8 +117,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
-
-4. Include History.js
+5. Include History.js
 
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
@@ -206,8 +211,9 @@ Thanks! every bit of help really does make a difference. Again thank you.
 		- Old browsers like MSIE 6,7 and Firefox 2 do not have a `onhashchange` event
 		- MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
 		- Non-Opera HTML4 browsers sometimes do not apply the hash when the hash is not `urlencoded`
-- State data and title will not persist if the page was closed then re-opened, or navigated to another website then back - this is expected/standard functionality
-- State titles (if set) will always be applied to the `document.title`
+	- All Browsers
+		- State data and titles do not persist once the site is left and then returned (includes page refreshes)
+		- State titles are never applied to the `document.title`
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
 - Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
@@ -215,6 +221,11 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 
 ## Changelog
+
+- v1.7.0 - ???
+	- Added Data Persistance Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/)
+	- Made HTML5 SUIDs more transparent (not yet done) - [Reported](https://github.com/balupton/History.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
+	- Fixed Session Storage Issue - Reported by a whole bunch of different people, [one](https://github.com/balupton/History.js/issues#issue/36), [two](https://github.com/balupton/History.js/issues#issue/37), [three](http://getsatisfaction.com/balupton/topics/history_js_1_6_losing_state_after_manual_page_reload)
 
 - v1.6.0 - March 22 2011
 	- Added Zepto adapter thanks to [Matt Garrett](http://twitter.com/#!/matthewgarrett)
@@ -275,9 +286,6 @@ Thanks! every bit of help really does make a difference. Again thank you.
 ## Todo for Upcoming Releases
 
 - Allow for url to be optional in `pushState` and `replaceState` calls
-- Add data persistance to HTML4 browsers (navigate to 3rd party website, navigate back, state data should still be there)
-	- Default will use cookies (requires no configuration) - limited to a 4KB payload.
-	- Extension will use cookies and add an ajax pre-fetch to fetch full (unlimited) data (requires configuration through a server-side helper)
 - Add an Ajax extension to succeed the [jQuery Ajaxy](http://balupton.com/projects/jquery-ajaxy) project
 - Add a compilation test to ensure `.debug = false` and no `History.log` or `console.xxx` calls exist.
 

@@ -13,10 +13,13 @@
 			border:none;
 		}
 		.dir {
-			padding-top:1em;
+			padding-bottom:1em;
 		}
 		.support {
-			padding-top:1em;
+			padding-bottom:1em;
+		}
+		.persist {
+			padding-bottom:1em;
 		}
 	</style>
 </head>
@@ -29,21 +32,25 @@
 		echo '<div class="dir">';
 		foreach ( $supports as $support ) :
 			echo '<div class="support">';
-			foreach ( $adapters as $adapter ) :
-				echo '<div class="adapter">';
+			foreach ( $persists as $persist ) :
+				echo '<div class="persist">';
+				foreach ( $adapters as $adapter ) :
+					echo '<div class="adapter">';
 
-				# Url
-				$tests_full_url = $tests_url."${dir}/${support}/${adapter}";
+					# Url
+					$tests_full_url = $tests_url."${dir}/${support}/${persist}/${adapter}";
 
-				# Titles
-				$Support = strtoupper($support);
-				$Adapter = ucwords($adapter);
-				$Dir = ucwords($dir);
-				$title = "History.js ${Dir} ${Support} ${Adapter} Test Suite";
+					# Titles
+					$Support = strtoupper($support);
+					$Adapter = ucwords($adapter);
+					$Persist = ucwords($persist);
+					$Dir = ucwords($dir);
+					$title = "History.js ${Dir} ${Support} ${Persist} ${Adapter} Test Suite";
 
-				# Render
-				?><a href="<?=$tests_full_url?>"><?=$title?></a><?php
-
+					# Render
+					?><a href="<?=$tests_full_url?>"><?=$title?></a><?php
+					echo '</div>';
+				endforeach;
 				echo '</div>';
 			endforeach;
 			echo '</div>';
