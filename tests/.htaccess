@@ -1,9 +1,13 @@
 Options +FollowSymlinks
 RewriteEngine On
-RewriteBase /
 
 # Clean Adapter
-RewriteCond %{REQUEST_FILENAME} !index.php$
-RewriteRule ([a-z]+)/([a-z0-9_\-]+)/([a-z0-9_\-]+)/([a-z0-9_\-]+)/?$ products/history.js/tests/frame.php?dir=$1&support=$2&persist=$3&adapter=$4 [NC,L,QSA]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ([^\.]+)$ $1.html [NC,L,QSA]
 
-# To alter the above for your test environment, all you need to do is change "products/history.js" to wherever history.js is located on your webserver. For example for me it's located at "http://localhost/products/history.js" - if for you it is located at "http://localhost/history.js" then you would change "products/history.js" to "history.js"
+# Can someone smarter than me make it so:
+# http://localhost/history.js/tests/uncompressed-html5-persistant-jquery
+# Does not redirect to:
+# http://localhost/history.js/tests/uncompressed-html5-persistant-jquery.html
+# But still accesses that url

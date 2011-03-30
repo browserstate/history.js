@@ -1,7 +1,4 @@
-<?php
-	# Header
-	require_once(dirname(__FILE__).'/_header.php');
-?><!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 	<title>History.js Test Suite</title>
@@ -12,7 +9,7 @@
 			outline:none;
 			border:none;
 		}
-		.dir {
+		.compress {
 			padding-bottom:1em;
 		}
 		.support {
@@ -28,8 +25,8 @@
 	<p>HTML5 Browsers - should pass the HTML4 and HTML5 tests</p>
 	<p>HTML4 Browsers - should pass the HTML4 tests and fail the HTML5 tests</p>
 	<?php
-	foreach ( $dirs as $dir ) :
-		echo '<div class="dir">';
+	foreach ( $compress as $compression ) :
+		echo '<div class="compress">';
 		foreach ( $supports as $support ) :
 			echo '<div class="support">';
 			foreach ( $persists as $persist ) :
@@ -38,17 +35,18 @@
 					echo '<div class="adapter">';
 
 					# Url
-					$tests_full_url = $tests_url."${dir}/${support}/${persist}/${adapter}";
+					$filename = "${compression}-${support}-${persist}-${adapter}.html";
+					$test_url = $tests_url."/${filename}";
 
-					# Titles
+					# Title
 					$Support = strtoupper($support);
 					$Adapter = ucwords($adapter);
 					$Persist = ucwords($persist);
-					$Dir = ucwords($dir);
-					$title = "History.js ${Dir} ${Support} ${Persist} ${Adapter} Test Suite";
+					$Compression = ucwords($compression);
+					$title = "History.js ${Compression} ${Support} ${Persist} ${Adapter} Test Suite";
 
 					# Render
-					?><a href="<?=$tests_full_url?>"><?=$title?></a><?php
+					?><a href="<?=$test_url?>"><?=$title?></a><?php
 					echo '</div>';
 				endforeach;
 				echo '</div>';

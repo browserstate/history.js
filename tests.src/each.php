@@ -1,45 +1,14 @@
 <?php
-	# Header
-	require_once(dirname(__FILE__).'/_header.php');
-
-	# Support
-	$support = isset($_GET['support']) ? $_GET['support'] : null;
-	if ( !in_array($support,$supports) ) {
-		throw new Exception('Unknown support ['.$support.']');
-	}
-
-	# Adapter
-	$adapter = isset($_GET['adapter']) ? $_GET['adapter'] : null;
-	if ( !in_array($adapter,$adapters) ) {
-		throw new Exception('Unknown adapter ['.$adapter.']');
-	}
-
-	# Persist
-	$persist = isset($_GET['persist']) ? $_GET['persist'] : null;
-	if ( !in_array($persist,$persists) ) {
-		throw new Exception('Unknown persist ['.$persist.']');
-	}
-
-	# Dir
-	$dir = isset($_GET['dir']) ? $_GET['dir'] : null;
-	if ( !in_array($dir,$dirs) ) {
-		throw new Exception('Unknown dir ['.$dirs.']');
-	}
-
 	# Url
-	$tests_full_url = $tests_url."${dir}/${support}/${persist}/${adapter}/";
+	$filename = "${compression}-${support}-${persist}-${adapter}.html";
+	$test_url = $tests_url."/${filename}";
 
 	# Titles
 	$Support = strtoupper($support);
 	$Adapter = ucwords($adapter);
 	$Persist = ucwords($persist);
-	$Dir = ucwords($dir);
-	$title = "History.js ${Dir} ${Support} ${Persist} ${Adapter} Test Suite";
-
-	# No Chache
-	header("Cache-Control: no-store, no-cache, must-revalidate");
-	header("Cache-Control: post-check=0, pre-check=0", false);
-	header("Pragma: no-cache");
+	$Compression = ucwords($compression);
+	$title = "History.js ${Compression} ${Support} ${Persist} ${Adapter} Test Suite";
 ?><!DOCTYPE html>
 <html>
 <head>
@@ -48,12 +17,12 @@
 	<meta http-equiv="CACHE-CONTROL" CONTENT="NO-CACHE" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<title><?=$title?></title>
-	<base href="<?=$tests_url?>" />
 
 	<!-- Check -->
 	<script>
-		if ( window.document.location.href !== "<?=$tests_full_url?>" ) {
-			window.document.location.href = "<?=$tests_full_url?>";
+		var test_url = "<?=$test_url?>";
+		if ( window.document.location.href !== test_url && window.document.location.href !== test_url.replace(/\.html/,'') ) {
+			window.document.location.href = test_url;
 		}
 	</script>
 
@@ -83,12 +52,12 @@
 
 	<!-- History.js -->
 	<?php if ( $persist === 'persistant' ) : ?>
-	<script src="../scripts/<?=$dir?>/amplify.store.js"></script>
+	<script src="../scripts/<?=$compression?>/amplify.store.js"></script>
 	<?php endif; ?>
-	<script src="../scripts/<?=$dir?>/history.adapter.<?=$adapter?>.js"></script>
-	<script src="../scripts/<?=$dir?>/history.js"></script>
+	<script src="../scripts/<?=$compression?>/history.adapter.<?=$adapter?>.js"></script>
+	<script src="../scripts/<?=$compression?>/history.js"></script>
 	<?php if ( $support === 'html4' ) : ?>
-	<script src="../scripts/<?=$dir?>/history.html4.js"></script>
+	<script src="../scripts/<?=$compression?>/history.html4.js"></script>
 	<?php endif; ?>
 
 	<!-- Tests -->
