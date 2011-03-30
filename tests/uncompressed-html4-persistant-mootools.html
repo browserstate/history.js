@@ -9,8 +9,9 @@
 
 	<!-- Check -->
 	<script>
-		if ( window.document.location.href !== "http://localhost/products/history.js/tests/uncompressed-html4-persistant-mootools.html" ) {
-			window.document.location.href = "http://localhost/products/history.js/tests/uncompressed-html4-persistant-mootools.html";
+		var test_url = "http://localhost/products/history.js/tests/uncompressed-html4-persistant-mootools.html";
+		if ( window.document.location.href !== test_url && window.document.location.href !== test_url.replace(/\.html/,'') ) {
+			window.document.location.href = test_url;
 		}
 	</script>
 

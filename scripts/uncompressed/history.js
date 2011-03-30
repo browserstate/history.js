@@ -235,6 +235,12 @@
 		};
 
 		/**
+		 * History.enabled
+		 * Is History enabled?
+		 */
+		History.enabled = !History.emulated.pushState;
+
+		/**
 		 * History.bugs
 		 * Which bugs are present
 		 */
@@ -381,7 +387,7 @@
 		History.getBasePageUrl = function(){
 			// Create
 			var basePageUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
-				return (/\./).test(part) ? '' : part;
+				return (/[^\/]$/).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
 			// Return

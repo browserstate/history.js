@@ -9,8 +9,9 @@
 
 	<!-- Check -->
 	<script>
-		if ( window.document.location.href !== "http://localhost/products/history.js/tests/uncompressed-html5-persistant-jquery.html" ) {
-			window.document.location.href = "http://localhost/products/history.js/tests/uncompressed-html5-persistant-jquery.html";
+		var test_url = "http://localhost/products/history.js/tests/uncompressed-html5-persistant-jquery.html";
+		if ( window.document.location.href !== test_url && window.document.location.href !== test_url.replace(/\.html/,'') ) {
+			window.document.location.href = test_url;
 		}
 	</script>
 

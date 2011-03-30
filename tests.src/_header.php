@@ -18,7 +18,7 @@
 	$compress = array('uncompressed','compressed');
 
 	# Persist
-	$persists = array('persistant','non-persistant');
+	$persists = array('persistant','nonpersistant');
 
 	# Support
 	$supports = array('html5','html4');
