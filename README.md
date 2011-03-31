@@ -218,6 +218,8 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
 	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
+- Known Issues
+	- Opera 11 fails to create history entries when under stressful loads
 
 
 ## Changelog

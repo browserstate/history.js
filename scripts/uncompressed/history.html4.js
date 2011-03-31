@@ -444,7 +444,6 @@
 						//History.debug('History.onHashChange: go forwards');
 						History.forward(false);
 					}
-					History.busy(false);
 					return false;
 				}
 
