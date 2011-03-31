@@ -36,7 +36,6 @@
 
 					# Url
 					$filename = "${compression}-${support}-${persist}-${adapter}.html";
-					$test_url = $tests_url."/${filename}";
 
 					# Title
 					$Support = strtoupper($support);
@@ -46,7 +45,7 @@
 					$title = "History.js ${Compression} ${Support} ${Persist} ${Adapter} Test Suite";
 
 					# Render
-					?><a href="<?=$test_url?>"><?=$title?></a><?php
+					?><a href="<?=$filename?>"><?=$title?></a><?php
 					echo '</div>';
 				endforeach;
 				echo '</div>';

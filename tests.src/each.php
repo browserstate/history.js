@@ -1,7 +1,6 @@
 <?php
 	# Url
 	$filename = "${compression}-${support}-${persist}-${adapter}.html";
-	$test_url = $tests_url."/${filename}";
 
 	# Titles
 	$Support = strtoupper($support);
@@ -20,8 +19,10 @@
 
 	<!-- Check -->
 	<script>
-		var test_url = "<?=$test_url?>";
-		if ( window.document.location.href !== test_url && window.document.location.href !== test_url.replace(/\.html/,'') ) {
+		var
+			href = window.document.location.href,
+			test_url = href.replace(/(history\.js\/tests\/[^\/\?\#]+).*/,'$1');
+		if ( test_url !== href ) {
 			window.document.location.href = test_url;
 		}
 	</script>

@@ -9,8 +9,10 @@
 
 	<!-- Check -->
 	<script>
-		var test_url = "http://localhost/products/history.js/tests/uncompressed-html4-persistant-zepto.html";
-		if ( window.document.location.href !== test_url && window.document.location.href !== test_url.replace(/\.html/,'') ) {
+		var
+			href = window.document.location.href,
+			test_url = href.replace(/(history\.js\/tests\/[^\/\?\#]+).*/,'$1');
+		if ( test_url !== href ) {
 			window.document.location.href = test_url;
 		}
 	</script>
