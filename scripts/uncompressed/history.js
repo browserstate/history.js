@@ -466,6 +466,7 @@
 		History.store = amplify ? (amplify.store('History.store')||{}) : {};
 		History.store.idToState = History.store.idToState||{};
 		History.store.urlToId = History.store.urlToId||{};
+		History.store.stateToId = History.store.stateToId||{};
 
 		/**
 		 * History.idToState
@@ -534,6 +535,9 @@
 				var str = History.getStateString(newState);
 				if ( typeof History.stateToId[str] !== 'undefined' ) {
 					id = History.stateToId[str];
+				}
+				else if ( typeof History.store.stateToId[str] !== 'undefined' ) {
+					id = History.store.stateToId[str];
 				}
 				else {
 					// Generate a new ID
@@ -1457,15 +1461,26 @@
 				// Ensure
 				currentStore.idToState = currentStore.idToState || {};
 				currentStore.urlToId = currentStore.urlToId || {};
+				currentStore.stateToId = currentStore.stateToId || {};
 
 				// Sync
 				for ( item in History.idToState ) {
-					if ( !History.idToState.hasOwnProperty(item) ) continue;
+					if ( !History.idToState.hasOwnProperty(item) ) {
+						continue;
+					}
 					currentStore.idToState[item] = History.idToState[item];
 				}
 				for ( item in History.urlToId ) {
-					if ( !History.urlToId.hasOwnProperty(item) ) continue;
+					if ( !History.urlToId.hasOwnProperty(item) ) {
+						continue;
+					}
 					currentStore.urlToId[item] = History.urlToId[item];
+				}
+				for ( item in History.stateToId ) {
+					if ( !History.stateToId.hasOwnProperty(item) ) {
+						continue;
+					}
+					currentStore.stateToId[item] = History.stateToId[item];
 				}
 
 				// Update
