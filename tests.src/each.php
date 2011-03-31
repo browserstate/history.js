@@ -9,7 +9,7 @@
 	$Compression = ucwords($compression);
 	$title = "History.js ${Compression} ${Support} ${Persist} ${Adapter} Test Suite";
 ?><!DOCTYPE html>
-<html>
+<html debug="true">
 <head>
 	<meta http-equiv="Expires" CONTENT="Mon, 06 Jan 1990 00:00:01 GMT" />
 	<meta http-equiv="PRAGMA" CONTENT="NO-CACHE" />
@@ -33,6 +33,9 @@
 	<!-- QUnit -->
 	<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css" type="text/css" media="screen">
 	<script src="../vendor/qunit/qunit/qunit.js"></script>
+
+	<!-- FireBug Lite -->
+	<script>if ( typeof console === 'undefined' || typeof console.log === 'undefined' || typeof console.log.apply === 'undefined' ) { document.write('<script src="../vendor/firebug-lite.js"><\/script>'); }</script>
 </head>
 <body>
 	<!-- Elements -->
@@ -45,13 +48,8 @@
 	<button onclick="history.back()">back</button><button onclick="history.forward()">forward</button>
 	<textarea id="log" style="width:100%;height:400px"></textarea>
 
-	<!-- FireBug Lite -->
-	<script>if ( typeof window.console === 'undefined' ) { document.write('<script src=".../vendor/firebug-lite.js"><\/script>'); }</script>
-
-	<!-- JSON -->
-	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
-
 	<!-- History.js -->
+	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$compression?>/json2.js"><\/script>'); }</script>
 	<?php if ( $persist === 'persistant' ) : ?>
 	<script src="../scripts/<?=$compression?>/amplify.store.js"></script>
 	<?php endif; ?>

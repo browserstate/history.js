@@ -225,9 +225,9 @@ Thanks! every bit of help really does make a difference. Again thank you.
 ## Changelog
 
 - v1.7.0 - ???
-	- Added Data Persistance Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/)
-	- Made HTML5 SUIDs more transparent (not yet done) - [Reported](https://github.com/balupton/History.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
-	- Fixed Session Storage Issue - Reported by a whole bunch of different people, [one](https://github.com/balupton/History.js/issues#issue/36), [two](https://github.com/balupton/History.js/issues#issue/37), [three](http://getsatisfaction.com/balupton/topics/history_js_1_6_losing_state_after_manual_page_reload)
+	- Added Data Persistance and Synchronisation Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/)
+	- Made HTML5 SUIDs more transparent- [Reported](https://github.com/balupton/History.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
+	- Fixed Session Storage Issue - Reported by a whole bunch of different people; [one](https://github.com/balupton/History.js/issues#issue/36), [two](https://github.com/balupton/History.js/issues#issue/37), [three](http://getsatisfaction.com/balupton/topics/history_js_1_6_losing_state_after_manual_page_reload)
 
 - v1.6.0 - March 22 2011
 	- Added Zepto adapter thanks to [Matt Garrett](http://twitter.com/#!/matthewgarrett)

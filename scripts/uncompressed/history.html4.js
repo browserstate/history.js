@@ -411,7 +411,7 @@
 				History.saveHash(currentHash);
 
 				// Expand Hash
-				currentState = History.extractState(currentHash||document.location.href);
+				currentState = History.extractState(currentHash||document.location.href,true);
 				if ( !currentState ) {
 					//History.debug('History.onHashChange: traditional anchor', currentHash);
 					// Traditional Anchor Hash

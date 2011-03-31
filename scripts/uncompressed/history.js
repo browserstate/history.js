@@ -88,6 +88,12 @@
 		History.options.doubleCheckInterval = History.options.doubleCheckInterval || 500;
 
 		/**
+		 * History.options.storeInterval
+		 * How long should we wait between store calls
+		 */
+		History.options.storeInterval = History.options.storeInterval || 1000;
+
+		/**
 		 * History.options.busyDelay
 		 * How long should we wait between busy events
 		 */
@@ -1432,6 +1438,48 @@
 
 
 		// ----------------------------------------------------------------------
+		// Data Persistance
+
+		/**
+		 * Bind for Saving Store
+		 */
+		if ( amplify ) {
+			History.onUnload = function(){
+				// Prepare
+				var
+					currentStore = amplify.store('History.store')||{},
+					item;
+
+				// Ensure
+				currentStore.idToState = currentStore.idToState || {};
+				currentStore.urlToId = currentStore.urlToId || {};
+
+				// Sync
+				for ( item in History.idToState ) {
+					if ( !History.idToState.hasOwnProperty(item) ) continue;
+					currentStore.idToState[item] = History.idToState[item];
+				}
+				for ( item in History.urlToId ) {
+					if ( !History.urlToId.hasOwnProperty(item) ) continue;
+					currentStore.urlToId[item] = History.urlToId[item];
+				}
+
+				// Update
+				History.store = currentStore;
+
+				// Store
+				amplify.store('History.store',currentStore);
+			};
+			// For Internet Explorer
+			setInterval(History.onUnload,History.options.storeInterval);
+			// For Other Browsers
+			History.Adapter.bind(window,'beforeunload',History.onUnload);
+			History.Adapter.bind(window,'unload',History.onUnload);
+			// Both are enabled for consistency
+		}
+
+
+		// ----------------------------------------------------------------------
 		// HTML5 State Support
 
 		if ( History.emulated.pushState ) {
@@ -1659,16 +1707,6 @@
 				// End replaceState closure
 				return true;
 			};
-
-			/**
-			 * Bind for Saving Store
-			 */
-			History.Adapter.bind(window,'unload',function(){
-				amplify.store('History.store',{
-					idToState: History.idToState,
-					urlToId: History.urlToId
-				});
-			});
 
 			/**
 			 * Create the initial State

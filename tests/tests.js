@@ -107,7 +107,7 @@ var checkState = function(){
 		same(actualState,expectedState,stateName);
 	});
 
-	// Image Load to Stress Safari
+	// Image Load to Stress Test Safari and Opera
 	(new Image()).src = "image.php";
 };
 
