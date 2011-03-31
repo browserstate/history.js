@@ -15,6 +15,9 @@
 	// Localise Globals
 	var
 		document = window.document, // Make sure we are using the correct document
+		setTimeout = window.setTimeout||setTimeout,
+		clearTimeout = window.clearTimeout||clearTimeout,
+		setInterval = window.setInterval||setInterval,
 		History = window.History = window.History||{}; // Public History Object
 
 	// Check Existence

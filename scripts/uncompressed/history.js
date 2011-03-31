@@ -17,6 +17,10 @@
 		document = window.document, // Make sure we are using the correct document
 		navigator = window.navigator, // Make sure we are using the correct navigator
 		amplify = window.amplify||false, // Amplify.js
+		setTimeout = window.setTimeout,
+		clearTimeout = window.clearTimeout,
+		setInterval = window.setInterval,
+		JSON = window.JSON,
 		History = window.History = window.History||{}, // Public History Object
 		history = window.history; // Old History Object
 
@@ -132,7 +136,7 @@
 		History.log = function(){
 			// Prepare
 			var
-				consoleExists = (typeof console !== 'undefined' && typeof console.log !== 'undefined' && typeof console.log.apply !== 'undefined'),
+				consoleExists = !(typeof console === 'undefined' || typeof console.log === 'undefined' || typeof console.log.apply === 'undefined'),
 				textarea = document.getElementById('log'),
 				message,
 				i,n
@@ -588,7 +592,7 @@
 			// ----------------------------------------------------------------------
 
 			// Clean the URL
-			newState.cleanUrl = newState.url.replace(/\&_suid.*/,'');
+			newState.cleanUrl = newState.url.replace(/\??\&_suid.*/,'');
 			newState.url = newState.cleanUrl;
 
 			// Check to see if we have more than just a url
@@ -597,7 +601,7 @@
 			// Apply
 			if ( newState.title || dataNotEmpty ) {
 				// Add ID to Hash
-				newState.hash = History.getShortUrl(newState.url).replace(/\&_suid.*/,'');
+				newState.hash = History.getShortUrl(newState.url).replace(/\??\&_suid.*/,'');
 				if ( !/\?/.test(newState.hash) ) {
 					newState.hash += '?';
 				}
@@ -1707,6 +1711,10 @@
 				// End replaceState closure
 				return true;
 			};
+
+			// Be aware, the following is only for native pushState implementations
+			// If you are wanting to include something for all browsers
+			// Then include it above this if block
 
 			/**
 			 * Create the initial State

@@ -2,7 +2,9 @@
 
 var
 	History = window.History,
-	document = window.document;
+	document = window.document,
+	test = window.test,
+	same = window.same;
 
 // Prepare
 History.options.debug = false;
@@ -80,13 +82,12 @@ var checkStatus = function(){
 	banner = banner || document.getElementById('qunit-banner');
 	var status = banner.className !== 'qunit-fail';
 	return status;
-}
+};
 
 // Check State
 var checkState = function(){
 	if ( !checkStatus() ) {
 		throw new Error('A test has failed');
-		return;
 	}
 
 	var

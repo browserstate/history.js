@@ -35,7 +35,7 @@
 	<script src="../vendor/qunit/qunit/qunit.js"></script>
 
 	<!-- FireBug Lite -->
-	<script>if ( typeof console === 'undefined' || typeof console.log === 'undefined' || typeof console.log.apply === 'undefined' ) { document.write('<script src="../vendor/firebug-lite.js"><\/script>'); }</script>
+	<script>if ( typeof console === 'undefined' || typeof console.log === 'undefined' || typeof console.log.apply === 'undefined' ) { document.write('<script src="http://getfirebug.com/firebug-lite.js"><\/script>'); }</script>
 </head>
 <body>
 	<!-- Elements -->
