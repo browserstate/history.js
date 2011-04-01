@@ -1,4 +1,4 @@
-Welcome to History.js (v1.7.0 - ???)
+Welcome to History.js (v1.7.0 - April 01 2011)
 ==================
 
 
@@ -60,7 +60,9 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 1. www.mysite.com
 1. www.mysite.com?state=3
 
-> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling).
+> Note 1: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling).
+>
+> Note 2: Safari 5 will also have a SUID appended to the URL, it is entirely transparent but just a visible side-effect. It is required to fix a bug with Safari 5.
 
 ### How would they look in a HTML4 Browser?
 
@@ -235,7 +237,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ## Changelog
 
-- v1.7.0 - ???
+- v1.7.0 - April 01 2011
 	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.
 	- Added (optional but recommended) Data Persistance and Synchronisation Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/) (refer to installation and compatibility sections for details)
 	- Made HTML5 SUIDs more transparent - [Reported](https://github.com/balupton/History.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
