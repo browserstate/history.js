@@ -588,11 +588,6 @@
 			};
 
 			/**
-			 * Create the initial State
-			 */
-			History.saveState(History.storeState(History.createStateObject({},'',document.location.href)));
-
-			/**
 			 * Ensure initial state is handled correctly
 			 */
 			if ( History.getHash() && !History.emulated.hashChange ) {

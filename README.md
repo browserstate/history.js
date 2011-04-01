@@ -8,7 +8,7 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
-- Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/) and [Prototype](http://www.prototypejs.org/)
+- Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/)
 
 Licensed under the [New BSD License](http://creativecommons.org/licenses/BSD/)
 Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
@@ -23,7 +23,9 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 		// Prepare
 		var History = window.History; // Note: We are using a capital H instead of a lower h
 		if ( !History.enabled ) {
-			return false; // History.js is disabled for this browser. This is because we can optionally choose to support HTML4 browsers or not.
+			 // History.js is disabled for this browser.
+			 // This is because we can optionally choose to support HTML4 browsers or not.
+			return false;
 		}
 
 		// Bind to StateChange Event
@@ -43,6 +45,8 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 		History.go(2); // logs {state:3}, "State 3", "?state=3"
 
 	})(window);
+
+To ajaxify your entire website with the HTML5 History API, History.js and jQuery [this snippet of code](https://gist.github.com/854622) is all you need. It's that easy.
 
 ### How would the above operations look in a HTML5 Browser?
 
@@ -97,7 +101,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 		<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
 
-3. Include [Amplify.js](http://amplifyjs.com/) for Data Persistance and Synchronisation Support (optional but recommended)
+3. Include [Amplify.js Store](http://amplifyjs.com/) for Data Persistance and Synchronisation Support (optional but recommended)
 
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/amplify.store.js"></script>
 
@@ -111,7 +115,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
 
-	- [Prototype](http://www.prototypejs.org/) v1.7+ (does not support versions of IE prior to version 9)
+	- [Prototype](http://www.prototypejs.org/) v1.7+ (does not support versions of IE prior to 9)
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
 
@@ -219,14 +223,14 @@ Thanks! every bit of help really does make a difference. Again thank you.
 		- State data and titles do not persist once the site is left and then returned (includes page refreshes)
 		- State titles are never applied to the `document.title`
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
-- Data persistance and synchronisation works like so. Every second or so, the SUIDs and URLs of the states will synchronise between the store and the local session. When a new session opens a familiar state (via the SUID or the URL) and it is not found locally then it will attempt to load the last known stored state with that information.
+- Data persistance and synchronisation works like so: Every second or so, the SUIDs and URLs of the states will synchronise between the store and the local session. When a new session opens a familiar state (via the SUID or the URL) and it is not found locally then it will attempt to load the last known stored state with that information.
 - URLs will be unescaped to the maximum, so for instance the URL `?key=a%20b%252c` will become `?key=a b c`. This is to ensure consistency between browser url encodings.
-- Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
+- Changing the hash of the page causes `onpopstate` to fire (this is expected/standard functionality). To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
 	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
 - Known Issues
-	- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing that can be done about this
-	- Mercury on iOS fails to apply URL changes - it should be treated as a HTML4 browser instead of a HTML5 browser
+	- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing we can do about this
+	- Mercury iOS fails to apply url changes (hashes and HTML5 History API states) - there is nothing we can do about this
 
 
 ## Changelog

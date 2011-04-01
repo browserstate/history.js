@@ -9,6 +9,10 @@
  */
 (function( amplify, undefined ) {
 
+// MooTools Compatibility
+JSON.stringify = JSON.stringify||JSON.encode;
+JSON.parse = JSON.parse||JSON.decode;
+
 var store = amplify.store = function( key, value, options, type ) {
 	var type = store.type;
 	if ( options && options.type && options.type in store.types ) {

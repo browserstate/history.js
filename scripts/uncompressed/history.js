@@ -24,6 +24,10 @@
 		History = window.History = window.History||{}, // Public History Object
 		history = window.history; // Old History Object
 
+	// MooTools Compatibility
+	JSON.stringify = JSON.stringify||JSON.encode;
+	JSON.parse = JSON.parse||JSON.decode;
+
 	// Check Existence
 	if ( typeof History.init !== 'undefined' ) {
 		throw new Error('History.js Core has already been loaded...');
@@ -235,7 +239,10 @@
 		History.emulated = {
 			pushState: !Boolean(
 				window.history && window.history.pushState && window.history.replaceState
-				&& !(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+				&& !(
+					(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+					|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
+				)
 			),
 			hashChange: Boolean(
 				!(('onhashchange' in window) || ('onhashchange' in document))
@@ -259,13 +266,13 @@
 			 * Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call
 			 * https://bugs.webkit.org/show_bug.cgi?id=56249
 			 */
-			setHash: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2][0-9]|3[0-3])/.test(navigator.userAgent)),
+			setHash: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent)),
 
 			/**
 			 * Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions
 			 * https://bugs.webkit.org/show_bug.cgi?id=42940
 			 */
-			safariPoll: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2][0-9]|3[0-3])/.test(navigator.userAgent)),
+			safariPoll: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent)),
 
 			/**
 			 * MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
@@ -377,8 +384,8 @@
 		History.getPageUrl = function(){
 			// Fetch
 			var
-				State = History.getState(),
-				stateUrl = State.url||document.location.href;
+				State = History.getState(false,false),
+				stateUrl = (State||{}).url||document.location.href;
 
 			// Create
 			var pageUrl = stateUrl.replace(/\/+$/,'').replace(/[^\/]+$/,function(part,index,string){
@@ -528,14 +535,22 @@
 		/**
 		 * History.getState()
 		 * Get an object containing the data, title and url of the current state
+		 * @param {Boolean} friendly
+		 * @param {Boolean} create
 		 * @return {Object} State
 		 */
-		History.getState = function(friendly){
+		History.getState = function(friendly,create){
 			// Prepare
 			if ( typeof friendly === 'undefined' ) { friendly = true; }
+			if ( typeof create === 'undefined' ) { create = true; }
 
 			// Fetch
-			var State = History.getLastSavedState()||History.createStateObject();
+			var State = History.getLastSavedState();
+
+			// Create
+			if ( !State && create ) {
+				State = History.createStateObject();
+			}
 
 			// Adjust
 			if ( friendly ) {
@@ -1497,7 +1512,12 @@
 
 
 		// ----------------------------------------------------------------------
-		// Data Persistance
+		// Initialise
+
+		/**
+		 * Create the initial State
+		 */
+		History.saveState(History.storeState(History.extractState(document.location.href,true)));
 
 		/**
 		 * Bind for Saving Store
@@ -1781,11 +1801,6 @@
 			// Be aware, the following is only for native pushState implementations
 			// If you are wanting to include something for all browsers
 			// Then include it above this if block
-
-			/**
-			 * Create the initial State
-			 */
-			History.saveState(History.storeState(History.extractState(document.location.href,true)));
 
 			/**
 			 * Setup Safari Fix
