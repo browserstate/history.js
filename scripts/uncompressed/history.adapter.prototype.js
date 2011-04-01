@@ -20,12 +20,18 @@
 		throw new Error('History.js Adapter has already been loaded...');
 	}
 
+	// Prototype does not support event binding to the window element in IE6-8
+	if ( typeof window.fireEvent === 'undefined' && typeof window.dispatchEvent === 'undefined' ) {
+		History.enable = false;
+		return;
+	}
+
 	/**
 	 * Bind and Trigger custom and native events in Prototype
 	 * @author Juriy Zaytsev (kangax)
 	 * @author Benjamin Arthur Lupton <contact@balupton.com>
 	 * @copyright MIT license <http://creativecommons.org/licenses/MIT/>
-	 **/
+	 */
 	(function(){
 		// Prepare
 		var
@@ -93,7 +99,7 @@
 			element = $(element);
 
 			// Check for Native Event
-			for (var name in eventMatchers) {
+			var name; for (name in eventMatchers) {
 				if (eventMatchers[name].test(eventName)) { eventType = name; break; }
 			}
 
@@ -102,28 +108,38 @@
 				return Element.fire(element,'custom:'+eventName);
 			}
 
-			// Fire Event
-			if (document.createEvent) {
+			// Create Event
+			if ( document.createEvent ) {
+				// Firefox + Others
 				oEvent = document.createEvent(eventType);
 
 				// Normal Event?
-				if (eventType == 'HTMLEvents') {
+				if ( eventType === 'HTMLEvents' ) {
 					oEvent.initEvent(eventName, options.bubbles, options.cancelable);
 				}
-
 				// Mouse Event?
-				else {
+				else if ( eventType ) {
 					oEvent.initMouseEvent(eventName, options.bubbles, options.cancelable, document.defaultView,
 						options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
 						options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, element);
 				}
-				element.dispatchEvent(oEvent);
 			}
-			else {
+			else if ( document.createEventObject ) {
+        // Internet Explorer
 				options.clientX = options.pointerX;
 				options.clientY = options.pointerY;
 				oEvent = Object.extend(document.createEventObject(), options);
-				element.fireEvent('on' + eventName, oEvent);
+			}
+
+			// Fire Event
+			if ( element.fireEvent ) {
+				element.fireEvent('on'+eventName,oEvent);
+			}
+			else if ( element.dispatchEvent ) {
+				element.dispatchEvent(oEvent);
+			}
+			else {
+				throw new Error('Cannot dispatch the event');
 			}
 
 			// Return

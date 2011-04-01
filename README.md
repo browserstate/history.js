@@ -20,13 +20,19 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 	(function(window,undefined){
 
+		// Prepare
 		var History = window.History; // Note: We are using a capital H instead of a lower h
+		if ( !History.enabled ) {
+			return false; // History.js is disabled for this browser. This is because we can optionally choose to support HTML4 browsers or not.
+		}
 
+		// Bind to StateChange Event
 		History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
 			var State = History.getState(); // Note: We are using History.getState() instead of event.state
 			History.log(State.data, State.title, State.url);
 		});
 
+		// Change our States
 		History.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"
 		History.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"
 		History.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"
@@ -105,7 +111,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
 
-	- [Prototype](http://www.prototypejs.org/) v1.7+
+	- [Prototype](http://www.prototypejs.org/) v1.7+ (does not support versions of IE prior to version 9)
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
 
@@ -226,10 +232,12 @@ Thanks! every bit of help really does make a difference. Again thank you.
 ## Changelog
 
 - v1.7.0 - ???
-	- Added (optional but recommended) Data Persistance and Synchronisation Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/) - See installation and compatibility sections for details
+	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.
+	- Added (optional but recommended) Data Persistance and Synchronisation Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/) (refer to installation and compatibility sections for details)
 	- Made HTML5 SUIDs more transparent - [Reported](https://github.com/balupton/History.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
 	- Fixed Session Storage Issue - Reported by a whole bunch of different people; [one](https://github.com/balupton/History.js/issues#issue/36), [two](https://github.com/balupton/History.js/issues#issue/37), [three](http://getsatisfaction.com/balupton/topics/history_js_1_6_losing_state_after_manual_page_reload)
 	- Fixed URL Encoding Issue - [Reported](https://github.com/balupton/history.js/issues/#issue/33) by [Rob Madole](http://robmadole.com/)
+	- Disabled support for IE6,7,8 when using the Prototype Adapter (there is nothing we can do about this, it is due to a bug in the prototype library) - [Reported](https://github.com/balupton/history.js/issues#issue/39) by [Sindre Wimberger](http://sindre.at/)
 
 - v1.6.0 - March 22 2011
 	- Added Zepto adapter thanks to [Matt Garrett](http://twitter.com/#!/matthewgarrett)

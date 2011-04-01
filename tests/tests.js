@@ -6,6 +6,11 @@ var
 	test = window.test,
 	same = window.same;
 
+// Check
+if ( !History.enabled ) {
+	throw new Error('History.js is disabled');
+}
+
 // Prepare
 History.options.debug = false;
 
@@ -109,7 +114,7 @@ var checkState = function(){
 	});
 
 	// Image Load to Stress Test Safari and Opera
-	(new Image()).src = "image.php";
+	//(new Image()).src = "image.php";
 };
 
 // Check the Initial State
