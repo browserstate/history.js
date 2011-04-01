@@ -408,11 +408,13 @@
 		 * History.getFullUrl(url)
 		 * Ensures that we have an absolute URL and not a relative URL
 		 * @param {string} url
+		 * @param {Boolean} allowBaseHref
 		 * @return {string} fullUrl
 		 */
-		History.getFullUrl = function(url){
+		History.getFullUrl = function(url,allowBaseHref){
 			// Prepare
 			var fullUrl = url, firstChar = url.substring(0,1);
+			allowBaseHref = (typeof allowBaseHref === 'undefined') ? true : allowBaseHref;
 
 			// Check
 			if ( /[a-z]+\:\/\//.test(url) ) {
@@ -432,7 +434,16 @@
 			}
 			else {
 				// Relative URL
-				fullUrl = History.getBaseUrl()+url;
+				if ( allowBaseHref ) {
+					fullUrl = History.getBaseUrl()+url.replace(/^(\.\/)+/,'');
+				} else {
+					fullUrl = History.getBasePageUrl()+url.replace(/^(\.\/)+/,'');
+				}
+				// We have an if condition above as we do not want hashes
+				// which are relative to the baseHref in our URLs
+				// as if the baseHref changes, then all our bookmarks
+				// would now point to different locations
+				// whereas the basePageUrl will always stay the same
 			}
 
 			// Return
@@ -447,13 +458,29 @@
 		 */
 		History.getShortUrl = function(url){
 			// Prepare
-			var shortUrl, rootUrl = History.getRootUrl(); // History.getBaseHref()||History.getBasePageUrl()
+			var shortUrl = url, baseUrl = History.getBaseUrl(), rootUrl = History.getRootUrl();
 
-			// Adjust
-			shortUrl = url.replace(rootUrl,'/');
+			// Trim baseUrl
+			if ( History.emulated.pushState ) {
+				// We are in a if statement as when pushState is not emulated
+				// The actual url these short urls are relative to can change
+				// So within the same session, we the url may end up somewhere different
+				shortUrl = shortUrl.replace(baseUrl,'');
+			}
+
+			// Trim rootUrl
+			shortUrl = shortUrl.replace(rootUrl,'/');
+
+			// Ensure we can still detect it as a state
+			if ( History.isTraditionalAnchor(shortUrl) ) {
+				shortUrl = './'+shortUrl;
+			}
+
+			// Clean It
+			shortUrl = shortUrl.replace(/^(\.\/)+/g,'./').replace(/\#$/,'');
 
 			// Return
-			return shortUrl.replace(/\#$/,'');
+			return shortUrl;
 		};
 
 		// ----------------------------------------------------------------------
@@ -743,8 +770,24 @@
 		};
 
 		/**
+		 * History.isTraditionalAnchor
+		 * Checks to see if the url is a traditional anchor or not
+		 * @param {String} url_or_hash
+		 * @return {Boolean}
+		 */
+		History.isTraditionalAnchor = function(url_or_hash){
+			// Check
+			var isTraditional = !(/[\/\?\.]/.test(url_or_hash));
+
+			// Return
+			return isTraditional;
+		};
+
+		/**
 		 * History.extractState
 		 * Get a State by it's URL or Hash
+		 * @param {String} url_or_hash
+		 * @return {State|null}
 		 */
 		History.extractState = function(url_or_hash,create){
 			// Prepare
@@ -769,7 +812,7 @@
 				}
 
 				// Create State
-				if ( !State && create && /\//.test(url_or_hash) ) {
+				if ( !State && create && !History.isTraditionalAnchor(url_or_hash) ) {
 					State = History.createStateObject(null,null,url);
 				}
 			}
@@ -1086,22 +1129,6 @@
 
 			// Return hash
 			return hash;
-		};
-
-		/**
-		 * History.isTraditionalAnchor(url)
-		 * Checks to see if the url is a traditional anchor
-		 * @param {string} url
-		 * @return {boolean}
-		 */
-		History.isTraditionalAnchor = function(url){
-			var
-				hash = History.getHashByUrl(url),
-				el = document.getElementById(hash),
-				isTraditionalAnchor = typeof el !== 'undefined';
-
-			// Return isTraditionalAnchor
-			return isTraditionalAnchor;
 		};
 
 		/**

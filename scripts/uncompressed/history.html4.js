@@ -414,14 +414,16 @@
 				History.saveHash(currentHash);
 
 				// Expand Hash
-				currentState = History.extractState(currentHash||document.location.href,true);
-				if ( !currentState ) {
+				if ( currentHash && History.isTraditionalAnchor(currentHash) ) {
 					//History.debug('History.onHashChange: traditional anchor', currentHash);
 					// Traditional Anchor Hash
 					History.Adapter.trigger(window,'anchorchange');
 					History.busy(false);
 					return false;
 				}
+
+				// Create State
+				currentState = History.extractState(History.getFullUrl(currentHash||document.location.href,false),true);
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(currentState) ) {
