@@ -214,11 +214,13 @@ Thanks! every bit of help really does make a difference. Again thank you.
 		- State titles are never applied to the `document.title`
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
 - Data persistance and synchronisation works like so. Every second or so, the SUIDs and URLs of the states will synchronise between the store and the local session. When a new session opens a familiar state (via the SUID or the URL) and it is not found locally then it will attempt to load the last known stored state with that information.
+- URLs will be unescaped to the maximum, so for instance the URL `?key=a%20b%252c` will become `?key=a b c`. This is to ensure consistency between browser url encodings.
 - Changing the hash of the page causes `onpopstate` to fire; this is expected/standard functionality. To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
 	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
 - Known Issues
-	- Opera 11 fails to create history entries when under stressful loads
+	- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing that can be done about this
+	- Mercury on iOS fails to apply URL changes - it should be treated as a HTML4 browser instead of a HTML5 browser
 
 
 ## Changelog
@@ -227,6 +229,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 	- Added (optional but recommended) Data Persistance and Synchronisation Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/) - See installation and compatibility sections for details
 	- Made HTML5 SUIDs more transparent - [Reported](https://github.com/balupton/History.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
 	- Fixed Session Storage Issue - Reported by a whole bunch of different people; [one](https://github.com/balupton/History.js/issues#issue/36), [two](https://github.com/balupton/History.js/issues#issue/37), [three](http://getsatisfaction.com/balupton/topics/history_js_1_6_losing_state_after_manual_page_reload)
+	- Fixed URL Encoding Issue - [Reported](https://github.com/balupton/history.js/issues/#issue/33) by [Rob Madole](http://robmadole.com/)
 
 - v1.6.0 - March 22 2011
 	- Added Zepto adapter thanks to [Matt Garrett](http://twitter.com/#!/matthewgarrett)

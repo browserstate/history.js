@@ -586,7 +586,7 @@
 			var newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(oldState.url||document.location.href);
+			newState.url = History.getFullUrl(History.unescapeString(oldState.url||document.location.href));
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -931,17 +931,41 @@
 		};
 
 		/**
+		 * History.unescapeString()
+		 * Unescape a string
+		 * @param {String} str
+		 * @return {string}
+		 */
+		History.unescapeString = function(str){
+			// Prepare
+			var result = str;
+
+			// Unescape hash
+			var tmp;
+			while ( true ) {
+				tmp = window.unescape(result);
+				if ( tmp === result ) {
+					break;
+				}
+				result = tmp;
+			}
+
+			// Return result
+			return result;
+		};
+
+		/**
 		 * History.unescapeHash()
 		 * normalize and Unescape a Hash
+		 * @param {String} hash
 		 * @return {string}
 		 */
 		History.unescapeHash = function(hash){
+			// Prepare
 			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			if ( /\%[^2][^5]/.test(result) ) {
-				result = window.unescape(result);
-			}
+			result = History.unescapeString(result);
 
 			// Return result
 			return result;
@@ -1035,10 +1059,10 @@
 			if ( !History.bugs.hashEscape ) {
 				// Restore common parts
 				result = result
-					.replace('%21','!')
-					.replace('%26','&')
-					.replace('%3D','=')
-					.replace('%3F','?');
+					.replace(/\%21/g,'!')
+					.replace(/\%26/g,'&')
+					.replace(/\%3D/g,'=')
+					.replace(/\%3F/g,'?');
 			}
 
 			// Return result
