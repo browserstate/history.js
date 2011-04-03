@@ -51,30 +51,28 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 ### How would the above operations look in a HTML5 Browser?
 
 1. www.mysite.com
-1. www.mysite.com?state=1
-1. www.mysite.com?state=2
-1. www.mysite.com?state=3
-1. www.mysite.com?state=4
-1. www.mysite.com?state=3
-1. www.mysite.com?state=1
+1. www.mysite.com/?state=1
+1. www.mysite.com/?state=2
+1. www.mysite.com/?state=3
+1. www.mysite.com/?state=4
+1. www.mysite.com/?state=3
+1. www.mysite.com/?state=1
 1. www.mysite.com
-1. www.mysite.com?state=3
+1. www.mysite.com/?state=3
 
-> Note 1: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling).
->
-> Note 2: Safari 5 will also have a SUID appended to the URL, it is entirely transparent but just a visible side-effect. It is required to fix a bug with Safari 5.
+> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling).
 
 ### How would they look in a HTML4 Browser?
 
 1. www.mysite.com
-1. www.mysite.com#?state=1&_suid=1
-1. www.mysite.com#?state=2&_suid=2
-1. www.mysite.com#?state=3&_suid=3
-1. www.mysite.com#?state=4
-1. www.mysite.com#?state=3&_suid=3
-1. www.mysite.com#?state=1&_suid=1
+1. www.mysite.com/#?state=1&_suid=1
+1. www.mysite.com/#?state=2&_suid=2
+1. www.mysite.com/#?state=3&_suid=3
+1. www.mysite.com/#?state=4
+1. www.mysite.com/#?state=3&_suid=3
+1. www.mysite.com/#?state=1&_suid=1
 1. www.mysite.com
-1. www.mysite.com#?state=3&_suid=3
+1. www.mysite.com/#?state=3&_suid=3
 
 > Note 1: These urls also work in HTML5 browsers - we use `replaceState` to transform these HTML4 states into their HTML5 equivalents so the user won't even notice :-)
 >
@@ -88,11 +86,12 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 - If you aren't utilising `title` or `data` then we don't even include a SUID (as there is no need for it) - as seen by State 4 above :-)
 - We also shrink the urls to make sure that the smallest url will be used. For instance we will adjust `http://www.mysite.com/#http://www.mysite.com/projects/History.js` to become `http://www.mysite.com/#/projects/History.js` automatically. (again tested, working, and smarter).
 - It works with domains, subdomains, subdirectories, whatever - doesn't matter where you put it. It's smart.
+- Safari 5 will also have a SUID appended to the URL, it is entirely transparent but just a visible side-effect. It is required to fix a bug with Safari 5.
 
 ### Is there a working demo?
 
 - Sure is, give it a download and navigate to the demo directory in your browser :-)
-- If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports. _Note: you will have to [run a `git submodule init; git submodule update` and update the `tests/.htaccess` for your path] prior to running the tests._
+- If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports.
 
 
 ## Download & Installation
@@ -101,7 +100,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 2. Include [JSON2](http://www.json.org/js.html) for HTML4 Browsers Only *(replace www.yourwebsite.com)*
 
-		<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$dir?>/json2.js"><\/script>'); }</script>
+		<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="http://www.yourwebsite.com/history.js/scripts/compressed/json2.js"><\/script>'); }</script>
 
 3. Include [Amplify.js Store](http://amplifyjs.com/) for Data Persistance and Synchronisation Support (optional but recommended)
 
@@ -117,7 +116,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
 
-	- [Prototype](http://www.prototypejs.org/) v1.7+ (does not support versions of IE prior to 9)
+	- [Prototype](http://www.prototypejs.org/) v1.7+ (does not support versions of IE prior to 9 due to a bug in the prototype library)
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
 
