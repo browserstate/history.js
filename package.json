@@ -46,6 +46,7 @@
 		"url" : "http://github.com/balupton/history.js.git"
 	},
 	"dependencies": {
+		"buildr": ">=0.2.3"
 	},
 	"engines" : {
 	},

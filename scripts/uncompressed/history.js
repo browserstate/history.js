@@ -1051,7 +1051,7 @@
 			// Handle Queueing
 			if ( queue !== false && History.busy() ) {
 				// Wait + Push to Queue
-				//History.debug('History.setHash: we must wait', arguments);
+				History.debug('History.setHash: we must wait', arguments);
 				History.pushQueue({
 					scope: History,
 					callback: History.setHash,
@@ -1062,7 +1062,7 @@
 			}
 
 			// Log
-			//History.debug('History.setHash: called',hash);
+			History.debug('History.setHash: called',hash);
 
 			// Prepare
 			var adjustedHash = History.escapeHash(hash);
@@ -1074,7 +1074,7 @@
 			var State = History.extractState(hash,true);
 			if ( State && !History.emulated.pushState ) {
 				// Hash is a state so skip the setHash
-				//History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',arguments);
+				History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',arguments);
 
 				// PushState
 				History.pushState(State.data,State.title,State.url,false);
@@ -1193,7 +1193,7 @@
 		History.busy = function(value){
 			// Apply
 			if ( typeof value !== 'undefined' ) {
-				//History.debug('History.busy: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues.length);
+				History.debug('History.busy: changing ['+(History.busy.flag||false)+'] to ['+(value||false)+']', History.queues.length);
 				History.busy.flag = value;
 			}
 			// Default
@@ -1350,7 +1350,7 @@
 					function(){
 						History.doubleCheckClear();
 						if ( !History.stateChanged ) {
-							//History.debug('History.doubleCheck: State has not yet changed, trying again', arguments);
+							History.debug('History.doubleCheck: State has not yet changed, trying again', arguments);
 							// Re-Attempt
 							tryAgain();
 						}
@@ -1391,12 +1391,12 @@
 			// Check if we have a state with that url
 			// If not create it
 			if ( !newState ) {
-				//History.debug('History.safariStatePoll: new');
+				History.debug('History.safariStatePoll: new');
 				newState = History.createStateObject();
 			}
 
 			// Apply the New State
-			//History.debug('History.safariStatePoll: trigger');
+			History.debug('History.safariStatePoll: trigger');
 			History.Adapter.trigger(window,'popstate');
 
 			// Chain
@@ -1412,12 +1412,12 @@
 		 * @param {Integer} queue [optional]
 		 */
 		History.back = function(queue){
-			//History.debug('History.back: called', arguments);
+			History.debug('History.back: called', arguments);
 
 			// Handle Queueing
 			if ( queue !== false && History.busy() ) {
 				// Wait + Push to Queue
-				//History.debug('History.back: we must wait', arguments);
+				History.debug('History.back: we must wait', arguments);
 				History.pushQueue({
 					scope: History,
 					callback: History.back,
@@ -1448,12 +1448,12 @@
 		 * @param {Integer} queue [optional]
 		 */
 		History.forward = function(queue){
-			//History.debug('History.forward: called', arguments);
+			History.debug('History.forward: called', arguments);
 
 			// Handle Queueing
 			if ( queue !== false && History.busy() ) {
 				// Wait + Push to Queue
-				//History.debug('History.forward: we must wait', arguments);
+				History.debug('History.forward: we must wait', arguments);
 				History.pushQueue({
 					scope: History,
 					callback: History.forward,
@@ -1484,7 +1484,7 @@
 		 * @param {Integer} queue [optional]
 		 */
 		History.go = function(index,queue){
-			//History.debug('History.go: called', arguments);
+			History.debug('History.go: called', arguments);
 
 			// Prepare
 			var i;
@@ -1603,12 +1603,12 @@
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
-						//History.debug('History.onPopState: state anchor', currentHash, currentState);
+						History.debug('History.onPopState: state anchor', currentHash, currentState);
 						History.replaceState(currentState.data, currentState.title, currentState.url, false);
 					}
 					else {
 						// Traditional Anchor
-						//History.debug('History.onPopState: traditional anchor', currentHash);
+						History.debug('History.onPopState: traditional anchor', currentHash);
 						History.Adapter.trigger(window,'anchorchange');
 						History.busy(false);
 					}
@@ -1663,7 +1663,7 @@
 				// Check if we are the same state
 				if ( History.isLastSavedState(newState) ) {
 					// There has been no change (just the page's hash has finally propagated)
-					//History.debug('History.onPopState: no change', newState, History.savedStates);
+					History.debug('History.onPopState: no change', newState, History.savedStates);
 					History.busy(false);
 					return false;
 				}
@@ -1694,7 +1694,7 @@
 			 * @return {true}
 			 */
 			History.pushState = function(data,title,url,queue){
-				//History.debug('History.pushState: called', arguments);
+				History.debug('History.pushState: called', arguments);
 
 				// Check the State
 				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
@@ -1704,7 +1704,7 @@
 				// Handle Queueing
 				if ( queue !== false && History.busy() ) {
 					// Wait + Push to Queue
-					//History.debug('History.pushState: we must wait', arguments);
+					History.debug('History.pushState: we must wait', arguments);
 					History.pushQueue({
 						scope: History,
 						callback: History.pushState,
@@ -1751,7 +1751,7 @@
 			 * @return {true}
 			 */
 			History.replaceState = function(data,title,url,queue){
-				//History.debug('History.replaceState: called', arguments);
+				History.debug('History.replaceState: called', arguments);
 
 				// Check the State
 				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
@@ -1761,7 +1761,7 @@
 				// Handle Queueing
 				if ( queue !== false && History.busy() ) {
 					// Wait + Push to Queue
-					//History.debug('History.replaceState: we must wait', arguments);
+					History.debug('History.replaceState: we must wait', arguments);
 					History.pushQueue({
 						scope: History,
 						callback: History.replaceState,

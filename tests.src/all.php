@@ -18,6 +18,10 @@
 		.persist {
 			padding-bottom:1em;
 		}
+		iframe {
+			width:100%;
+			height:400px;
+		}
 	</style>
 </head>
 <body>
@@ -55,5 +59,6 @@
 		echo '</div>';
 	endforeach;
 	?>
+	<iframe src="uncompressed-html4-nonpersistant-jquery.html" />
 </body>
 </html>
