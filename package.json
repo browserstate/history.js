@@ -61,6 +61,18 @@
 			"img": false,
 			"html": false
 		},
+		"check": {
+			"js": true,
+			"jsOptions": {
+				"browser": true,
+				"laxbreak": true
+			}
+		},
+		"ignore": {
+			"check": [
+				"json2.js"
+			]
+		},
 		"bundle": false,
 		"directories": {
 			"out": "./scripts/compressed",

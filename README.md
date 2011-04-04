@@ -215,7 +215,6 @@ Thanks! every bit of help really does make a difference. Again thank you.
 		- Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions / [bug report](https://bugs.webkit.org/show_bug.cgi?id=42940)
 		- Google Chrome 8,9,10 and Firefox 4 prior to the RC will always fire `onpopstate` once the page has loaded / [change recommendation](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/)
 		- Safari iOS 4.0, 4.1, 4.2 have a working HTML5 History API - although the actual back buttons of the browsers do not work, therefore we treat them as HTML4 browsers
-		- None of the HTML5 browsers actually utilise the `title` argument to the `pushState` and `replaceState` calls
 	- HTML4 Browsers
 		- Old browsers like MSIE 6,7 and Firefox 2 do not have a `onhashchange` event
 		- MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
@@ -244,7 +243,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 	- Fixed URL Encoding Issue - [Reported](https://github.com/balupton/history.js/issues/#issue/33) by [Rob Madole](http://robmadole.com/)
 	- Disabled support for IE6,7,8 when using the Prototype Adapter (there is nothing we can do about this, it is due to a bug in the prototype library) - [Reported](https://github.com/balupton/history.js/issues#issue/39) by [Sindre Wimberger](http://sindre.at/)
 	- URLs in the State Hashes for HTML4 Browsers are now even shorter - [Discussion](https://github.com/balupton/history.js/issues#issue/28)
-	- Fixed a issue with the MooTools Adapter and JSON with IE7 and IE8
+	- Fixed an issue with the MooTools Adapter and JSON with IE7 and IE8
 
 - v1.6.0 - March 22 2011
 	- Added Zepto adapter thanks to [Matt Garrett](http://twitter.com/#!/matthewgarrett)

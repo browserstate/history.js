@@ -9,18 +9,11 @@
 			outline:none;
 			border:none;
 		}
-		.compress {
-			padding-bottom:1em;
-		}
-		.support {
-			padding-bottom:1em;
-		}
+		.item,
+		.compress,
+		.support,
 		.persist {
 			padding-bottom:1em;
-		}
-		iframe {
-			width:100%;
-			height:400px;
 		}
 	</style>
 </head>
@@ -59,6 +52,8 @@
 		echo '</div>';
 	endforeach;
 	?>
-	<iframe src="uncompressed-html4-nonpersistant-jquery.html" />
+	<div class="item">
+		<a href="iframe.html">iframe</a>
+	</div>
 </body>
 </html>

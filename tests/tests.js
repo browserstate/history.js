@@ -12,7 +12,7 @@ if ( !History.enabled ) {
 }
 
 // Prepare
-History.options.debug = false;
+History.options.debug = true;
 
 // Variables
 var

@@ -21,6 +21,7 @@
 		clearTimeout = window.clearTimeout,
 		setInterval = window.setInterval,
 		JSON = window.JSON,
+		alert = window.alert,
 		History = window.History = window.History||{}, // Public History Object
 		history = window.history; // Old History Object
 
@@ -251,39 +252,47 @@
 			)
 		};
 
-		/**
-		 * History.enabled
-		 * Is History enabled?
-		 */
-		History.enabled = !History.emulated.pushState;
 
 		/**
 		 * History.bugs
 		 * Which bugs are present
 		 */
-		History.bugs = {
-			/**
-			 * Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call
-			 * https://bugs.webkit.org/show_bug.cgi?id=56249
-			 */
-			setHash: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent)),
+		History.bugs = {};
 
-			/**
-			 * Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions
-			 * https://bugs.webkit.org/show_bug.cgi?id=42940
-			 */
-			safariPoll: Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent)),
+		/**
+		 * Safari 5 and Safari iOS 4 fail to have the correct history trail when inside an iframe
+		 * https://github.com/balupton/history.js/issues/#issue/40
+		 */
+		History.bugs.safariIFrame = Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent) && window.parent !== window);
 
-			/**
-			 * MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
-			 */
-			ieDoubleCheck: Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8),
+		/**
+		 * Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call
+		 * https://bugs.webkit.org/show_bug.cgi?id=56249
+		 */
+		History.bugs.safariHash = Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent));
 
-			/**
-			 * MSIE 6 requires the entire hash to be encoded for the hashes to trigger the onHashChange event
-			 */
-			hashEscape: Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 7)
-		};
+		/**
+		 * Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions
+		 * https://bugs.webkit.org/show_bug.cgi?id=42940
+		 */
+		History.bugs.safariPoll = Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent));
+
+		/**
+		 * MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
+		 */
+		History.bugs.ieDoubleCheck = Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8);
+
+		/**
+		 * MSIE 6 requires the entire hash to be encoded for the hashes to trigger the onHashChange event
+		 */
+		History.bugs.hashEscape = Boolean(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 7);
+
+
+		/**
+		 * History.enabled
+		 * Is History enabled?
+		 */
+		History.enabled = !History.emulated.pushState;
 
 		/**
 		 * History.isEmptyObject(obj)
@@ -293,7 +302,9 @@
 		 */
 		History.isEmptyObject = function(obj) {
 			for ( var name in obj ) {
-				return false;
+				if ( obj.hasOwnProperty(name) ) {
+					return false;
+				}
 			}
 			return true;
 		};
@@ -1083,7 +1094,7 @@
 				// Hash is a proper hash, so apply it
 
 				// Handle browser bugs
-				if ( History.bugs.setHash ) {
+				if ( History.bugs.safariHash ) {
 					// Fix Safari Bug https://bugs.webkit.org/show_bug.cgi?id=56249
 
 					// Fetch the base page
@@ -1517,7 +1528,7 @@
 		/**
 		 * Create the initial State
 		 */
-		History.saveState(History.storeState(History.extractState(document.location.href,true)));
+		 History.saveState(History.storeState(History.extractState(document.location.href,true)));
 
 		/**
 		 * Bind for Saving Store
@@ -1536,22 +1547,19 @@
 
 				// Sync
 				for ( item in History.idToState ) {
-					if ( !History.idToState.hasOwnProperty(item) ) {
-						continue;
+					if ( History.idToState.hasOwnProperty(item) ) {
+						currentStore.idToState[item] = History.idToState[item];
 					}
-					currentStore.idToState[item] = History.idToState[item];
 				}
 				for ( item in History.urlToId ) {
-					if ( !History.urlToId.hasOwnProperty(item) ) {
-						continue;
+					if ( History.urlToId.hasOwnProperty(item) ) {
+						currentStore.urlToId[item] = History.urlToId[item];
 					}
-					currentStore.urlToId[item] = History.urlToId[item];
 				}
 				for ( item in History.stateToId ) {
-					if ( !History.stateToId.hasOwnProperty(item) ) {
-						continue;
+					if ( History.stateToId.hasOwnProperty(item) ) {
+						currentStore.stateToId[item] = History.stateToId[item];
 					}
-					currentStore.stateToId[item] = History.stateToId[item];
 				}
 
 				// Update
@@ -1803,10 +1811,19 @@
 			// Then include it above this if block
 
 			/**
-			 * Setup Safari Fix
+			 * Setup Safari Poll Fix
 			 */
 			if ( History.bugs.safariPoll ) {
 				setInterval(History.safariStatePoll, History.options.safariPollInterval);
+			}
+
+			/**
+			 * Perform Safari Iframe Fix
+			 * Works by adding a extra history entry for the initial state at the start
+			 */
+			if ( History.bugs.safariIFrame ) {
+				var initState = History.getState();
+				history.pushState(initState.data,initState.title,initState.url);
 			}
 
 			/**
