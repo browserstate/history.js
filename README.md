@@ -1,4 +1,4 @@
-Welcome to History.js (v1.7.0 - April 01 2011)
+Welcome to History.js (v1.7.1 - ???)
 ==================
 
 
@@ -234,6 +234,11 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 
 ## Changelog
+
+- v1.7.1 - ???
+	- Fixed using History.js inside an iFrame with Safari 5 - [Reported](https://github.com/balupton/history.js/issues/#issue/40) by [desaintflorent](https://github.com/desaintflorent)
+	- Fixed using History.js inside an iFrame with IE8 and IE9 (not yet done)
+	- Fixed pushing states which contain traditional anchors (not yet done) - [Reported](https://github.com/balupton/history.js/issues#issue/42) by [Mark Jaquith](http://markjaquith.com/)
 
 - v1.7.0 - April 01 2011
 	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.
