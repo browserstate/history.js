@@ -25,10 +25,10 @@ window.YUI().use('node-base node-event-simulate event', function(Y){
 	History.Adapter = {
 		/**
 		 * History.Adapter.bind(el,event,callback)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @param {Function} callback
-		 * @return {element}
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		bind: function(el,event,callback){
 			// node-base
@@ -37,9 +37,9 @@ window.YUI().use('node-base node-event-simulate event', function(Y){
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @return {element}
+		 * @param {Element|selector} el
+		 * @param {string} event - custom and standard events
+		 * @return {void}
 		 */
 		trigger: function(el,event){
 			// node-event-simulate
@@ -49,7 +49,7 @@ window.YUI().use('node-base node-event-simulate event', function(Y){
 		/**
 		 * History.Adapter.trigger(el,event,data)
 		 * @param {Function} callback
-		 * @return {true}
+		 * @return {void}
 		 */
 		onDomLoad: function(callback) {
 			// event

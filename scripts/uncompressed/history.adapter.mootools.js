@@ -27,10 +27,10 @@
 	History.Adapter = {
 		/**
 		 * History.Adapter.bind(el,event,callback)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @param {Function} callback
-		 * @return
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		bind: function(el,event,callback){
 			var El = typeof el === 'string' ? document.id(el) : el;
@@ -39,10 +39,10 @@
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @param {Object} extra - a object of extra event data
-		 * @return
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @param {Object=} extra - a object of extra event data (optional)
+		 * @return void
 		 */
 		trigger: function(el,event,extra){
 			var El = typeof el === 'string' ? document.id(el) : el;
@@ -51,9 +51,9 @@
 
 		/**
 		 * History.Adapter.extractEventData(key,event,extra)
-		 * @param {String} key - key for the event data to extract
-		 * @param {String} event - custom and standard events
-		 * @return
+		 * @param {string} key - key for the event data to extract
+		 * @param {string} event - custom and standard events
+		 * @return {mixed}
 		 */
 		extractEventData: function(key,event){
 			// MooTools Native then MooTools Custom
@@ -65,8 +65,8 @@
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Function} callback
-		 * @return
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		onDomLoad: function(callback) {
 			window.addEvent('domready',callback);

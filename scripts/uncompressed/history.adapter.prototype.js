@@ -138,8 +138,6 @@
 				oEvent = Object.extend(document.createEventObject(), options);
 			}
 
-			oEvent.blah = true;
-
 			// Fire Event
 			if ( element.fireEvent ) {
 				element.fireEvent('on'+eventName,oEvent);
@@ -169,10 +167,10 @@
 
 		/**
 		 * History.Adapter.bind(el,event,callback)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @param {Function} callback
-		 * @return
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		bind: function(el,event,callback){
 			Element.bind(el,event,callback);
@@ -180,9 +178,9 @@
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @return
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @return {void}
 		 */
 		trigger: function(el,event){
 			Element.trigger(el,event);
@@ -190,9 +188,9 @@
 
 		/**
 		 * History.Adapter.extractEventData(key,event,extra)
-		 * @param {String} key - key for the event data to extract
-		 * @param {String} event - custom and standard events
-		 * @return
+		 * @param {string} key - key for the event data to extract
+		 * @param {string} event - custom and standard events
+		 * @return {mixed}
 		 */
 		extractEventData: function(key,event){
 			// Prototype.js Native
@@ -204,8 +202,8 @@
 
 		/**
 		 * History.Adapter.trigger(el,event,data)
-		 * @param {Function} callback
-		 * @return
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		onDomLoad: function(callback) {
 			Event.observe(window.document, 'dom:loaded', callback);

@@ -149,6 +149,7 @@
 		/**
 		 * History.log(message,...)
 		 * Logs the passed arguments
+		 * @return {void}
 		 */
 		History.log = function(){
 			// Prepare
@@ -197,9 +198,6 @@
 			else if ( !consoleExists ) {
 				alert(message);
 			}
-
-			// Return true
-			return true;
 		};
 
 		// ----------------------------------------------------------------------
@@ -345,7 +343,7 @@
 		/**
 		 * History.getRootUrl()
 		 * Turns "http://mysite.com/dir/page.html?asd" into "http://mysite.com"
-		 * @return {String} rootUrl
+		 * @return {string} rootUrl
 		 */
 		History.getRootUrl = function(){
 			// Create
@@ -362,7 +360,7 @@
 		/**
 		 * History.getBaseHref()
 		 * Fetches the `href` attribute of the `<base href="...">` element if it exists
-		 * @return {String} baseHref
+		 * @return {string} baseHref
 		 */
 		History.getBaseHref = function(){
 			// Create
@@ -389,7 +387,7 @@
 		/**
 		 * History.getBaseUrl()
 		 * Fetches the baseHref or basePageUrl or rootUrl (whichever one exists first)
-		 * @return {String} baseUrl
+		 * @return {string} baseUrl
 		 */
 		History.getBaseUrl = function(){
 			// Create
@@ -402,7 +400,7 @@
 		/**
 		 * History.getPageUrl()
 		 * Fetches the URL of the current page
-		 * @return {String} pageUrl
+		 * @return {string} pageUrl
 		 */
 		History.getPageUrl = function(){
 			// Fetch
@@ -422,7 +420,7 @@
 		/**
 		 * History.getBasePageUrl()
 		 * Fetches the Url of the directory of the current page
-		 * @return {String} basePageUrl
+		 * @return {string} basePageUrl
 		 */
 		History.getBasePageUrl = function(){
 			// Create
@@ -590,7 +588,7 @@
 		 * History.getIdByState(State)
 		 * Gets a ID for a State
 		 * @param {State} newState
-		 * @return {String} id
+		 * @return {string} id
 		 */
 		History.getIdByState = function(newState){
 
@@ -720,7 +718,7 @@
 		/**
 		 * History.getStateById(id)
 		 * Get a state by it's UID
-		 * @param {String} id
+		 * @param {string} id
 		 */
 		History.getStateById = function(id){
 			// Prepare
@@ -758,7 +756,7 @@
 		/**
 		 * Get a State's ID
 		 * @param {State} passedState
-		 * @return {String} id
+		 * @return {string} id
 		 */
 		History.getStateId = function(passedState){
 			// Prepare
@@ -775,7 +773,7 @@
 		 * History.getHashByState(State)
 		 * Creates a Hash for the State Object
 		 * @param {State} passedState
-		 * @return {String} hash
+		 * @return {string} hash
 		 */
 		History.getHashByState = function(passedState){
 			// Prepare
@@ -811,7 +809,7 @@
 		/**
 		 * History.isTraditionalAnchor
 		 * Checks to see if the url is a traditional anchor or not
-		 * @param {String} url_or_hash
+		 * @param {string} url_or_hash
 		 * @return {Boolean}
 		 */
 		History.isTraditionalAnchor = function(url_or_hash){
@@ -825,7 +823,7 @@
 		/**
 		 * History.extractState
 		 * Get a State by it's URL or Hash
-		 * @param {String} url_or_hash
+		 * @param {string} url_or_hash
 		 * @return {State|null}
 		 */
 		History.extractState = function(url_or_hash,create){
@@ -1015,7 +1013,7 @@
 		/**
 		 * History.unescapeString()
 		 * Unescape a string
-		 * @param {String} str
+		 * @param {string} str
 		 * @return {string}
 		 */
 		History.unescapeString = function(str){
@@ -1039,7 +1037,7 @@
 		/**
 		 * History.unescapeHash()
 		 * normalize and Unescape a Hash
-		 * @param {String} hash
+		 * @param {string} hash
 		 * @return {string}
 		 */
 		History.unescapeHash = function(hash){
@@ -1433,7 +1431,8 @@
 		/**
 		 * History.back(queue)
 		 * Send the browser history back one item
-		 * @param {Integer} queue [optional]
+		 * @param {integer} queue [optional]
+		 * @return {boolean}
 		 */
 		History.back = function(queue){
 			History.debug('History.back: called', arguments);
@@ -1469,7 +1468,8 @@
 		/**
 		 * History.forward(queue)
 		 * Send the browser history forward one item
-		 * @param {Integer} queue [optional]
+		 * @param {integer} queue [optional]
+		 * @return {boolean}
 		 */
 		History.forward = function(queue){
 			History.debug('History.forward: called', arguments);
@@ -1505,7 +1505,7 @@
 		/**
 		 * History.go(index,queue)
 		 * Send the browser history back or forward index times
-		 * @param {Integer} queue [optional]
+		 * @param {integer} queue [optional]
 		 */
 		History.go = function(index,queue){
 			History.debug('History.go: called', arguments);
@@ -1611,6 +1611,7 @@
 			/**
 			 * History.onPopState(event,extra)
 			 * Refresh the Current State
+			 * @return {boolean}
 			 */
 			History.onPopState = function(event,eventData){
 				// Prepare
@@ -1702,7 +1703,7 @@
 			 * @param {object} data
 			 * @param {string} title
 			 * @param {string} url
-			 * @return {true}
+			 * @return {boolean}
 			 */
 			History.pushState = function(data,title,url,queue){
 				History.debug('History.pushState: called', arguments);
@@ -1761,7 +1762,7 @@
 			 * @param {object} data
 			 * @param {string} title
 			 * @param {string} url
-			 * @return {true}
+			 * @return {boolean}
 			 */
 			History.replaceState = function(data,title,url,queue){
 				History.debug('History.replaceState: called', arguments);

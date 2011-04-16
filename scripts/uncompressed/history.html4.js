@@ -62,7 +62,7 @@
 		 * History.isLastHash(newHash)
 		 * Checks if the hash is the last hash
 		 * @param {string} newHash
-		 * @return {boolean} true
+		 * @return {boolean}
 		 */
 		History.isLastHash = function(newHash){
 			// Prepare
@@ -79,7 +79,7 @@
 		 * History.saveHash(newHash)
 		 * Push a Hash
 		 * @param {string} newHash
-		 * @return {boolean} true
+		 * @return {boolean}
 		 */
 		History.saveHash = function(newHash){
 			// Check Hash
@@ -141,7 +141,7 @@
 		 * History.discardState(State)
 		 * Discards the state by ignoring it through History
 		 * @param {object} State
-		 * @return {true}
+		 * @return {void}
 		 */
 		History.discardState = function(discardedState,forwardState,backState){
 			//History.debug('History.discardState', arguments);
@@ -157,16 +157,13 @@
 
 			// Add to DiscardedStates
 			History.discardedStates[discardedStateHash] = discardObject;
-
-			// Return true
-			return true;
 		};
 
 		/**
 		 * History.discardHash(hash)
 		 * Discards the hash by ignoring it through History
 		 * @param {string} hash
-		 * @return {true}
+		 * @return {void}
 		 */
 		History.discardHash = function(discardedHash,forwardState,backState){
 			//History.debug('History.discardState', arguments);
@@ -179,16 +176,13 @@
 
 			// Add to discardedHash
 			History.discardedHashes[discardedHash] = discardObject;
-
-			// Return true
-			return true;
 		};
 
 		/**
 		 * History.discardState(State)
 		 * Checks to see if the state is discarded
 		 * @param {object} State
-		 * @return {bool}
+		 * @return {boolean}
 		 */
 		History.discardedState = function(State){
 			// Prepare
@@ -205,13 +199,13 @@
 		 * History.discardedHash(hash)
 		 * Checks to see if the state is discarded
 		 * @param {string} State
-		 * @return {bool}
+		 * @return {boolean}
 		 */
 		History.discardedHash = function(hash){
 			// Check
 			var discarded = History.discardedHashes[hash]||false;
 
-			// Return true
+			// Return
 			return discarded;
 		};
 
@@ -221,7 +215,7 @@
 		 * @param {object} data
 		 * @param {string} title
 		 * @param {string} url
-		 * @return {true}
+		 * @return {void}
 		 */
 		History.recycleState = function(State){
 			//History.debug('History.recycleState', arguments);
@@ -232,9 +226,6 @@
 			if ( History.discardedState(State) ) {
 				delete History.discardedStates[StateHash];
 			}
-
-			// Return true
-			return true;
 		};
 
 		// ----------------------------------------------------------------------
@@ -248,6 +239,7 @@
 			/**
 			 * History.hashChangeInit()
 			 * Init the HashChange Emulation
+			 * @return {boolean}
 			 */
 			History.hashChangeInit = function(){
 				// Define our Checker Function
@@ -387,6 +379,7 @@
 			/**
 			 * History.onHashChange(event)
 			 * Trigger HTML5's window.onpopstate via HTML4 HashChange Support
+			 * @return {boolean}
 			 */
 			History.onHashChange = function(event){
 				//History.debug('History.onHashChange', arguments);
@@ -468,7 +461,7 @@
 			 * @param {object} data
 			 * @param {string} title
 			 * @param {string} url
-			 * @return {true}
+			 * @return {boolean}
 			 */
 			History.pushState = function(data,title,url,queue){
 				//History.debug('History.pushState: called', arguments);
@@ -546,7 +539,7 @@
 			 * @param {object} data
 			 * @param {string} title
 			 * @param {string} url
-			 * @return {true}
+			 * @return {boolean}
 			 */
 			History.replaceState = function(data,title,url,queue){
 				//History.debug('History.replaceState: called', arguments);
