@@ -75,38 +75,14 @@ var
 			'url': '/eight'
 		}
 	},
-	stateOrder = [
-		0,	// 1
-		1,	// 2
-		2,	// 3
-		3,	// 4
-		4,	// 5
-		3,	// 6
-		1,	// 7
-		0,	// 8
-		1,	// 9
-		3,	// 10
-		4,	// 11
-		3,	// 12
-		1,	// 13
-		0,	// 14
-		5,	// 15
-		0,	// 16
-		6,	// 17
-		7,	// 18
-		8,	// 19
-		1,	// 20
-		8,	// 21
-		7,	// 22
-		6,	// 23
-		0,	// 24
-	],
+	internalOrder = [false],
+	stateOrder = [0],
 	currentTest = 0;
 
 // Original Title
 var title = document.title;
 
-var banner;
+var banner, internal = false;
 
 var checkStatus = function(){
 	banner = banner || document.getElementById('qunit-banner');
@@ -124,6 +100,9 @@ var checkState = function(){
 		stateIndex = stateOrder[currentTest],
 		expectedState = History.normalizeState(States[stateIndex]),
 		actualState = History.getState(false);
+
+	expectedState.internal = internalOrder[currentTest];
+	actualState.internal = History.temp.internal;
 
 	++currentTest;
 
@@ -169,10 +148,14 @@ History.Adapter.onDomLoad(function(){
 	// State 1 (0 -> 1)
 	// Tests HTML4 -> HTML5 Graceful Upgrade
 	addLog('Test 2',History.queues.length,History.busy.flag);
+	internalOrder.push('pushState');
+	stateOrder.push(1);
 	History.setHash(History.getHashByState(States[1]));
 
 	// State 2 (1 -> 2)
 	addLog('Test 3',History.queues.length,History.busy.flag);
+	internalOrder.push('pushState');
+	stateOrder.push(2);
 	History.pushState(States[2].data, States[2].title, States[2].url);
 
 	// State 2 (2 -> 2) / No Change
@@ -185,10 +168,14 @@ History.Adapter.onDomLoad(function(){
 
 	// State 3 (2 -> 3)
 	addLog('Test 4',History.queues.length,History.busy.flag);
+	internalOrder.push('replaceState');
+	stateOrder.push(3);
 	History.replaceState(States[3].data, States[3].title, States[3].url);
 
 	// State 4 (3 -> 4)
 	addLog('Test 5',History.queues.length,History.busy.flag);
+	internalOrder.push('pushState');
+	stateOrder.push(4);
 	History.pushState(States[4].data, States[4].title, States[4].url);
 
 	// ----------------------------------------------------------------------
@@ -197,28 +184,44 @@ History.Adapter.onDomLoad(function(){
 	// State 3 (4 -> 3)
 	// State 1 (3 -> 2 -> 1)
 	addLog('Test 6,7',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	internalOrder.push(false);
+	stateOrder.push(3);
+	stateOrder.push(1);
 	History.go(-2);
 
 	// State 0 (1 -> 0)
 	// Tests Default State
 	addLog('Test 8',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(0);
 	History.back();
 
 	// State 1 (0 -> 1)
 	// State 3 (1 -> 2 -> 3)
 	addLog('Test 9,10',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	internalOrder.push(false);
+	stateOrder.push(1);
+	stateOrder.push(3);
 	History.go(2);
 
 	// State 4 (3 -> 4)
 	addLog('Test 11',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(4);
 	History.forward();
 
 	// State 3 (4 -> 3)
 	addLog('Test 12',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(3);
 	History.back();
 
 	// State 1 (3 -> 2 -> 1)
 	addLog('Test 13',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(1);
 	History.back();
 
 	// ----------------------------------------------------------------------
@@ -234,15 +237,21 @@ History.Adapter.onDomLoad(function(){
 
 	// State 0 (1 -> 0)
 	addLog('Test 14',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(0);
 	History.back();
 
 	// State 5 (0 -> 5)
 	// Tests pushing a state with a hash included
 	addLog('Test 15',History.queues.length,History.busy.flag);
+	internalOrder.push('pushState');
+	stateOrder.push(5);
 	History.pushState(States[5].data, States[5].title, States[5].url);
 
 	// State 0 (5 -> 0)
 	addLog('Test 16',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(0);
 	History.back();
 
 	// ----------------------------------------------------------------------
@@ -251,19 +260,27 @@ History.Adapter.onDomLoad(function(){
 	// State 6 (0 -> 6)
 	// Also tests data with no title
 	addLog('Test 17',History.queues.length,History.busy.flag);
+	internalOrder.push('pushState');
+	stateOrder.push(6);
 	History.pushState(States[6].data, States[6].title, States[6].url);
 
 	// State 7 (6 -> 7)
 	addLog('Test 18',History.queues.length,History.busy.flag);
+	internalOrder.push('pushState');
+	stateOrder.push(7);
 	History.pushState(States[7].data, States[7].title, States[7].url);
 
 	// State 7 (7 -> 8)
 	addLog('Test 19',History.queues.length,History.busy.flag);
+	internalOrder.push('pushState');
+	stateOrder.push(8);
 	History.pushState(States[8].data, States[8].title, States[8].url);
 
 	// State 1 (8 -> 1)
 	// Should be /eight?state=1
 	addLog('Test 20',History.queues.length,History.busy.flag);
+	internalOrder.push('pushState');
+	stateOrder.push(1);
 	History.pushState(States[1].data, States[1].title, States[1].url);
 
 	// ----------------------------------------------------------------------
@@ -271,18 +288,26 @@ History.Adapter.onDomLoad(function(){
 
 	// State 8 (1 -> 8)
 	addLog('Test 21',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(8);
 	History.back();
 
 	// State 7 (8 -> 7)
 	addLog('Test 22',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(7);
 	History.back();
 
 	// State 6 (7 -> 6)
 	addLog('Test 23',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(6);
 	History.back();
 
 	// State 0 (6 -> 0)
 	addLog('Test 24',History.queues.length,History.busy.flag);
+	internalOrder.push(false);
+	stateOrder.push(0);
 	History.back();
 
 	},1000); // wait for test one to complete

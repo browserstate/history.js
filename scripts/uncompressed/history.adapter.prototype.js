@@ -1,8 +1,15 @@
 /**
- * History.js Prototype Adapter
+ * History.js Prototype.js Adapter
  * @author Benjamin Arthur Lupton <contact@balupton.com>
  * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
+ */
+
+/**
+ * Prototype.js currently does not support the following:
+ * - The ability to easily work with custom events
+ * - The ability to send data through event triggers
+ * - The ability trigger events on the window element in IE6,7,8
  */
 
 // Closure
@@ -131,6 +138,8 @@
 				oEvent = Object.extend(document.createEventObject(), options);
 			}
 
+			oEvent.blah = true;
+
 			// Fire Event
 			if ( element.fireEvent ) {
 				element.fireEvent('on'+eventName,oEvent);
@@ -177,6 +186,20 @@
 		 */
 		trigger: function(el,event){
 			Element.trigger(el,event);
+		},
+
+		/**
+		 * History.Adapter.extractEventData(key,event,extra)
+		 * @param {String} key - key for the event data to extract
+		 * @param {String} event - custom and standard events
+		 * @return
+		 */
+		extractEventData: function(key,event){
+			// Prototype.js Native
+			var result = (event && event[key]) || undefined;
+
+			// Return
+			return result;
 		},
 
 		/**

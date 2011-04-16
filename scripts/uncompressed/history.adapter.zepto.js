@@ -41,6 +41,20 @@
 		},
 
 		/**
+		 * History.Adapter.extractEventData(key,event,extra)
+		 * @param {String} key - key for the event data to extract
+		 * @param {String} event - custom and standard events
+		 * @return
+		 */
+		extractEventData: function(key,event){
+			// Zepto Native
+			var result = (event && event[key]) || undefined;
+
+			// Return
+			return result;
+		},
+
+		/**
 		 * History.Adapter.trigger(el,event,data)
 		 * @param {Function} callback
 		 * @return

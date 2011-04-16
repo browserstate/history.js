@@ -34,10 +34,26 @@
 		 * History.Adapter.trigger(el,event)
 		 * @param {Element|Selector} el
 		 * @param {String} event - custom and standard events
+		 * @param {Object} extra - a object of extra event data
 		 * @return
 		 */
-		trigger: function(el,event){
-			jQuery(el).trigger(event);
+		trigger: function(el,event,extra){
+			jQuery(el).trigger(event,extra);
+		},
+
+		/**
+		 * History.Adapter.extractEventData(key,event,extra)
+		 * @param {String} key - key for the event data to extract
+		 * @param {String} event - custom and standard events
+		 * @param {Object} extra - a object of extra event data
+		 * @return
+		 */
+		extractEventData: function(key,event,extra){
+			// jQuery Native then jQuery Custom
+			var result = (event && event.originalEvent && event.originalEvent[key]) || (extra && extra[key]) || undefined;
+
+			// Return
+			return result;
 		},
 
 		/**

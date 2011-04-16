@@ -122,6 +122,18 @@
 
 
 		// ----------------------------------------------------------------------
+		// Temporary
+
+		/**
+		 * History.temp
+		 * Things that only exist temporarily
+		 */
+		History.temp = {
+			internal: false,
+			expectedStateId: false
+		};
+
+		// ----------------------------------------------------------------------
 		// Debug
 
 		/**
@@ -567,6 +579,7 @@
 			if ( friendly ) {
 				State = History.cloneObject(State);
 				State.url = State.cleanUrl||State.url;
+				State.internal = History.temp.internal;
 			}
 
 			// Return
@@ -1012,7 +1025,7 @@
 			// Unescape hash
 			var tmp;
 			while ( true ) {
-				tmp = window.unescape(result);
+				tmp = window.decodeURI(result);
 				if ( tmp === result ) {
 					break;
 				}
@@ -1122,7 +1135,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			result = window.escape(result);
+			result = window.encodeURI(result);
 
 			// IE6 Escape Bug
 			if ( !History.bugs.hashEscape ) {
@@ -1160,17 +1173,17 @@
 		/**
 		 * History.setTitle(title)
 		 * Applies the title to the document
-		 * @param {State} newState
+		 * @param {String|State} (input)
 		 * @return {Boolean}
 		 */
-		History.setTitle = function(newState){
+		History.setTitle = function(input){
 			// Prepare
-			var title = newState.title;
+			var title = (typeof input === 'string') ? (input) : (input.title);
 
 			// Initial
 			if ( !title ) {
 				var firstState = History.getStateByIndex(0);
-				if ( firstState && firstState.url === newState.url ) {
+				if ( firstState && firstState.url === (input.url||document.location.href) ) {
 					title = firstState.title||History.options.initialTitle;
 				}
 			}
@@ -1599,15 +1612,19 @@
 			 * History.onPopState(event,extra)
 			 * Refresh the Current State
 			 */
-			History.onPopState = function(event){
+			History.onPopState = function(event,eventData){
+				// Prepare
+				var
+					currentHash, currentState, newState = false, stateId = false, internal = false;
+
 				// Reset the double check
 				History.doubleCheckComplete();
 
-				// Check for a Hash, and handle apporiatly
-				var currentHash	= History.getHash();
+				// Check for a Hash, and handle appropriately
+				currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					var currentState = History.extractState(currentHash||document.location.href,true);
+					currentState = History.extractState(currentHash||document.location.href,true);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
@@ -1622,37 +1639,23 @@
 					}
 
 					// We don't care for hashes
-					History.expectedStateId = false;
+					History.temp.expectedStateId = false;
 					return false;
 				}
 
-				// Prepare
-				var newState = false;
-
-				// Prepare
-				event = event||{};
-				if ( typeof event.state === 'undefined' ) {
-					// jQuery
-					if ( typeof event.originalEvent !== 'undefined' && typeof event.originalEvent.state !== 'undefined' ) {
-						event.state = event.originalEvent.state||false;
-					}
-					// MooTools
-					else if ( typeof event.event !== 'undefined' && typeof event.event.state !== 'undefined' ) {
-						event.state = event.event.state||false;
-					}
-				}
-
-				// Ensure
-				event.state = (event.state||false);
+				// Extract
+				stateId = History.Adapter.extractEventData('state',event,eventData)||false;
 
 				// Fetch State
-				if ( event.state ) {
+				if ( stateId ) {
 					// Vanilla: Back/forward button was used
-					newState = History.getStateById(event.state);
+					newState = History.getStateById(stateId);
+					// Reset internal as we were not an internal event
+					History.temp.internal = false;
 				}
-				else if ( History.expectedStateId ) {
+				else if ( History.temp.expectedStateId ) {
 					// Vanilla: A new state was pushed, and popstate was called manually
-					newState = History.getStateById(History.expectedStateId);
+					newState = History.getStateById(History.temp.expectedStateId);
 				}
 				else {
 					// Initial State
@@ -1666,7 +1669,7 @@
 				}
 
 				// Clean
-				History.expectedStateId = false;
+				History.temp.expectedStateId = false;
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(newState) ) {
@@ -1736,12 +1739,14 @@
 				else {
 					// Store the newState
 					History.storeState(newState);
-					History.expectedStateId = newState.id;
+					History.temp.expectedStateId = newState.id;
 
 					// Push the newState
 					history.pushState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
+					History.temp.internal = 'pushState';
+					History.temp.expectedStateId = newState.id;
 					History.Adapter.trigger(window,'popstate');
 				}
 
@@ -1793,12 +1798,13 @@
 				else {
 					// Store the newState
 					History.storeState(newState);
-					History.expectedStateId = newState.id;
 
 					// Push the newState
 					history.replaceState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
+					History.temp.internal = 'replaceState';
+					History.temp.expectedStateId = newState.id;
 					History.Adapter.trigger(window,'popstate');
 				}
 

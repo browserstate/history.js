@@ -5,12 +5,16 @@
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
  */
 
-// Closure
-(function(window,undefined){
+/**
+ * YUI requires the following features in order to be suitable for History.js:
+ * - The ability to bind and trigger custom events such as 'statechange'
+ */
+alert('The History.js YUI Adapter is not yet finished.');
+
+window.YUI().use('node-base node-event-simulate event', function(Y){
 	// Localise Globals
 	var
-		History = window.History = window.History||{},
-		YUI = window.YUI;
+		History = window.History = window.History||{};
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -27,9 +31,8 @@
 		 * @return {element}
 		 */
 		bind: function(el,event,callback){
-			YUI().use('node-base', function(Y){
-				Y.one(el).on(event,callback);
-			});
+			// node-base
+			Y.one(el).on(event,callback);
 		},
 
 		/**
@@ -39,9 +42,8 @@
 		 * @return {element}
 		 */
 		trigger: function(el,event){
-			YUI().use('node-event-simulate', function(Y){
-				Y.one(el).simulate(event);
-			});
+			// node-event-simulate
+			Y.one(el).simulate(event);
 		},
 
 		/**
@@ -50,9 +52,8 @@
 		 * @return {true}
 		 */
 		onDomLoad: function(callback) {
-			YUI().use('event', function(Y){
-				Y.on('domready', callback);
-			});
+			// event
+			Y.on('domready', callback);
 		}
 	};
 

@@ -8,7 +8,7 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
-- Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/)
+- Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/), [RightJS](http://rightjs.org/) and [Zepto](http://zeptojs.com/)
 
 Licensed under the [New BSD License](http://creativecommons.org/licenses/BSD/)
 Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
@@ -119,6 +119,10 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 	- [Prototype](http://www.prototypejs.org/) v1.7+ (does not support versions of IE prior to 9 due to a bug in the prototype library)
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
+
+	- [RightJS](http://rightjs.org/) v2.2.3+
+
+			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.right.js"></script>
 
 	- [Zepto](http://zeptojs.com/) v0.5+
 
@@ -236,6 +240,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 ## Changelog
 
 - v1.7.1 - ???
+	- Added [RightJS](http://rightjs.org/) Adapter
 	- Fixed using History.js inside an iFrame with Safari 5 - [Reported](https://github.com/balupton/history.js/issues/#issue/40) by [desaintflorent](https://github.com/desaintflorent)
 	- Fixed using History.js inside an iFrame with IE8 and IE9 (not yet done)
 	- Fixed pushing states which contain traditional anchors (not yet done) - [Reported](https://github.com/balupton/history.js/issues#issue/42) by [Mark Jaquith](http://markjaquith.com/)
