@@ -232,13 +232,13 @@ History.Adapter.onDomLoad(function(){
 /*
 	// State 5 (0 -> 5)
 	// Tests pushing a state with a hash included
-	addLog('Test 15',History.queues.length,History.busy.flag);
+	addLog('Test 13',History.queues.length,History.busy.flag);
 	internalOrder.push('pushState');
 	stateOrder.push(5);
 	History.pushState(States[5].data, States[5].title, States[5].url);
 
 	// State 0 (5 -> 0)
-	addLog('Test 16',History.queues.length,History.busy.flag);
+	addLog('Test 14',History.queues.length,History.busy.flag);
 	internalOrder.push(false);
 	stateOrder.push(0);
 	History.back();

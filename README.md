@@ -150,7 +150,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 ## Getting Support
 
-History.js is an actively developed, supported and maintained project. You can grab support via its [GitHub Issue Tracker](https://github.com/balupton/History.js/issues). Alternatively you can reach [Benjamin Lupton](http://balupton.com) (the core developer) via [twitter](http://twitter.com/balupton), skype (balupton) or email (contact@balupton.com).
+**History.js is an actively supported, maintained and developed project.** You can grab support via its **[GitHub Issue Tracker](https://github.com/balupton/History.js/issues)** or contact its core developer [Benjamin Lupton](http://balupton.com) via [twitter](http://twitter.com/balupton), skype (balupton) and email (b@lupton.cc). Benjamin is also available for [bookings](http://speakerrate.com/speakers/11963-benjamin-lupton) (trainings, seminars, talks), [consulting](http://careers.stackoverflow.com/balupton) (development, advisory), [sponsorship](https://github.com/balupton) (angels, investors, donations, advertisement), interviews, chats, hackathons, socials and mentoring.
 
 
 ## Giving Support

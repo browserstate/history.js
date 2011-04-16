@@ -53,7 +53,8 @@
 	endforeach;
 	?>
 	<div class="item">
-		<a href="iframe.html">iframe</a>
+		<a href="iframe-tests.html">iframe tests</a>
+		<a href="iframe-demo.html">iframe demo</a>
 	</div>
 </body>
 </html>

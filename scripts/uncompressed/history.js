@@ -1689,16 +1689,16 @@
 					return false;
 				}
 
+				// Store the State
+				History.storeState(newState);
+				History.saveState(newState);
+
 				// Check for Ignore
 				if ( History.temp.ignore ) {
 					--History.temp.ignore;
 					History.busy(false);
 					return false;
 				}
-
-				// Store the State
-				History.storeState(newState);
-				History.saveState(newState);
 
 				// Force update of the title
 				History.setTitle(newState);
