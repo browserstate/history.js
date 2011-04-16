@@ -191,8 +191,12 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 - `History.pushState(data,title,url)` <br/> Pushes a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
 - `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
-- `History.getState()` <br/> Gets the current state of the browser, returns an object with `data`, `title` and `url`
+- `History.getState()` <br/> Gets the current state of the browser, returns a State object with the keys `data`, `title`, `url` and some special ones:
+	- `internal`: enum of `'pushState'`, `'replaceState'` or `false`: whether or not were called internally or externally (back/forward button, refresh, new page)
+	- `same`: boolean value: whether or not this state is the same as the last one
+	- `anchor`: string or `false`: if the state has a traditional anchor, this is it
 - `History.getHash()` <br/> Gets the current hash of the browser
+- `History.setTitle(title)` <br/> Sets the title of the browser as well as the `<title>` element on the page
 - `History.Adapter.bind(element,event,callback)` <br/> A framework independent event binder, you may either use this or your framework's native event binder.
 - `History.Adapter.trigger(element,event)` <br/> A framework independent event trigger, you may either use this or your framework's native event trigger.
 - `History.Adapter.onDomLoad(callback)` <br/> A framework independent onDomLoad binder, you may either use this or your framework's native onDomLoad binder.
@@ -204,8 +208,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ### Events
 
-- `window.onstatechange` <br/> Fired when the state of the page changes (does not include hash changes)
-- `window.onanchorchange` <br/> Fired when the anchor of the page changes (does not include state hashes)
+- `window.onstatechange` <br/> Fired when the state of the page changes (includes anchor changes)
 
 
 ## Notes on Compatibility
@@ -213,14 +216,14 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - History.js **solves** the following browser bugs:
 	- HTML5 Browsers
 		- Chrome 8 sometimes does not contain the correct state data when traversing back to the initial state
-		- Safari 5, Safari iOS 4 and Firefox 3 and 4 do not fire the `onhashchange` event when the page is loaded with a hash
-		- Safari 5 and Safari iOS 4 do not fire the `onpopstate` event when the hash has changed unlike the other browsers
+		- Safari 5, Safari iOS 4 and Firefox 3 and 4 do not fire the `window.onhashchange` event when the page is loaded with a hash
+		- Safari 5 and Safari iOS 4 do not fire the `window.onpopstate` event when the hash has changed unlike the other browsers
 		- Safari 5 and Safari iOS 4 fail to return to the correct state once a hash is replaced by a `replaceState` call / [bug report](https://bugs.webkit.org/show_bug.cgi?id=56249)
 		- Safari 5 and Safari iOS 4 sometimes fail to apply the state change under busy conditions / [bug report](https://bugs.webkit.org/show_bug.cgi?id=42940)
-		- Google Chrome 8,9,10 and Firefox 4 prior to the RC will always fire `onpopstate` once the page has loaded / [change recommendation](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/)
+		- Google Chrome 8,9,10 and Firefox 4 prior to the RC will always fire `window.onpopstate` once the page has loaded / [change recommendation](http://hacks.mozilla.org/2011/03/history-api-changes-in-firefox-4/)
 		- Safari iOS 4.0, 4.1, 4.2 have a working HTML5 History API - although the actual back buttons of the browsers do not work, therefore we treat them as HTML4 browsers
 	- HTML4 Browsers
-		- Old browsers like MSIE 6,7 and Firefox 2 do not have a `onhashchange` event
+		- Old browsers like MSIE 6,7 and Firefox 2 do not have a `window.onhashchange` event
 		- MSIE 6 and 7 sometimes do not apply a hash even it was told to (requiring a second call to the apply function)
 		- Non-Opera HTML4 browsers sometimes do not apply the hash when the hash is not `urlencoded`
 	- All Browsers
@@ -229,9 +232,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - ReplaceState functionality is emulated in HTML4 browsers by discarding the replaced state, so when the discarded state is accessed it is skipped using the appropriate `History.back()` / `History.forward()` call
 - Data persistance and synchronisation works like so: Every second or so, the SUIDs and URLs of the states will synchronise between the store and the local session. When a new session opens a familiar state (via the SUID or the URL) and it is not found locally then it will attempt to load the last known stored state with that information.
 - URLs will be unescaped to the maximum, so for instance the URL `?key=a%20b%252c` will become `?key=a b c`. This is to ensure consistency between browser url encodings.
-- Changing the hash of the page causes `onpopstate` to fire (this is expected/standard functionality). To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
-	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
-	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
+- We use the new `window.onstatechange` event, as History.js binds into to the original `window.onpopstate` to do it's handling, and sometimes it may decide that we do not want to follow through with the propagation. Simply calling `event.stopImmediatePropagation()` is not enough to ensure consistency, so we have created the new `window.onstatechange` event for this.
 - Known Issues
 	- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing we can do about this
 	- Mercury iOS fails to apply url changes (hashes and HTML5 History API states) - there is nothing we can do about this

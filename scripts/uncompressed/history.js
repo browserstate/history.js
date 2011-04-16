@@ -131,7 +131,8 @@
 		History.temp = {
 			internal: false,
 			expectedStateId: false,
-			ignore: 0
+			ignore: 0,
+			same: false
 		};
 
 		// ----------------------------------------------------------------------
@@ -579,6 +580,7 @@
 				State = History.cloneObject(State);
 				State.url = State.cleanUrl||State.url;
 				State.internal = History.temp.internal;
+				State.same = History.temp.same;
 			}
 
 			// Return
@@ -1683,6 +1685,7 @@
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(newState) ) {
+					// It is only possible to reach here via external influence, but even then, it should be impossible
 					// There has been no change (just the page's hash has finally propagated)
 					History.debug('History.onPopState: no change', newState, History.savedStates);
 					History.busy(false);
@@ -1699,6 +1702,9 @@
 					History.busy(false);
 					return false;
 				}
+
+				// Update Same
+				History.temp.same = false;
 
 				// Force update of the title
 				History.setTitle(newState);
@@ -1748,21 +1754,24 @@
 				// Create the newState
 				var newState = History.createStateObject(data,title,url);
 
+				// Update Internal
+				if ( queue !== false ) { History.temp.internal = 'pushState'; }
+
 				// Check it
 				if ( History.isLastSavedState(newState) ) {
 					// Won't be a change
+					History.temp.same = true;
+					History.Adapter.trigger(window,'statechange');
 					History.busy(false);
 				}
 				else {
 					// Store the newState
 					History.storeState(newState);
-					History.temp.expectedStateId = newState.id;
 
 					// Push the newState
 					history.pushState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
-					if ( queue !== false ) { History.temp.internal = 'pushState'; }
 					History.temp.expectedStateId = newState.id;
 					History.Adapter.trigger(window,'popstate');
 				}
@@ -1807,9 +1816,14 @@
 				// Create the newState
 				var newState = History.createStateObject(data,title,url);
 
+				// Update Internal
+				if ( queue !== false ) { History.temp.internal = 'replaceState'; }
+
 				// Check it
 				if ( History.isLastSavedState(newState) ) {
 					// Won't be a change
+					History.temp.same = true;
+					History.Adapter.trigger(window,'statechange');
 					History.busy(false);
 				}
 				else {
@@ -1820,7 +1834,6 @@
 					history.replaceState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
-					if ( queue !== false ) { History.temp.internal = 'replaceState'; }
 					History.temp.expectedStateId = newState.id;
 					History.Adapter.trigger(window,'popstate');
 				}
