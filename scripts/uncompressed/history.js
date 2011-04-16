@@ -130,7 +130,8 @@
 		 */
 		History.temp = {
 			internal: false,
-			expectedStateId: false
+			expectedStateId: false,
+			ignore: 0
 		};
 
 		// ----------------------------------------------------------------------
@@ -1503,27 +1504,35 @@
 		};
 
 		/**
-		 * History.go(index,queue)
+		 * History.go(index)
 		 * Send the browser history back or forward index times
-		 * @param {integer} queue [optional]
 		 */
-		History.go = function(index,queue){
+		History.go = function(index){
 			History.debug('History.go: called', arguments);
 
 			// Prepare
-			var i;
+			var i, ignore;
+
+			// Ignore
+			ignore = (index < 0 ? index*-1 : index)-1;
+			if ( ignore ) {
+				History.queue(function(){
+					History.temp.ignore = ignore;
+					History.busy(false);
+				});
+			}
 
 			// Handle
 			if ( index > 0 ) {
 				// Forward
 				for ( i=1; i<=index; ++i ) {
-					History.forward(queue);
+					History.forward();
 				}
 			}
 			else if ( index < 0 ) {
 				// Backward
 				for ( i=-1; i>=index; --i ) {
-					History.back(queue);
+					History.back();
 				}
 			}
 			else {
@@ -1680,6 +1689,13 @@
 					return false;
 				}
 
+				// Check for Ignore
+				if ( History.temp.ignore ) {
+					--History.temp.ignore;
+					History.busy(false);
+					return false;
+				}
+
 				// Store the State
 				History.storeState(newState);
 				History.saveState(newState);
@@ -1746,7 +1762,7 @@
 					history.pushState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
-					History.temp.internal = 'pushState';
+					if ( queue !== false ) { History.temp.internal = 'pushState'; }
 					History.temp.expectedStateId = newState.id;
 					History.Adapter.trigger(window,'popstate');
 				}
@@ -1804,7 +1820,7 @@
 					history.replaceState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
-					History.temp.internal = 'replaceState';
+					if ( queue !== false ) { History.temp.internal = 'replaceState'; }
 					History.temp.expectedStateId = newState.id;
 					History.Adapter.trigger(window,'popstate');
 				}
