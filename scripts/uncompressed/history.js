@@ -297,7 +297,12 @@
 		/**
 		 * Safari 5 and Safari iOS 4 do not trigger onpopstate on onhashchange events
 		 */
-		History.bugs.noHashPopState = Boolean(
+		History.bugs.noHashPopState = Boolean(!History.emulated.pushState && navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent));
+
+		/**
+		 * Safari 5 and Safari iOS 4 and Firefox 4 do not trigger an initial onpopstate
+		 */
+		History.bugs.noInitialPopState = Boolean(
 			!History.emulated.pushState &&
 			(
 				(navigator.vendor === 'Apple Computer, Inc.' && /AppleWebKit\/5([0-2]|3[0-3])/.test(navigator.userAgent)) ||
@@ -1137,7 +1142,8 @@
 			// Prepare
 			var
 				adjustedHash = History.escapeHash(hash),
-				State, pageUrl;
+				State, pageUrl,
+				hashState;
 
 			// Make Busy + Continue
 			History.busy(true);
@@ -1162,7 +1168,13 @@
 					pageUrl = History.getPageUrl();
 
 					// Safari hash apply
-					History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
+					hashState = History.extractState(pageUrl+'#'+adjustedHash);
+					if ( hashState ) {
+						History.pushState(hashState.data,hashState.title,hashState.url+'#'+adjustedHash,false);
+					}
+					else {
+						History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
+					}
 				}
 				else {
 					// Normal hash apply
@@ -1939,11 +1951,18 @@
 				});
 
 				// Initialise Alias
-				if ( History.getHash() ) {
+				if ( History.getHash() && History.bugs.noInitialPopState ) {
 					History.Adapter.onDomLoad(function(){
 						History.Adapter.trigger(window,'popstate');
 					});
 				}
+			}
+
+			/**
+			 * Ensure a initial popstate
+			 */
+			if ( History.bugs.noInitialPopState ) {
+				History.Adapter.trigger(window,'popstate');
 			}
 
 		} // !History.emulated.pushState
