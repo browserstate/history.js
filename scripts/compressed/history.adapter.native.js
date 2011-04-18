@@ -1,0 +1,1 @@
+window.alert("The History.js Native Adapter is not yet finished.")

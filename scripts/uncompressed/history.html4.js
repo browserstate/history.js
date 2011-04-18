@@ -66,10 +66,12 @@
 		 */
 		History.isLastHash = function(newHash){
 			// Prepare
-			var oldHash = History.getHashByIndex();
+			var
+				oldHash = History.getHashByIndex(),
+				isLast;
 
 			// Check
-			var isLast = newHash === oldHash;
+			isLast = newHash === oldHash;
 
 			// Return isLast
 			return isLast;
@@ -146,10 +148,12 @@
 		History.discardState = function(discardedState,forwardState,backState){
 			//History.debug('History.discardState', arguments);
 			// Prepare
-			var discardedStateHash = History.getHashByState(discardedState);
+			var
+				discardedStateHash = History.getHashByState(discardedState),
+				discardObject;
 
 			// Create Discard Object
-			var discardObject = {
+			discardObject = {
 				'discardedState': discardedState,
 				'backState': backState,
 				'forwardState': forwardState
@@ -186,10 +190,12 @@
 		 */
 		History.discardedState = function(State){
 			// Prepare
-			var StateHash = History.getHashByState(State);
+			var
+				StateHash = History.getHashByState(State),
+				discarded;
 
 			// Check
-			var discarded = History.discardedStates[StateHash]||false;
+			discarded = History.discardedStates[StateHash]||false;
 
 			// Return true
 			return discarded;
@@ -247,7 +253,9 @@
 
 				// Define some variables that will help in our checker function
 				var
-					lastDocumentHash = '';
+					lastDocumentHash = '',
+					iframeId, iframe,
+					lastIframeHash, checkerRunning;
 
 				// Handle depending on the browser
 				if ( History.isInternetExplorer() ) {
@@ -255,9 +263,8 @@
 					// We need to use an iframe to emulate the back and forward buttons
 
 					// Create iFrame
-					var
-						iframeId = 'historyjs-iframe',
-						iframe = document.createElement('iframe');
+					iframeId = 'historyjs-iframe';
+					iframe = document.createElement('iframe');
 
 					// Adjust iFarme
 					iframe.setAttribute('id', iframeId);
@@ -271,12 +278,15 @@
 					iframe.contentWindow.document.close();
 
 					// Define some variables that will help in our checker function
-					var
-						lastIframeHash = '',
-						checkerRunning = false;
+					lastIframeHash = '';
+					checkerRunning = false;
 
 					// Define the checker function
 					History.checkerFunction = function(){
+						// Prepare
+						var
+							documentHash, iframeHash;
+
 						// Check Running
 						if ( checkerRunning ) {
 							return false;
@@ -286,9 +296,8 @@
 						checkerRunning = true;
 
 						// Fetch
-						var
-							documentHash = History.getHash()||'',
-							iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash)||'';
+						documentHash = History.getHash()||'';
+						iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash)||'';
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -390,7 +399,8 @@
 					currentHash						= History.getHashByUrl(currentUrl),
 					currentState					= null,
 					currentStateHash			= null,
-					currentStateHashExits	= null;
+					currentStateHashExits	= null,
+					discardObject;
 
 				// Check if we are the same state
 				if ( History.isLastHash(currentHash) ) {
@@ -430,7 +440,7 @@
 				currentStateHash = History.getHashByState(currentState);
 
 				// Check if we are DiscardedState
-				var discardObject = History.discardedState(currentState);
+				discardObject = History.discardedState(currentState);
 				if ( discardObject ) {
 					// Ignore this state as it has been discarded and go back to the state before it
 					if ( History.getHashByIndex(-2) === History.getHashByState(discardObject.forwardState) ) {
@@ -445,14 +455,90 @@
 					return false;
 				}
 
+				// Make Busy
+				History.busy(true);
+
 				// Push the new HTML5 State
 				//History.debug('History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,currentState.url,false);
+				History.addState(currentState.data,currentState.title,currentState.url);
 
 				// End onHashChange closure
 				return true;
 			};
 			History.Adapter.bind(window,'hashchange',History.onHashChange);
+
+			/**
+			 *
+			 */
+			History.addState = function(data,title,url,caller){
+				// Fetch the State Object
+				var
+					newState = History.createStateObject(data,title,url),
+					newStateHash = History.getHashByState(newState),
+					oldState = History.getState(false),
+					oldStateHash = History.getHashByState(oldState),
+					html4Hash = History.getHash(),
+					previousState;
+
+				// Handle
+				if ( caller === 'replaceState' ) {
+					// Fetch
+					previousState = History.getStateByIndex(-2);
+
+					// Discard Old State
+					History.discardState(oldState,newState,previousState);
+				}
+
+				// Store the newState
+				History.storeState(newState);
+				History.expectedStateId = newState.id;
+
+				// Recycle the State
+				History.recycleState(newState);
+
+				// Force update of the title
+				History.setTitle(newState);
+
+				// Check if we are the same State
+				if ( newStateHash === oldStateHash ) {
+					History.debug('History.pushState: no change', newStateHash);
+					// Update Same
+					History.temp.same = true;
+				}
+				else {
+					// A state change has occured
+
+					// Update HTML4 Hash
+					if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
+						// As the hashes are different we will go through updating the hash
+						// We then exit, and wait to be called again by the hashchange handler
+						History.debug('History.pushState: update hash', newStateHash, html4Hash);
+						History.setHash(newStateHash,false);
+						return false;
+					}
+
+					// Update HTML5 State
+					History.saveState(newState);
+
+					// Check for Ignore
+					if ( History.temp.ignore ) {
+						--History.temp.ignore;
+						History.busy(false);
+						return false;
+					}
+
+					// Update Same
+					History.temp.same = false;
+				}
+
+				// Fire HTML5 Event
+				//History.debug('History.pushState: trigger popstate');
+				History.Adapter.trigger(window,'statechange');
+				History.busy(false);
+
+				// Return
+				return true;
+			};
 
 			/**
 			 * History.pushState(data,title,url)
@@ -488,48 +574,11 @@
 				// Make Busy
 				History.busy(true);
 
-				// Fetch the State Object
-				var
-					newState = History.createStateObject(data,title,url),
-					newStateHash = History.getHashByState(newState),
-					oldState = History.getState(false),
-					oldStateHash = History.getHashByState(oldState),
-					html4Hash = History.getHash();
+				// Update Internal
+				History.temp.internal = queue !== false ? 'pushState' : false;
 
-				// Store the newState
-				History.storeState(newState);
-				History.expectedStateId = newState.id;
-
-				// Recycle the State
-				History.recycleState(newState);
-
-				// Force update of the title
-				History.setTitle(newState);
-
-				// Check if we are the same State
-				if ( newStateHash === oldStateHash ) {
-					//History.debug('History.pushState: no change', newStateHash);
-					History.busy(false);
-					return false;
-				}
-
-				// Update HTML4 Hash
-				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
-					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
-					History.setHash(newStateHash,false);
-					return false;
-				}
-
-				// Update HTML5 State
-				History.saveState(newState);
-
-				// Fire HTML5 Event
-				//History.debug('History.pushState: trigger popstate');
-				History.Adapter.trigger(window,'statechange');
-				History.busy(false);
-
-				// End pushState closure
-				return true;
+				// Alias to addState
+				return History.addState(data,title,url,'pushState');
 			};
 
 			/**
@@ -565,20 +614,11 @@
 				// Make Busy
 				History.busy(true);
 
-				// Fetch the State Objects
-				var
-					newState        = History.createStateObject(data,title,url),
-					oldState        = History.getState(false),
-					previousState   = History.getStateByIndex(-2);
+				// Update Internal
+				History.temp.internal = queue !== false ? 'replaceState' : false;
 
-				// Discard Old State
-				History.discardState(oldState,newState,previousState);
-
-				// Alias to PushState
-				History.pushState(newState.data,newState.title,newState.url,false);
-
-				// End replaceState closure
-				return true;
+				// Alias to addState
+				return History.addState(data,title,url,'replaceState');
 			};
 
 			/**

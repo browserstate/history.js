@@ -65,12 +65,17 @@
 			"js": true,
 			"jsOptions": {
 				"browser": true,
-				"laxbreak": true
+				"laxbreak": true,
+				"boss": true,
+				"undef": true,
+				"onevar": true,
+				"strict": true
 			}
 		},
 		"ignore": {
 			"check": [
-				"json2.js"
+				"json2.js",
+				"amplify.store.js"
 			]
 		},
 		"bundle": false,

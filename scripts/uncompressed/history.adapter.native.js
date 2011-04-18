@@ -11,4 +11,4 @@
  * This means that say instead of doing $('window').bind('statechange',callback)
  * You would actually have to do History.Adapter.bind('statechange',callback)
  */
-alert('The History.js Native Adapter is not yet finished.');
+window.alert('The History.js Native Adapter is not yet finished.');

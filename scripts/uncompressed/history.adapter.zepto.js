@@ -7,6 +7,8 @@
 
 // Closure
 (function(window,undefined){
+	"use strict";
+
 	// Localise Globals
 	var
 		History = window.History = window.History||{},
@@ -27,7 +29,7 @@
 		 * @return {void}
 		 */
 		bind: function(el,event,callback){
-			Zepto(el).bind(event,callback);
+			new Zepto(el).bind(event,callback);
 		},
 
 		/**
@@ -37,7 +39,7 @@
 		 * @return {void}
 		 */
 		trigger: function(el,event){
-			Zepto(el).trigger(event);
+			new Zepto(el).trigger(event);
 		},
 
 		/**
@@ -60,7 +62,7 @@
 		 * @return {void}
 		 */
 		onDomLoad: function(callback) {
-			Zepto(callback);
+			new Zepto(callback);
 		}
 	};
 

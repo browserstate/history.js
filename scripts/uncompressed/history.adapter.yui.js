@@ -9,9 +9,11 @@
  * YUI requires the following features in order to be suitable for History.js:
  * - The ability to bind and trigger custom events such as 'statechange'
  */
-alert('The History.js YUI Adapter is not yet finished.');
+window.alert('The History.js YUI Adapter is not yet finished.');
 
 window.YUI().use('node-base node-event-simulate event', function(Y){
+	"use strict";
+
 	// Localise Globals
 	var
 		History = window.History = window.History||{};

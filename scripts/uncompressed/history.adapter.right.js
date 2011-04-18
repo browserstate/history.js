@@ -7,6 +7,8 @@
 
 // Closure
 (function(window,undefined){
+	"use strict";
+
 	// Localise Globals
 	var
 		History = window.History = window.History||{},

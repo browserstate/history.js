@@ -34,19 +34,47 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 			History.log(State.data, State.title, State.url);
 		});
 
-		// Change our States
-		History.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"
-		History.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"
-		History.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"
-		History.pushState(null, null, "?state=4"); // logs {}, '', "?state=4"
-		History.back(); // logs {state:3}, "State 3", "?state=3"
-		History.back(); // logs {state:1}, "State 1", "?state=1"
-		History.back(); // logs {}, "Home Page", "?"
-		History.go(2); // logs {state:3}, "State 3", "?state=3"
+		// Check the Initial State
+		var initialState = History.getState();
+		History.log(initialState.data, initialState.title, initialState.url);
+		// ^ Logs: {}, "Home Page", "?"
+
+		// Add our States
+		History.pushState({state:1}, "State 1", "?state=1");
+		// ^ Logs: {state:1}, "State 1", "?state=1"
+		History.pushState({state:2}, "State 2", "?state=2");
+		// ^ Logs: {state:2}, "State 2", "?state=2"
+		History.replaceState({state:3}, "State 3", "?state=3");
+		// ^ Logs: {state:3}, "State 3", "?state=3"
+		History.pushState(null, null, "?state=4");
+		// ^ Logs: {}, '', "?state=4"
+
+		// Notice how the above calls trigger statechange events, if for some reason you do not want this to happen
+		// then inside your statechange handler you can use the following:
+		// if ( History.getState().internal ) { return; }
+
+		// Other special variables include:
+		// `History.getState().anchor` for when the state includes a traditional anchor
+		// and `History.getState().same` for when the state is the same as the last state (no change)
+
+		// Traverse our States
+		History.back();
+		// ^ Logs: {state:3}, "State 3", "?state=3"
+		History.back();
+		// ^ Logs: {state:1}, "State 1", "?state=1"
+		History.back();
+		// ^ Logs: {}, "Home Page", "?"
+		History.go(2);
+		// ^ Logs: logs {state:3}, "State 3", "?state=3"
 
 	})(window);
 
-To ajaxify your entire website with the HTML5 History API, History.js and jQuery [this snippet of code](https://gist.github.com/854622) is all you need. It's that easy.
+For solutions to ajaxify your entire website with History.js and zero-configuration there is:
+
+- [This snippet of jQuery code](https://gist.github.com/854622) which you can drop into your site
+- [This bookmarklet](https://gist.github.com/919358) which you can use to see what your website (or others) looks like with History.js enabled
+- [This Google Chrome Extension](https://chrome.google.com/extensions/detail/oikegcanmmpmcmbkdopcfdlbiepmcebg) which you can use to inject History.js and keep it injected on websites of your choice
+
 
 ### How would the above operations look in a HTML5 Browser?
 
@@ -61,6 +89,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 1. www.mysite.com/?state=3
 
 > Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling).
+
 
 ### How would they look in a HTML4 Browser?
 
@@ -80,6 +109,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 >
 > Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
+
 ### What's the deal with the SUIDs used in the HTML4 States?
 
 - SUIDs (State Unique Identifiers) are used when we utilise a `title` and/or `data` in our state. Adding a SUID allows us to associate particular states with data and titles while keeping the urls as simple as possible (don't worry it's all tested, working and a lot smarter than I'm making it out to be).
@@ -96,13 +126,13 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 ## Download & Installation
 
-1. Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/History.js/tarball/master) or [zip](https://github.com/balupton/History.js/zipball/master)
+1. Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/history.js/tarball/master) or [zip](https://github.com/balupton/history.js/zipball/master)
 
 2. Include [JSON2](http://www.json.org/js.html) for HTML4 Browsers Only *(replace www.yourwebsite.com)*
 
 		<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="http://www.yourwebsite.com/history.js/scripts/compressed/json2.js"><\/script>'); }</script>
 
-3. Include [Amplify.js Store](http://amplifyjs.com/) for Data Persistance and Synchronisation Support (optional but recommended)
+3. Include [Amplify.js Store](http://amplifyjs.com/api/store) for Data Persistance and Synchronisation Support (optional but recommended)
 
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/amplify.store.js"></script>
 
@@ -120,7 +150,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
 
-	- [RightJS](http://rightjs.org/) v2.2.3+
+	- [RightJS](http://rightjs.org/) v2.2+
 
 			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.right.js"></script>
 
@@ -191,8 +221,11 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 - `History.pushState(data,title,url)` <br/> Pushes a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
 - `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
-- `History.getState()` <br/> Gets the current state of the browser, returns a State object with the keys `data`, `title`, `url` and some special ones:
-	- `internal`: enum of `'pushState'`, `'replaceState'` or `false`: whether or not were called internally or externally (back/forward button, refresh, new page)
+- `History.getState()` <br/> Gets the current state of the browser, returns a State object with the keys:
+	- `data`: object: the state data that was pushed
+	- `title`: string or `null`: the state title that was pushed
+	- `url`: string: the state url that was pushed
+	- `internal`: enum of `'pushState'`, `'replaceState'` or `false`: whether or not we where called internally or externally (back/forward button, refresh, new page)
 	- `same`: boolean value: whether or not this state is the same as the last one
 	- `anchor`: string or `false`: if the state has a traditional anchor, this is it
 - `History.getHash()` <br/> Gets the current hash of the browser

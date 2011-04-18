@@ -7,10 +7,13 @@
 
 // Closure
 (function(window,undefined){
+	"use strict";
+
 	// Localise Globals
 	var
 		History = window.History = window.History||{},
-		MooTools = window.MooTools;
+		MooTools = window.MooTools,
+		Element = window.Element;
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {

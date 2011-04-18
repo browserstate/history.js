@@ -1,0 +1,1 @@
+window.alert("The History.js Dojo Adapter is not yet finished.")

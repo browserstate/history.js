@@ -14,6 +14,8 @@
 
 // Closure
 (function(window,undefined){
+	"use strict";
+
 	// Localise Globals
 	var
 		History = window.History = window.History||{},
@@ -61,11 +63,14 @@
 		// Check for Native Event
 		Event.hasNativeEvent = function(element, eventName) {
 			// Prepare
-			var eventType = null, result;
+			var
+				eventType = null, result, name;
+
+			// Fetch
 			element = $(element);
 
 			// Cycle
-			for (var name in eventMatchers) {
+			for (name in eventMatchers) {
 				if ( eventMatchers[name].test(eventName) ) {
 					eventType = name;
 					break;
@@ -101,12 +106,15 @@
 		// Trigger
 		Event.trigger = function(element, eventName) {
 			// Prepare
-			var options = Object.extend(defaultOptions, arguments[2] || { });
-			var oEvent, eventType = null;
+			var
+				options = Object.extend(defaultOptions, arguments[2] || { }),
+				oEvent, eventType = null, name;
+
+			// Fetch
 			element = $(element);
 
 			// Check for Native Event
-			var name; for (name in eventMatchers) {
+			for (name in eventMatchers) {
 				if (eventMatchers[name].test(eventName)) { eventType = name; break; }
 			}
 
