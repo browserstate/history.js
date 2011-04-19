@@ -691,34 +691,41 @@
 			newState.title = oldState.title||'';
 			newState.url = History.getFullUrl(History.unescapeString(oldState.url||document.location.href));
 			newState.data = History.cloneObject(oldState.data);
-
-			// Extract Anchor
-			newState.anchor = newState.url.replace(/^[^#]+#?/,'')||false;
-			newState.url = newState.url.replace(/#.*/,'');
-
-			// Hash
+			newState.anchor = History.extractAnchor(newState.url);
 			newState.hash = History.getShortUrl(newState.url);
 
-			// Fetch ID
+			// ID
 			newState.id = History.getIdByState(newState);
 
 			// ----------------------------------------------------------------------
 
 			// Clean the URL
-			newState.cleanUrl = newState.url.replace(/\??\&_suid.*/,'');
+			newState.cleanUrl = newState.url.replace(/\??\&_anchor.*/,'').replace(/\??\&_suid.*/,'').replace(/#.*/,'');
 			newState.url = newState.cleanUrl;
 
 			// Check to see if we have more than just a url
 			dataNotEmpty = !History.isEmptyObject(newState.data);
 
-			// Apply
+			// Add SUID to the Hash
 			if ( newState.title || dataNotEmpty ) {
 				// Add ID to Hash
-				newState.hash = History.getShortUrl(newState.url).replace(/\??\&_suid.*/,'');
+				newState.hash = History.getShortUrl(newState.url);
 				if ( !/\?/.test(newState.hash) ) {
 					newState.hash += '?';
 				}
 				newState.hash += '&_suid='+newState.id;
+			}
+
+			// Add Anchor to the Hash
+			if ( newState.anchor ) {
+				if ( !/\?/.test(newState.hash) ) {
+					newState.hash += '?';
+				}
+				if ( History.emulated.pushState ) {
+					// Safari 5 doesn't need this
+					newState.hash += '&_anchor='+newState.anchor;
+				}
+				newState.url += '#'+newState.anchor;
 			}
 
 			// Create the Hashed URL
@@ -834,10 +841,33 @@
 		};
 
 		/**
+		 * History.extractAnchor(url_or_hash)
+		 * Get a State Anchor by it's URL or Hash
+		 * @param {string} url_or_hash
+		 * @return {string|false} anchor
+		 */
+		History.extractAnchor = function ( url_or_hash ) {
+			// Prepare
+			var anchor,parts,url;
+
+			// Obvious
+			anchor = url_or_hash.replace(/^[^#]+#?/,'');
+			if ( !anchor ) {
+				// Advanced
+				parts = /(.*)\&_anchor=([a-zA-Z0-9_\-]+)$/.exec(url_or_hash);
+				url = parts ? (parts[1]||url_or_hash) : url_or_hash;
+				anchor = parts ? String(parts[2]||'') : '';
+			}
+
+			// Return
+			return anchor||false;
+		};
+
+		/**
 		 * History.extractId(url_or_hash)
 		 * Get a State ID by it's URL or Hash
 		 * @param {string} url_or_hash
-		 * @return {string} id
+		 * @return {string|false} id
 		 */
 		History.extractId = function ( url_or_hash ) {
 			// Prepare
@@ -860,7 +890,7 @@
 		 */
 		History.isTraditionalAnchor = function(url_or_hash){
 			// Check
-			var isTraditional = !(/[\/\?\.]/.test(url_or_hash));
+			var isTraditional = !(/[^a-zA-Z0-9_\-]/.test(url_or_hash));
 
 			// Return
 			return isTraditional;
@@ -872,10 +902,11 @@
 		 * @param {string} url_or_hash
 		 * @return {State|null}
 		 */
-		History.extractState = function(url_or_hash,create){
+		History.extractState = function(url_or_hash,create,allowTraditional){
 			// Prepare
 			var State = null, id, url, anchor;
 			create = create||false;
+			allowTraditional = typeof allowTraditional === 'undefined' ? true : allowTraditional;
 
 			// Strip Anchor
 			url_or_hash = url_or_hash;
@@ -892,14 +923,19 @@
 				url = History.getFullUrl(url_or_hash);
 
 				// Check URL
-				id = History.getIdByUrl(url.replace(/#.*/,''))||false;
+				id = History.getIdByUrl(url)||false;
 				if ( id ) {
 					State = History.getStateById(id);
 				}
 
 				// Create State
-				if ( !State && create && !History.isTraditionalAnchor(url_or_hash) ) {
-					State = History.createStateObject(null,null,url);
+				if ( !State && create ) {
+					if ( !allowTraditional && History.isTraditionalAnchor(url_or_hash) ) {
+						// do nothing
+					}
+					else {
+						State = History.createStateObject(null,null,url);
+					}
 				}
 			}
 
@@ -964,32 +1000,40 @@
 		 * @return {Object} newState
 		 */
 		History.storeState = function(newState){
+			// Check Hash
+			if ( History.isLastStoredState(newState) ) {
+				return newState;
+			}
+
 			// Store the State
 			History.urlToId[newState.url] = newState.id;
 
 			// Push the State
-			History.storedStates.push(History.cloneObject(newState));
+			History.storedStates.push(newState.id);
 
-			// Return newState
+			// Return
 			return newState;
 		};
 
 		/**
-		 * History.isLastSavedState(newState)
+		 * History.isLastStoredState(newState)
 		 * Tests to see if the state is the last state
 		 * @param {Object} newState
 		 * @return {boolean} isLast
 		 */
-		History.isLastSavedState = function(newState){
+		History.isLastStoredState = function(newState){
 			// Prepare
 			var
 				isLast = false,
-				newId, oldState, oldId;
+				oldState,
+				newId, oldId;
 
 			// Check
-			if ( History.savedStates.length ) {
+			if ( History.storedStates.length ) {
+				oldState = History.getLastStoredState();
+
+				// Compare ids
 				newId = newState.id;
-				oldState = History.getLastSavedState();
 				oldId = oldState.id;
 
 				// Check
@@ -1001,22 +1045,72 @@
 		};
 
 		/**
+		 * History.isLastSavedState(newState)
+		 * Tests to see if the state is the last state
+		 * @param {Object} newState
+		 * @param {boolean=} friendly (optional)
+		 * @return {boolean} isLast
+		 */
+		History.isLastSavedState = function(newState,friendly){
+			// Prepare
+			var
+				isLast = false,
+				oldState,
+				newId, oldId,
+				newFriendly, oldFriendly;
+
+			// Check
+			if ( History.savedStates.length ) {
+				oldState = History.getLastSavedState();
+
+				// How do we compare
+				if ( friendly ) {
+					// Compare data, title and url
+					newFriendly = {
+						data: newState.data,
+						title: newState.title,
+						url: newState.cleanUrl
+					};
+					oldFriendly = {
+						data: oldState.data,
+						title: oldState.title,
+						url: oldState.cleanUrl
+					};
+
+					// Check
+					isLast = (JSON.stringify(newFriendly) === JSON.stringify(oldFriendly));
+				}
+				else {
+					// Compare ids
+					newId = newState.id;
+					oldId = oldState.id;
+
+					// Check
+					isLast = (newId === oldId);
+				}
+			}
+
+			// Return
+			return isLast;
+		};
+
+		/**
 		 * History.saveState
 		 * Push a State
 		 * @param {Object} newState
-		 * @return {boolean} changed
+		 * @return {Object} newState
 		 */
 		History.saveState = function(newState){
 			// Check Hash
 			if ( History.isLastSavedState(newState) ) {
-				return false;
+				return newState;
 			}
 
 			// Push the State
 			History.savedStates.push(newState.id);
 
-			// Return true
-			return true;
+			// Return
+			return newState;
 		};
 
 		/**
@@ -1142,13 +1236,13 @@
 			var
 				adjustedHash = History.escapeHash(hash),
 				State, pageUrl,
-				hashState;
+				parentState;
 
 			// Make Busy + Continue
 			History.busy(true);
 
 			// Check if hash is a state
-			State = History.extractState(hash,true);
+			State = History.extractState(hash,true,false);
 			if ( State && !History.emulated.pushState ) {
 				// Hash is a state so skip the setHash
 				History.debug('History.setHash: Hash is a state so skipping the hash set with a direct pushState call',arguments);
@@ -1166,20 +1260,16 @@
 					// Fetch the base page
 					pageUrl = History.getPageUrl();
 
-					// Fetch Hash State
-					hashState = History.extractState(pageUrl);
-
-					// Update Internal
-					History.temp.internal = false;
-					History.temp.anchor = adjustedHash;
-					History.temp.same = History.isLastSavedState(hashState,true);
+					// Fetch Parent State
+					parentState = History.extractState(pageUrl.replace(/#.*/,''));
 
 					// Apply the State
-					history.pushState(hashState.id,hashState.title,hashState.url+adjustedHash);
-
-					// Fire
-					History.Adapter.trigger(window,'statechange');
-					History.busy(false);
+					if ( parentState ) {
+						History.pushState(parentState.data,parentState.title,parentState.url+'#'+adjustedHash,false);
+					}
+					else {
+						History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
+					}
 				}
 				else {
 					// Normal hash apply
@@ -1476,7 +1566,7 @@
 				newState;
 
 			// Check for a difference
-			if ( !History.isLastSavedState(urlState) ) {
+			if ( urlState && !History.isLastSavedState(urlState) ) {
 				newState = urlState;
 			}
 			else {
@@ -1697,7 +1787,7 @@
 			History.onPopState = function(event,eventData){
 				// Prepare
 				var
-					currentHash, currentState, newState = false, stateId = false, internal = false;
+					currentHash, currentState, parentState, newState = false, stateId = false, internal = false;
 
 				// Reset the double check
 				History.doubleCheckComplete();
@@ -1706,24 +1796,18 @@
 				currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					currentState = History.extractState(currentHash||document.location.href,true);
+					currentState = History.extractState(currentHash||document.location.href,true,false);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
 						History.debug('History.onPopState: state anchor', currentHash, currentState);
 						History.replaceState(currentState.data, currentState.title, currentState.url, false);
-						History.temp.expectedStateId = false;
-						History.temp.anchor = false;
 						return false;
 					}
 					else {
 						// Traditional Anchor
 						History.debug('History.onPopState: traditional anchor', currentHash);
-						History.temp.anchor = currentHash;
 					}
-				}
-				else {
-					History.temp.anchor = false;
 				}
 
 				// Extract
@@ -1745,16 +1829,20 @@
 
 				// The State did not exist in our store
 				if ( !newState ) {
-					// Regenerate the State
-					newState = History.createStateObject(null,null,document.location.href);
-				}
+					// Is there an anchor?
+					// If so generate from the parent state if it exists
+					if ( currentHash ) {
+						parentState = History.extractState(document.location.href.replace(/#.*/,''));
+						if ( parentState ) {
+							newState = History.createStateObject(parentState.data,parentState.title,document.location.href);
+						}
+					}
 
-				// Clean
-				if ( !History.temp.expectedStateId ) {
-					History.temp.internal = false;
+					// Regenerate the State
+					if ( !newState ) {
+						newState = History.createStateObject(null,null,document.location.href);
+					}
 				}
-				History.temp.expectedStateId = false;
-				newState.anchor = false;
 
 				// Check for Ignore
 				if ( History.temp.ignore ) {
@@ -1763,27 +1851,29 @@
 					return false;
 				}
 
-				// Check if we are the same state
-				if ( History.isLastSavedState(newState) ) {
-					// It is only possible to reach here via external influence, but even then, it should be impossible
-					// There has been no change (just the page's hash has finally propagated)
-					//History.debug('History.onPopState: no change', newState, History.savedStates);
-
-					// Won't be a change
-					History.temp.same = true;
-					History.Adapter.trigger(window,'statechange');
-					History.busy(false);
-
-					// Return false
-					return false;
+				// Prevent a back traversal where a hash has changed from triggering popstate and hashchange
+				if ( History.temp.internal === 'hashchange' ) {
+					// Check
+					if ( History.isLastSavedState(newState) ) {
+						History.busy(false);
+						return false;
+					}
+					// Reset
+					History.temp.internal = false;
 				}
+
+				// Clean
+				if ( !History.temp.expectedStateId ) {
+					History.temp.internal = false;
+				}
+				History.temp.expectedStateId = false;
+
+				// Check for Same
+				History.temp.same = History.isLastSavedState(newState,true);
 
 				// Store the State
 				History.storeState(newState);
 				History.saveState(newState);
-
-				// Update Same
-				History.temp.same = false;
 
 				// Force update of the title
 				History.setTitle(newState);
@@ -1809,11 +1899,6 @@
 			History.pushState = function(data,title,url,queue){
 				History.debug('History.pushState: called', arguments);
 
-				// Check the State
-				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
-				}
-
 				// Handle Queueing
 				if ( queue !== false && History.busy() ) {
 					// Wait + Push to Queue
@@ -1835,28 +1920,21 @@
 
 				// Update Internal
 				if ( queue !== false ) { History.temp.internal = 'pushState'; }
-				History.temp.anchor = newState.anchor;
+				History.temp.same = History.isLastSavedState(newState,true);
 
 				// Check it
 				if ( History.isLastSavedState(newState) ) {
-					// Won't be a change
-					History.temp.same = true;
-
 					// Fire HTML5 Event
 					// We fire statechange here as we do not need any extra processing
 					History.Adapter.trigger(window,'statechange');
 					History.busy(false);
 				}
 				else {
-					// Will be a change
-					History.temp.same = false;
-
 					// Store the newState
 					History.storeState(newState);
 
 					// Push the newState
-					pushUrl = newState.anchor ? newState.url+'#'+newState.anchor : newState.url;
-					history.pushState(newState.id,newState.title,pushUrl);
+					history.pushState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
 					History.temp.expectedStateId = newState.id;
@@ -1879,11 +1957,6 @@
 			History.replaceState = function(data,title,url,queue){
 				History.debug('History.replaceState: called', arguments);
 
-				// Check the State
-				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
-				}
-
 				// Handle Queueing
 				if ( queue !== false && History.busy() ) {
 					// Wait + Push to Queue
@@ -1905,25 +1978,21 @@
 
 				// Update Internal
 				if ( queue !== false ) { History.temp.internal = 'replaceState'; }
-				History.temp.anchor = newState.anchor;
+				History.temp.same = History.isLastSavedState(newState,true);
 
 				// Check it
 				if ( History.isLastSavedState(newState) ) {
-					// Won't be a change
-					History.temp.same = true;
+					// Fire HTML5 Event
+					// We fire statechange here as we do not need any extra processing
 					History.Adapter.trigger(window,'statechange');
 					History.busy(false);
 				}
 				else {
-					// Will be a change
-					History.temp.same = false;
-
 					// Store the newState
 					History.storeState(newState);
 
 					// Push the newState
-					pushUrl = newState.anchor ? newState.url+'#'+newState.anchor : newState.url;
-					history.replaceState(newState.id,newState.title,pushUrl);
+					history.replaceState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
 					History.temp.expectedStateId = newState.id;
@@ -1963,6 +2032,7 @@
 			if ( History.bugs.noHashPopState ) {
 				// Alias
 				History.Adapter.bind(window,'hashchange',function(){
+					History.temp.internal = 'hashchange';
 					History.Adapter.trigger(window,'popstate');
 				});
 

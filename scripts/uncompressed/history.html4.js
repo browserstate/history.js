@@ -552,12 +552,6 @@
 			History.pushState = function(data,title,url,queue){
 				//History.debug('History.pushState: called', arguments);
 
-				// Check the State
-				var urlHash = History.getHashByUrl(url);
-				if ( urlHash ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors). ['+urlHash+']');
-				}
-
 				// Handle Queueing
 				if ( queue !== false && History.busy() ) {
 					// Wait + Push to Queue
