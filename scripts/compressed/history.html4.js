@@ -1,1 +1,640 @@
-(function(a,b){"use strict";var c=a.document,d=a.setTimeout||d,e=a.clearTimeout||e,f=a.setInterval||f,g=a.History=a.History||{};if(typeof g.initHtml4!="undefined")throw new Error("History.js HTML4 Support has already been loaded...");g.initHtml4=function(){if(typeof g.initHtml4.initialized!="undefined")return!1;g.initHtml4.initialized=!0,g.enabled=!0,g.savedHashes=[],g.isLastHash=function(a){var b=g.getHashByIndex(),c;c=a===b;return c},g.saveHash=function(a){if(g.isLastHash(a))return!1;g.savedHashes.push(a);return!0},g.getHashByIndex=function(a){var b=null;typeof a=="undefined"?b=g.savedHashes[g.savedHashes.length-1]:a<0?b=g.savedHashes[g.savedHashes.length+a]:b=g.savedHashes[a];return b},g.discardedHashes={},g.discardedStates={},g.discardState=function(a,b,c){var d=g.getHashByState(a),e;e={discardedState:a,backState:c,forwardState:b},g.discardedStates[d]=e},g.discardHash=function(a,b,c){var d={discardedHash:a,backState:c,forwardState:b};g.discardedHashes[a]=d},g.discardedState=function(a){var b=g.getHashByState(a),c;c=g.discardedStates[b]||!1;return c},g.discardedHash=function(a){var b=g.discardedHashes[a]||!1;return b},g.recycleState=function(a){var b=g.getHashByState(a);g.discardedState(a)&&delete g.discardedStates[b]},g.emulated.hashChange&&(g.hashChangeInit=function(){g.checkerFunction=null;var b="",d,e,h,i;g.isInternetExplorer()?(d="historyjs-iframe",e=c.createElement("iframe"),e.setAttribute("id",d),e.style.display="none",c.body.appendChild(e),e.contentWindow.document.open(),e.contentWindow.document.close(),h="",i=!1,g.checkerFunction=function(){var c,d;if(i)return!1;i=!0,c=g.getHash()||"",d=g.unescapeHash(e.contentWindow.document.location.hash)||"",c!==b?(b=c,d!==c&&(h=d=c,e.contentWindow.document.open(),e.contentWindow.document.close(),e.contentWindow.document.location.hash=g.escapeHash(c)),g.Adapter.trigger(a,"hashchange")):d!==h&&(h=d,g.setHash(d,!1)),i=!1;return!0}):g.checkerFunction=function(){var c=g.getHash();c!==b&&(b=c,g.Adapter.trigger(a,"hashchange"));return!0},f(g.checkerFunction,g.options.hashChangeInterval);return!0},g.Adapter.onDomLoad(g.hashChangeInit)),g.emulated.pushState&&(g.onHashChange=function(b){var d=b&&b.newURL||c.location.href,e=g.getHashByUrl(d),f=null,h=null,i=null,j;if(g.isLastHash(e)){g.busy(!1);return!1}g.doubleCheckComplete(),g.saveHash(e);if(e&&g.isTraditionalAnchor(e)){g.Adapter.trigger(a,"anchorchange"),g.busy(!1);return!1}f=g.extractState(g.getFullUrl(e||c.location.href,!1),!0);if(g.isLastSavedState(f)){g.busy(!1);return!1}h=g.getHashByState(f),j=g.discardedState(f);if(j){g.getHashByIndex(-2)===g.getHashByState(j.forwardState)?g.back(!1):g.forward(!1);return!1}g.busy(!0),g.addState(f.data,f.title,f.url);return!0},g.Adapter.bind(a,"hashchange",g.onHashChange),g.addState=function(b,d,e,f){var h=g.createStateObject(b,d,e),i=g.getHashByState(h),j=g.getState(!1),k=g.getHashByState(j),l=g.getHash(),m;f==="replaceState"&&(m=g.getStateByIndex(-2),g.discardState(j,h,m)),g.storeState(h),g.expectedStateId=h.id,g.recycleState(h),g.setTitle(h);if(i===k)g.debug("History.pushState: no change",i),g.temp.same=!0;else{if(i!==l&&i!==g.getShortUrl(c.location.href)){g.debug("History.pushState: update hash",i,l),g.setHash(i,!1);return!1}g.saveState(h);if(g.temp.ignore){--g.temp.ignore,g.busy(!1);return!1}g.temp.same=!1}g.Adapter.trigger(a,"statechange"),g.busy(!1);return!0},g.pushState=function(a,b,c,d){var e=g.getHashByUrl(c);if(e)throw new Error("History.js does not support states with fragement-identifiers (hashes/anchors). ["+e+"]");if(d!==!1&&g.busy()){g.pushQueue({scope:g,callback:g.pushState,args:arguments,queue:d});return!1}g.busy(!0),g.temp.internal=d!==!1?"pushState":!1;return g.addState(a,b,c,"pushState")},g.replaceState=function(a,b,c,d){if(g.getHashByUrl(c))throw new Error("History.js does not support states with fragement-identifiers (hashes/anchors).");if(d!==!1&&g.busy()){g.pushQueue({scope:g,callback:g.replaceState,args:arguments,queue:d});return!1}g.busy(!0),g.temp.internal=d!==!1?"replaceState":!1;return g.addState(a,b,c,"replaceState")},g.getHash()&&!g.emulated.hashChange&&g.Adapter.onDomLoad(function(){g.Adapter.trigger(a,"hashchange")}))},g.init()})(window)
+/**
+ * History.js HTML4 Support
+ * Depends on the HTML5 Support
+ * @author Benjamin Arthur Lupton <contact@balupton.com>
+ * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+ * @license New BSD License <http://creativecommons.org/licenses/BSD/>
+ */
+
+(function(window,undefined){
+	"use strict";
+
+	// --------------------------------------------------------------------------
+	// Initialise
+
+	// Localise Globals
+	var
+		document = window.document, // Make sure we are using the correct document
+		setTimeout = window.setTimeout||setTimeout,
+		clearTimeout = window.clearTimeout||clearTimeout,
+		setInterval = window.setInterval||setInterval,
+		History = window.History = window.History||{}; // Public History Object
+
+	// Check Existence
+	if ( typeof History.initHtml4 !== 'undefined' ) {
+		throw new Error('History.js HTML4 Support has already been loaded...');
+	}
+
+	// --------------------------------------------------------------------------
+	// Initialise HTML4 Support
+
+	// Initialise HTML4 Support
+	History.initHtml4 = function(){
+		// Initialise
+		if ( typeof History.initHtml4.initialized !== 'undefined' ) {
+			// Already Loaded
+			return false;
+		}
+		else {
+			History.initHtml4.initialized = true;
+		}
+
+		// ----------------------------------------------------------------------
+		// Properties
+
+		/**
+		 * History.enabled
+		 * Is History enabled?
+		 */
+		History.enabled = true;
+
+
+		// ----------------------------------------------------------------------
+		// Hash Storage
+
+		/**
+		 * History.savedHashes
+		 * Store the hashes in an array
+		 */
+		History.savedHashes = [];
+
+		/**
+		 * History.isLastHash(newHash)
+		 * Checks if the hash is the last hash
+		 * @param {string} newHash
+		 * @return {boolean}
+		 */
+		History.isLastHash = function(newHash){
+			// Prepare
+			var
+				oldHash = History.getHashByIndex(),
+				isLast;
+
+			// Check
+			isLast = newHash === oldHash;
+
+			// Return isLast
+			return isLast;
+		};
+
+		/**
+		 * History.saveHash(newHash)
+		 * Push a Hash
+		 * @param {string} newHash
+		 * @return {boolean}
+		 */
+		History.saveHash = function(newHash){
+			// Check Hash
+			if ( History.isLastHash(newHash) ) {
+				return false;
+			}
+
+			// Push the Hash
+			History.savedHashes.push(newHash);
+
+			// Return true
+			return true;
+		};
+
+		/**
+		 * History.getHashByIndex()
+		 * Gets a hash by the index
+		 * @param {integer} index
+		 * @return {string}
+		 */
+		History.getHashByIndex = function(index){
+			// Prepare
+			var hash = null;
+
+			// Handle
+			if ( typeof index === 'undefined' ) {
+				// Get the last inserted
+				hash = History.savedHashes[History.savedHashes.length-1];
+			}
+			else if ( index < 0 ) {
+				// Get from the end
+				hash = History.savedHashes[History.savedHashes.length+index];
+			}
+			else {
+				// Get from the beginning
+				hash = History.savedHashes[index];
+			}
+
+			// Return hash
+			return hash;
+		};
+
+		// ----------------------------------------------------------------------
+		// Discarded States
+
+		/**
+		 * History.discardedHashes
+		 * A hashed array of discarded hashes
+		 */
+		History.discardedHashes = {};
+
+		/**
+		 * History.discardedStates
+		 * A hashed array of discarded states
+		 */
+		History.discardedStates = {};
+
+		/**
+		 * History.discardState(State)
+		 * Discards the state by ignoring it through History
+		 * @param {object} State
+		 * @return {void}
+		 */
+		History.discardState = function(discardedState,forwardState,backState){
+			//History.debug('History.discardState', arguments);
+			// Prepare
+			var
+				discardedStateHash = History.getHashByState(discardedState),
+				discardObject;
+
+			// Create Discard Object
+			discardObject = {
+				'discardedState': discardedState,
+				'backState': backState,
+				'forwardState': forwardState
+			};
+
+			// Add to DiscardedStates
+			History.discardedStates[discardedStateHash] = discardObject;
+		};
+
+		/**
+		 * History.discardHash(hash)
+		 * Discards the hash by ignoring it through History
+		 * @param {string} hash
+		 * @return {void}
+		 */
+		History.discardHash = function(discardedHash,forwardState,backState){
+			//History.debug('History.discardState', arguments);
+			// Create Discard Object
+			var discardObject = {
+				'discardedHash': discardedHash,
+				'backState': backState,
+				'forwardState': forwardState
+			};
+
+			// Add to discardedHash
+			History.discardedHashes[discardedHash] = discardObject;
+		};
+
+		/**
+		 * History.discardState(State)
+		 * Checks to see if the state is discarded
+		 * @param {object} State
+		 * @return {boolean}
+		 */
+		History.discardedState = function(State){
+			// Prepare
+			var
+				StateHash = History.getHashByState(State),
+				discarded;
+
+			// Check
+			discarded = History.discardedStates[StateHash]||false;
+
+			// Return true
+			return discarded;
+		};
+
+		/**
+		 * History.discardedHash(hash)
+		 * Checks to see if the state is discarded
+		 * @param {string} State
+		 * @return {boolean}
+		 */
+		History.discardedHash = function(hash){
+			// Check
+			var discarded = History.discardedHashes[hash]||false;
+
+			// Return
+			return discarded;
+		};
+
+		/**
+		 * History.recycleState(State)
+		 * Allows a discarded state to be used again
+		 * @param {object} data
+		 * @param {string} title
+		 * @param {string} url
+		 * @return {void}
+		 */
+		History.recycleState = function(State){
+			//History.debug('History.recycleState', arguments);
+			// Prepare
+			var StateHash = History.getHashByState(State);
+
+			// Remove from DiscardedStates
+			if ( History.discardedState(State) ) {
+				delete History.discardedStates[StateHash];
+			}
+		};
+
+		// ----------------------------------------------------------------------
+		// HTML4 HashChange Support
+
+		if ( History.emulated.hashChange ) {
+			/*
+			 * We must emulate the HTML4 HashChange Support by manually checking for hash changes
+			 */
+
+			/**
+			 * History.hashChangeInit()
+			 * Init the HashChange Emulation
+			 * @return {boolean}
+			 */
+			History.hashChangeInit = function(){
+				// Define our Checker Function
+				History.checkerFunction = null;
+
+				// Define some variables that will help in our checker function
+				var
+					lastDocumentHash = '',
+					iframeId, iframe,
+					lastIframeHash, checkerRunning;
+
+				// Handle depending on the browser
+				if ( History.isInternetExplorer() ) {
+					// IE6 and IE7
+					// We need to use an iframe to emulate the back and forward buttons
+
+					// Create iFrame
+					iframeId = 'historyjs-iframe';
+					iframe = document.createElement('iframe');
+
+					// Adjust iFarme
+					iframe.setAttribute('id', iframeId);
+					iframe.style.display = 'none';
+
+					// Append iFrame
+					document.body.appendChild(iframe);
+
+					// Create initial history entry
+					iframe.contentWindow.document.open();
+					iframe.contentWindow.document.close();
+
+					// Define some variables that will help in our checker function
+					lastIframeHash = '';
+					checkerRunning = false;
+
+					// Define the checker function
+					History.checkerFunction = function(){
+						// Prepare
+						var
+							documentHash, iframeHash;
+
+						// Check Running
+						if ( checkerRunning ) {
+							return false;
+						}
+
+						// Update Running
+						checkerRunning = true;
+
+						// Fetch
+						documentHash = History.getHash()||'';
+						iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash)||'';
+
+						// The Document Hash has changed (application caused)
+						if ( documentHash !== lastDocumentHash ) {
+							// Equalise
+							lastDocumentHash = documentHash;
+
+							// Create a history entry in the iframe
+							if ( iframeHash !== documentHash ) {
+								//History.debug('hashchange.checker: iframe hash change', 'documentHash (new):', documentHash, 'iframeHash (old):', iframeHash);
+
+								// Equalise
+								lastIframeHash = iframeHash = documentHash;
+
+								// Create History Entry
+								iframe.contentWindow.document.open();
+								iframe.contentWindow.document.close();
+
+								// Update the iframe's hash
+								iframe.contentWindow.document.location.hash = History.escapeHash(documentHash);
+							}
+
+							// Trigger Hashchange Event
+							History.Adapter.trigger(window,'hashchange');
+						}
+
+						// The iFrame Hash has changed (back button caused)
+						else if ( iframeHash !== lastIframeHash ) {
+							//History.debug('hashchange.checker: iframe hash out of sync', 'iframeHash (new):', iframeHash, 'documentHash (old):', documentHash);
+
+							// Equalise
+							lastIframeHash = iframeHash;
+
+							// Update the Hash
+							History.setHash(iframeHash,false);
+						}
+
+						// Reset Running
+						checkerRunning = false;
+
+						// Return true
+						return true;
+					};
+				}
+				else {
+					// We are not IE
+					// Firefox 1 or 2, Opera
+
+					// Define the checker function
+					History.checkerFunction = function(){
+						// Prepare
+						var documentHash = History.getHash();
+
+						// The Document Hash has changed (application caused)
+						if ( documentHash !== lastDocumentHash ) {
+							// Equalise
+							lastDocumentHash = documentHash;
+
+							// Trigger Hashchange Event
+							History.Adapter.trigger(window,'hashchange');
+						}
+
+						// Return true
+						return true;
+					};
+				}
+
+				// Apply the checker function
+				setInterval(History.checkerFunction, History.options.hashChangeInterval);
+
+				// Done
+				return true;
+			}; // History.hashChangeInit
+
+			// Bind hashChangeInit
+			History.Adapter.onDomLoad(History.hashChangeInit);
+
+		} // History.emulated.hashChange
+
+
+		// ----------------------------------------------------------------------
+		// HTML5 State Support
+
+		if ( History.emulated.pushState ) {
+			/*
+			 * We must emulate the HTML5 State Management by using HTML4 HashChange
+			 */
+
+			/**
+			 * History.onHashChange(event)
+			 * Trigger HTML5's window.onpopstate via HTML4 HashChange Support
+			 * @return {boolean}
+			 */
+			History.onHashChange = function(event){
+				//History.debug('History.onHashChange', arguments);
+
+				// Prepare
+				var
+					currentUrl						= ((event && event.newURL) || document.location.href),
+					currentHash						= History.getHashByUrl(currentUrl),
+					currentState					= null,
+					currentStateHash			= null,
+					currentStateHashExits	= null,
+					discardObject;
+
+				// Check if we are the same state
+				if ( History.isLastHash(currentHash) ) {
+					// There has been no change (just the page's hash has finally propagated)
+					//History.debug('History.onHashChange: no change');
+					History.busy(false);
+					return false;
+				}
+
+				// Reset the double check
+				History.doubleCheckComplete();
+
+				// Store our location for use in detecting back/forward direction
+				History.saveHash(currentHash);
+
+				// Expand Hash
+				if ( currentHash && History.isTraditionalAnchor(currentHash) ) {
+					//History.debug('History.onHashChange: traditional anchor', currentHash);
+					// Traditional Anchor Hash
+					History.Adapter.trigger(window,'anchorchange');
+					History.busy(false);
+					return false;
+				}
+
+				// Create State
+				currentState = History.extractState(History.getFullUrl(currentHash||document.location.href,false),true);
+
+				// Check if we are the same state
+				if ( History.isLastSavedState(currentState) ) {
+					//History.debug('History.onHashChange: no change');
+					// There has been no change (just the page's hash has finally propagated)
+					History.busy(false);
+					return false;
+				}
+
+				// Create the state Hash
+				currentStateHash = History.getHashByState(currentState);
+
+				// Check if we are DiscardedState
+				discardObject = History.discardedState(currentState);
+				if ( discardObject ) {
+					// Ignore this state as it has been discarded and go back to the state before it
+					if ( History.getHashByIndex(-2) === History.getHashByState(discardObject.forwardState) ) {
+						// We are going backwards
+						//History.debug('History.onHashChange: go backwards');
+						History.back(false);
+					} else {
+						// We are going forwards
+						//History.debug('History.onHashChange: go forwards');
+						History.forward(false);
+					}
+					return false;
+				}
+
+				// Make Busy
+				History.busy(true);
+
+				// Push the new HTML5 State
+				//History.debug('History.onHashChange: success hashchange');
+				History.addState(currentState.data,currentState.title,currentState.url);
+
+				// End onHashChange closure
+				return true;
+			};
+			History.Adapter.bind(window,'hashchange',History.onHashChange);
+
+			/**
+			 *
+			 */
+			History.addState = function(data,title,url,caller){
+				// Fetch the State Object
+				var
+					newState = History.createStateObject(data,title,url),
+					newStateHash = History.getHashByState(newState),
+					oldState = History.getState(false),
+					oldStateHash = History.getHashByState(oldState),
+					html4Hash = History.getHash(),
+					previousState;
+
+				// Handle
+				if ( caller === 'replaceState' ) {
+					// Fetch
+					previousState = History.getStateByIndex(-2);
+
+					// Discard Old State
+					History.discardState(oldState,newState,previousState);
+				}
+
+				// Store the newState
+				History.storeState(newState);
+				History.expectedStateId = newState.id;
+
+				// Recycle the State
+				History.recycleState(newState);
+
+				// Force update of the title
+				History.setTitle(newState);
+
+				// Check if we are the same State
+				if ( newStateHash === oldStateHash ) {
+					History.debug('History.pushState: no change', newStateHash);
+					// Update Same
+					History.temp.same = true;
+				}
+				else {
+					// A state change has occured
+
+					// Update HTML4 Hash
+					if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
+						// As the hashes are different we will go through updating the hash
+						// We then exit, and wait to be called again by the hashchange handler
+						History.debug('History.pushState: update hash', newStateHash, html4Hash);
+						History.setHash(newStateHash,false);
+						return false;
+					}
+
+					// Update HTML5 State
+					History.saveState(newState);
+
+					// Check for Ignore
+					if ( History.temp.ignore ) {
+						--History.temp.ignore;
+						History.busy(false);
+						return false;
+					}
+
+					// Update Same
+					History.temp.same = false;
+				}
+
+				// Fire HTML5 Event
+				//History.debug('History.pushState: trigger popstate');
+				History.Adapter.trigger(window,'statechange');
+				History.busy(false);
+
+				// Return
+				return true;
+			};
+
+			/**
+			 * History.pushState(data,title,url)
+			 * Add a new State to the history object, become it, and trigger onpopstate
+			 * We have to trigger for HTML4 compatibility
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {boolean}
+			 */
+			History.pushState = function(data,title,url,queue){
+				//History.debug('History.pushState: called', arguments);
+
+				// Check the State
+				var urlHash = History.getHashByUrl(url);
+				if ( urlHash ) {
+					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors). ['+urlHash+']');
+				}
+
+				// Handle Queueing
+				if ( queue !== false && History.busy() ) {
+					// Wait + Push to Queue
+					//History.debug('History.pushState: we must wait', arguments);
+					History.pushQueue({
+						scope: History,
+						callback: History.pushState,
+						args: arguments,
+						queue: queue
+					});
+					return false;
+				}
+
+				// Make Busy
+				History.busy(true);
+
+				// Update Internal
+				History.temp.internal = queue !== false ? 'pushState' : false;
+
+				// Alias to addState
+				return History.addState(data,title,url,'pushState');
+			};
+
+			/**
+			 * History.replaceState(data,title,url)
+			 * Replace the State and trigger onpopstate
+			 * We have to trigger for HTML4 compatibility
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {boolean}
+			 */
+			History.replaceState = function(data,title,url,queue){
+				//History.debug('History.replaceState: called', arguments);
+
+				// Check the State
+				if ( History.getHashByUrl(url) ) {
+					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
+				}
+
+				// Handle Queueing
+				if ( queue !== false && History.busy() ) {
+					// Wait + Push to Queue
+					//History.debug('History.replaceState: we must wait', arguments);
+					History.pushQueue({
+						scope: History,
+						callback: History.replaceState,
+						args: arguments,
+						queue: queue
+					});
+					return false;
+				}
+
+				// Make Busy
+				History.busy(true);
+
+				// Update Internal
+				History.temp.internal = queue !== false ? 'replaceState' : false;
+
+				// Alias to addState
+				return History.addState(data,title,url,'replaceState');
+			};
+
+			/**
+			 * Ensure initial state is handled correctly
+			 */
+			if ( History.getHash() && !History.emulated.hashChange ) {
+				History.Adapter.onDomLoad(function(){
+					History.Adapter.trigger(window,'hashchange');
+				});
+			}
+
+		} // History.emulated.pushState
+
+	}; // History.initHtml4
+
+	// Try and Initialise History
+	History.init();
+
+})(window);

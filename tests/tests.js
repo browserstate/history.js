@@ -26,8 +26,7 @@
 			// One
 			1: {
 				'data': {
-					'state': 1,
-					'rand': Math.random()
+					'state': 1
 				},
 				'title': 'State 1',
 				'url': '?state=1'
@@ -74,6 +73,14 @@
 			// Eight
 			8: {
 				'url': '/eight'
+			},
+			// Nine
+			9: {
+				'data': {
+					'state': 1
+				},
+				'title': 'State 1',
+				'url': '?state=1#log'
 			}
 		},
 		internalOrder = [false],
@@ -116,7 +123,6 @@
 		actualState.same = friendlyState.same;
 
 		// Anchor
-		expectedState.anchor = anchorOrder[currentTest];
 		actualState.anchor = friendlyState.anchor;
 
 		// Handle
@@ -144,12 +150,11 @@
 	};
 
 	// Add Test
-	addTest = function(testIndex,stateIndex,internal,same,anchor){
+	addTest = function(testIndex,stateIndex,internal,same){
 		addLog('Test '+testIndex,History.queues.length,History.busy.flag);
 		stateOrder.push(stateIndex);
 		internalOrder.push(internal||false);
 		sameOrder.push(same||false);
-		anchorOrder.push(anchor||false);
 	};
 
 	// Check the Initial State
@@ -226,7 +231,7 @@
 		// Test State Functionality: Traditional Anchors
 
 		// State 1 (1 -> #log) / No Change
-		addTest(14,1,false,true,'log');
+		addTest(14,9,false,true);
 		History.setHash('log');
 
 		// State 1 (#log -> 1) / No Change
@@ -239,7 +244,7 @@
 
 		// State 5 (0 -> 5)
 		// Tests pushing a state with a hash included
-		addTest(17,5,'pushState',false,'log');
+		addTest(17,5,'pushState',false);
 		History.pushState(States[5].data, States[5].title, States[5].url);
 
 		// State 0 (5 -> 0)

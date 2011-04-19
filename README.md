@@ -69,9 +69,9 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 	})(window);
 
-For solutions to ajaxify your entire website with History.js and zero-configuration there is:
+For solutions to ajaxify your entire website with zero-configuration, there are these pre-made scripts:
 
-- [This snippet of jQuery code](https://gist.github.com/854622) which you can drop into your site
+- [This snippet of jQuery code](https://gist.github.com/854622) which you can drop into your website
 - [This bookmarklet](https://gist.github.com/919358) which you can use to see what your website (or others) looks like with History.js enabled
 - [This Google Chrome Extension](https://chrome.google.com/extensions/detail/oikegcanmmpmcmbkdopcfdlbiepmcebg) which you can use to inject History.js and keep it injected on websites of your choice
 

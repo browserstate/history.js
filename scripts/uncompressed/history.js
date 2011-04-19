@@ -698,7 +698,6 @@
 
 			// Hash
 			newState.hash = History.getShortUrl(newState.url);
-			newState.pushUrl = newState.anchor ? newState.url+'#'+newState.anchor : newState.url;
 
 			// Fetch ID
 			newState.id = History.getIdByState(newState);
@@ -879,7 +878,7 @@
 			create = create||false;
 
 			// Strip Anchor
-			url_or_hash = url_or_hash.replace(/#.*/,'');
+			url_or_hash = url_or_hash;
 
 			// Fetch SUID
 			id = History.extractId(url_or_hash);
@@ -893,7 +892,7 @@
 				url = History.getFullUrl(url_or_hash);
 
 				// Check URL
-				id = History.getIdByUrl(url)||false;
+				id = History.getIdByUrl(url.replace(/#.*/,''))||false;
 				if ( id ) {
 					State = History.getStateById(id);
 				}
@@ -1167,14 +1166,20 @@
 					// Fetch the base page
 					pageUrl = History.getPageUrl();
 
-					// Safari hash apply
-					hashState = History.extractState(pageUrl+'#'+adjustedHash);
-					if ( hashState ) {
-						History.pushState(hashState.data,hashState.title,hashState.url+'#'+adjustedHash,false);
-					}
-					else {
-						History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
-					}
+					// Fetch Hash State
+					hashState = History.extractState(pageUrl);
+
+					// Update Internal
+					History.temp.internal = false;
+					History.temp.anchor = adjustedHash;
+					History.temp.same = History.isLastSavedState(hashState,true);
+
+					// Apply the State
+					history.pushState(hashState.id,hashState.title,hashState.url+adjustedHash);
+
+					// Fire
+					History.Adapter.trigger(window,'statechange');
+					History.busy(false);
 				}
 				else {
 					// Normal hash apply
@@ -1826,25 +1831,32 @@
 				History.busy(true);
 
 				// Create the newState
-				var newState = History.createStateObject(data,title,url);
+				var newState = History.createStateObject(data,title,url), pushUrl;
 
 				// Update Internal
 				if ( queue !== false ) { History.temp.internal = 'pushState'; }
-				History.temp.anchor = false;
+				History.temp.anchor = newState.anchor;
 
 				// Check it
 				if ( History.isLastSavedState(newState) ) {
 					// Won't be a change
 					History.temp.same = true;
+
+					// Fire HTML5 Event
+					// We fire statechange here as we do not need any extra processing
 					History.Adapter.trigger(window,'statechange');
 					History.busy(false);
 				}
 				else {
+					// Will be a change
+					History.temp.same = false;
+
 					// Store the newState
 					History.storeState(newState);
 
 					// Push the newState
-					history.pushState(newState.id,newState.title,newState.pushUrl);
+					pushUrl = newState.anchor ? newState.url+'#'+newState.anchor : newState.url;
+					history.pushState(newState.id,newState.title,pushUrl);
 
 					// Fire HTML5 Event
 					History.temp.expectedStateId = newState.id;
@@ -1889,11 +1901,11 @@
 				History.busy(true);
 
 				// Create the newState
-				var newState = History.createStateObject(data,title,url);
+				var newState = History.createStateObject(data,title,url), pushUrl;
 
 				// Update Internal
 				if ( queue !== false ) { History.temp.internal = 'replaceState'; }
-				History.temp.anchor = false;
+				History.temp.anchor = newState.anchor;
 
 				// Check it
 				if ( History.isLastSavedState(newState) ) {
@@ -1903,11 +1915,15 @@
 					History.busy(false);
 				}
 				else {
+					// Will be a change
+					History.temp.same = false;
+
 					// Store the newState
 					History.storeState(newState);
 
 					// Push the newState
-					history.replaceState(newState.id,newState.title,newState.pushUrl);
+					pushUrl = newState.anchor ? newState.url+'#'+newState.anchor : newState.url;
+					history.replaceState(newState.id,newState.title,pushUrl);
 
 					// Fire HTML5 Event
 					History.temp.expectedStateId = newState.id;
