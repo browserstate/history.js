@@ -16,7 +16,6 @@
 		console = window.console||undefined, // Prevent a JSLint complain
 		document = window.document, // Make sure we are using the correct document
 		navigator = window.navigator, // Make sure we are using the correct navigator
-		amplify = window.amplify||false, // Amplify.js
 		setTimeout = window.setTimeout,
 		clearTimeout = window.clearTimeout,
 		setInterval = window.setInterval,
@@ -188,6 +187,26 @@
 			// Return true
 			return true;
 		};
+		
+		// ----------------------------------------------------------------------
+		// Implement Storage
+		
+		History.storage = (window.localStorage && function(name, value){
+			if(value === undefined){
+				try {
+					return JSON.parse(localStorage.getItem(name));
+				} catch(er){
+					return {};
+				}
+			} else {
+				try {
+					value = JSON.stringify(value);
+					return localStorage.setItem(name, value);
+				} catch(er){
+					return {};
+				}
+			}
+		}) || (window.amplify && amplify.store) || false;
 
 		// ----------------------------------------------------------------------
 		// Emulated Status
@@ -497,7 +516,7 @@
 		 * History.store
 		 * The store for all session specific data
 		 */
-		History.store = amplify ? (amplify.store('History.store')||{}) : {};
+		History.store = History.storage ? (History.storage('History.store')||{}) : {};
 		History.store.idToState = History.store.idToState||{};
 		History.store.urlToId = History.store.urlToId||{};
 		History.store.stateToId = History.store.stateToId||{};
@@ -1522,11 +1541,11 @@
 		/**
 		 * Bind for Saving Store
 		 */
-		if ( amplify ) {
+		if ( History.storage ) {
 			History.onUnload = function(){
 				// Prepare
 				var
-					currentStore = amplify.store('History.store')||{},
+					currentStore = History.storage('History.store')||{},
 					item;
 
 				// Ensure
@@ -1558,7 +1577,7 @@
 				History.store = currentStore;
 
 				// Store
-				amplify.store('History.store',currentStore);
+				History.storage('History.store',currentStore);
 			};
 			// For Internet Explorer
 			setInterval(History.onUnload,History.options.storeInterval);
