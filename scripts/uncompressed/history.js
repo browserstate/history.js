@@ -1542,7 +1542,26 @@
 		 * Bind for Saving Store
 		 */
 		if ( History.storage ) {
+			
+			//privateWindowBindMethod for beforeunload, because this needs special treatment in IE and not all libs have normalized this
+			var windowBind = function(name, fn){
+				var old = window[name];
+				window[name] = function(e){
+					if(old && old.call){
+						old.call(this, e || window.event);
+					}
+					fn.call(this, e || window.event);
+				};
+			};
+			
+			//private flag
+			var isUnloadSaveHandled;
+			
 			History.onUnload = function(){
+				
+				//handled save, no need to do anything
+				if(isUnloadSaveHandled){return;}
+				
 				// Prepare
 				var
 					currentStore = History.storage('History.store')||{},
@@ -1578,13 +1597,12 @@
 
 				// Store
 				History.storage('History.store',currentStore);
+				isUnloadSaveHandled = true;
 			};
-			// For Internet Explorer
-			setInterval(History.onUnload,History.options.storeInterval);
-			// For Other Browsers
-			History.Adapter.bind(window,'beforeunload',History.onUnload);
-			History.Adapter.bind(window,'unload',History.onUnload);
-			// Both are enabled for consistency
+			
+			
+			windowBind('onbeforeunload', History.onUnload);
+			windowBind('onunload', History.onUnload);
 		}
 
 
