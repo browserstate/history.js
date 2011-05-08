@@ -110,11 +110,6 @@
 			 */
 			doubleCheckInterval: 500,
 			/**
-			 * History.options.storeInterval
-			 * How long should we wait between store calls
-			 */
-			storeInterval: 1000,
-			/**
 			 * History.options.busyDelay
 			 * How long should we wait between busy events
 			 */
@@ -124,6 +119,18 @@
 			 * If true will enable debug messages to be logged
 			 */
 			debug: false,
+			/**
+			 * History.options.maxStore
+			 * Maximum data in in string.length to be saved to localStorage
+			 */
+			maxStore: 50000,
+			/**
+			 * History.options.storeExpires
+			 * When does the story expire (currently only available with amplify)
+			 * defaults to 120 days
+			 * storeExpires isn't that important, because history.js adds the hole data into one key
+			 */
+			storeExpires: 86400000 * 120,
 			/**
 			 * History.options.initialTitle
 			 * What is the title of the initial state
@@ -204,22 +211,67 @@
 		// ----------------------------------------------------------------------
 		// Implement Storage
 		
-		History.storage = (window.localStorage && function(name, value){
-			if(value === undefined){
-				try {
-					return JSON.parse(localStorage.getItem(name));
-				} catch(er){
-					return {};
-				}
-			} else {
-				try {
-					value = JSON.stringify(value);
-					return localStorage.setItem(name, value);
-				} catch(er){
-					return {};
-				}
+		History.storage = false;
+		
+		
+		var reduceStorage = function(name){
+			History.storage(name, null);
+			//try to add only collected data from this pageview
+			if(name == 'History.store'){
+				History.storage(name, {
+					idToState: History.idToState || {},
+					urlToId: History.urlToId || {},
+					stateToId: History.stateToId || {}
+				});
 			}
-		}) || (window.amplify && amplify.store) || false;
+		};
+		
+		if( 'localStorage' in window ){
+			History.storage = function(name, value, testLength){
+				if(value === undefined){
+					try {
+						return JSON.parse(localStorage.getItem(name));
+					} catch(er){
+						return {};
+					}
+				} else if( value === null ) {
+					try {
+						localStorage.removeItem(name);
+					} catch(er){}
+				} else {
+					try {
+						value = JSON.stringify(value);
+						//if we want to store too much items, we try to reduce data 
+						if( testLength && value.length > testLength ){
+							reduceStorage( name );
+							return;
+						}
+						
+						localStorage.setItem(name, value);
+					} catch(er){
+						//if storage is exceeded we remove everything
+						History.storage(name, null);
+					}
+				}
+			};
+		} else if( window.amplify && amplify.store ){
+			History.storage = function(name, value, testLength){
+				//value !== null and !== undefined
+				if( value != null && testLength ){
+					var stringVal = '';
+					try {
+						stringVal = JSON.stringify( value );
+					} catch(er){}
+					if( stringVal > testLength ){
+						reduceStorage( name );
+						return;
+					}
+				}
+				amplify.store( name, value, {
+					expires: History.storeExpires
+				} );
+			};
+		}
 
 		// ----------------------------------------------------------------------
 		// Emulated Status
@@ -1579,7 +1631,7 @@
 				History.extend( History.store.stateToId, History.stateToId );
 				
 				// Store
-				History.storage('History.store', History.store);
+				History.storage('History.store', History.store, History.options.maxStore);
 				isUnloadSaveHandled = true;
 			};
 			
