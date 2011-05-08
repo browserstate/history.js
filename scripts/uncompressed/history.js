@@ -52,6 +52,25 @@
 		// Return true
 		return true;
 	};
+	
+	//helper method
+	History.extend = function(obj, extend){
+		for(var prop in extend){
+			if ( !extend.hasOwnProperty( prop ) ) {
+				continue;
+			}
+			if( typeof extend[ prop ] == 'object' ){
+				if( extend[ prop ].push && extend[ prop ].concat && 'length' in extend[ prop ] ){
+					obj[ prop ] = extend[ prop ].concat( [] );
+				} else {
+					obj[ prop ] = History.extend( obj[ prop ] || {}, extend[ prop ] );
+				}
+			} else {
+				obj[ prop ] = extend[ prop ];
+			}
+		}
+		return obj;
+	};
 
 	// --------------------------------------------------------------------------
 	// Initialise Core
@@ -74,49 +93,43 @@
 		 * History.options
 		 * Configurable options
 		 */
-		History.options = History.options||{};
-
-		/**
-		 * History.options.hashChangeInterval
-		 * How long should the interval be before hashchange checks
-		 */
-		History.options.hashChangeInterval = History.options.hashChangeInterval || 100;
-
-		/**
-		 * History.options.safariPollInterval
-		 * How long should the interval be before safari poll checks
-		 */
-		History.options.safariPollInterval = History.options.safariPollInterval || 500;
-
-		/**
-		 * History.options.doubleCheckInterval
-		 * How long should the interval be before we perform a double check
-		 */
-		History.options.doubleCheckInterval = History.options.doubleCheckInterval || 500;
-
-		/**
-		 * History.options.storeInterval
-		 * How long should we wait between store calls
-		 */
-		History.options.storeInterval = History.options.storeInterval || 1000;
-
-		/**
-		 * History.options.busyDelay
-		 * How long should we wait between busy events
-		 */
-		History.options.busyDelay = History.options.busyDelay || 250;
-
-		/**
-		 * History.options.debug
-		 * If true will enable debug messages to be logged
-		 */
-		History.options.debug = History.options.debug || false;
-
-		/**
-		 * History.options.initialTitle
-		 * What is the title of the initial state
-		 */
-		History.options.initialTitle = History.options.initialTitle || document.title;
+		History.options = History.extend(  {
+			/**
+			 * History.options.hashChangeInterval
+			 * How long should the interval be before hashchange checks
+			 */
+			hashChangeInterval: 100,
+			/**
+			 * History.options.safariPollInterval
+			 * How long should the interval be before safari poll checks
+			 */
+			safariPollInterval: 500,
+			/**
+			 * History.options.doubleCheckInterval
+			 * How long should the interval be before we perform a double check
+			 */
+			doubleCheckInterval: 500,
+			/**
+			 * History.options.storeInterval
+			 * How long should we wait between store calls
+			 */
+			storeInterval: 1000,
+			/**
+			 * History.options.busyDelay
+			 * How long should we wait between busy events
+			 */
+			busyDelay: 250,
+			/**
+			 * History.options.debug
+			 * If true will enable debug messages to be logged
+			 */
+			debug: false,
+			/**
+			 * History.options.initialTitle
+			 * What is the title of the initial state
+			 */
+			initialTitle: document.title
+		}, History.options || {} );
 
 
 		// ----------------------------------------------------------------------
@@ -324,15 +337,8 @@
 		 * @return {Object}
 		 */
 		History.cloneObject = function(obj) {
-			var hash,newObj;
-			if ( obj ) {
-				hash = JSON.stringify(obj);
-				newObj = JSON.parse(hash);
-			}
-			else {
-				newObj = {};
-			}
-			return newObj;
+			//should be faster in old browsers without native stringify/parse
+			return History.extend({}, obj || {});
 		};
 
 		// ----------------------------------------------------------------------
@@ -516,11 +522,16 @@
 		 * History.store
 		 * The store for all session specific data
 		 */
-		History.store = History.storage ? (History.storage('History.store')||{}) : {};
-		History.store.idToState = History.store.idToState||{};
-		History.store.urlToId = History.store.urlToId||{};
-		History.store.stateToId = History.store.stateToId||{};
-
+		History.store = History.extend(
+			{
+				idToState: {},
+				urlToId: {},
+				stateToId: {}
+			}, 
+			History.storage ? ( History.storage('History.store')||{} ) : {}
+		);
+		
+		
 		/**
 		 * History.idToState
 		 * 1-1: State ID to State Object
@@ -1562,41 +1573,13 @@
 				//handled save, no need to do anything
 				if(isUnloadSaveHandled){return;}
 				
-				// Prepare
-				var
-					currentStore = History.storage('History.store')||{},
-					item;
-
-				// Ensure
-				currentStore.idToState = currentStore.idToState || {};
-				currentStore.urlToId = currentStore.urlToId || {};
-				currentStore.stateToId = currentStore.stateToId || {};
-
 				// Sync
-				for ( item in History.idToState ) {
-					if ( !History.idToState.hasOwnProperty(item) ) {
-						continue;
-					}
-					currentStore.idToState[item] = History.idToState[item];
-				}
-				for ( item in History.urlToId ) {
-					if ( !History.urlToId.hasOwnProperty(item) ) {
-						continue;
-					}
-					currentStore.urlToId[item] = History.urlToId[item];
-				}
-				for ( item in History.stateToId ) {
-					if ( !History.stateToId.hasOwnProperty(item) ) {
-						continue;
-					}
-					currentStore.stateToId[item] = History.stateToId[item];
-				}
-
-				// Update
-				History.store = currentStore;
-
+				History.extend( History.store.idToState, History.idToState );
+				History.extend( History.store.urlToId, History.urlToId );
+				History.extend( History.store.stateToId, History.stateToId );
+				
 				// Store
-				History.storage('History.store',currentStore);
+				History.storage('History.store', History.store);
 				isUnloadSaveHandled = true;
 			};
 			
