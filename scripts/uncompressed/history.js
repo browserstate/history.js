@@ -20,6 +20,7 @@
 		setTimeout = window.setTimeout,
 		clearTimeout = window.clearTimeout,
 		setInterval = window.setInterval,
+		clearInterval = window.clearInterval,
 		JSON = window.JSON,
 		History = window.History = window.History||{}, // Public History Object
 		history = window.history; // Old History Object
@@ -118,6 +119,30 @@
 		 * What is the title of the initial state
 		 */
 		History.options.initialTitle = History.options.initialTitle || document.title;
+
+
+		// ----------------------------------------------------------------------
+		// Interval record
+
+		/**
+		 * History.intervalList
+		 * List of intervals set, to be cleared when document is unloaded.
+		 */
+		History.intervalList = [];
+
+		/**
+		 * History.clearAllIntervals
+		 * Clears all setInterval instances.
+		 */
+		History.clearAllIntervals = function(){
+			var i;
+			for (i = 0; i < History.intervalList.length; i++) {
+				clearInterval(History.intervalList[i]);
+			}
+			History.intervalList = null;
+ 		};
+		History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
+		History.Adapter.bind(window,"unload",History.clearAllIntervals);
 
 
 		// ----------------------------------------------------------------------
@@ -1561,7 +1586,7 @@
 				amplify.store('History.store',currentStore);
 			};
 			// For Internet Explorer
-			setInterval(History.onUnload,History.options.storeInterval);
+			History.intervalList.push(setInterval(History.onUnload,History.options.storeInterval));
 			// For Other Browsers
 			History.Adapter.bind(window,'beforeunload',History.onUnload);
 			History.Adapter.bind(window,'unload',History.onUnload);
@@ -1806,7 +1831,7 @@
 			 * Setup Safari Fix
 			 */
 			if ( History.bugs.safariPoll ) {
-				setInterval(History.safariStatePoll, History.options.safariPollInterval);
+				History.intervalList.push(setInterval(History.safariStatePoll, History.options.safariPollInterval));
 			}
 
 			/**
