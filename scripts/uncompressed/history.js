@@ -16,7 +16,6 @@
 		console = window.console||undefined, // Prevent a JSLint complain
 		document = window.document, // Make sure we are using the correct document
 		navigator = window.navigator, // Make sure we are using the correct navigator
-		amplify = window.amplify||false, // Amplify.js
 		setTimeout = window.setTimeout,
 		clearTimeout = window.clearTimeout,
 		setInterval = window.setInterval,
@@ -53,6 +52,25 @@
 		// Return true
 		return true;
 	};
+	
+	//helper method
+	History.extend = function(obj, extend){
+		for(var prop in extend){
+			if ( !extend.hasOwnProperty( prop ) ) {
+				continue;
+			}
+			if( typeof extend[ prop ] == 'object' ){
+				if( extend[ prop ].push && extend[ prop ].concat && 'length' in extend[ prop ] ){
+					obj[ prop ] = extend[ prop ].concat( [] );
+				} else {
+					obj[ prop ] = History.extend( obj[ prop ] || {}, extend[ prop ] );
+				}
+			} else {
+				obj[ prop ] = extend[ prop ];
+			}
+		}
+		return obj;
+	};
 
 	// --------------------------------------------------------------------------
 	// Initialise Core
@@ -75,49 +93,50 @@
 		 * History.options
 		 * Configurable options
 		 */
-		History.options = History.options||{};
-
-		/**
-		 * History.options.hashChangeInterval
-		 * How long should the interval be before hashchange checks
-		 */
-		History.options.hashChangeInterval = History.options.hashChangeInterval || 100;
-
-		/**
-		 * History.options.safariPollInterval
-		 * How long should the interval be before safari poll checks
-		 */
-		History.options.safariPollInterval = History.options.safariPollInterval || 500;
-
-		/**
-		 * History.options.doubleCheckInterval
-		 * How long should the interval be before we perform a double check
-		 */
-		History.options.doubleCheckInterval = History.options.doubleCheckInterval || 500;
-
-		/**
-		 * History.options.storeInterval
-		 * How long should we wait between store calls
-		 */
-		History.options.storeInterval = History.options.storeInterval || 1000;
-
-		/**
-		 * History.options.busyDelay
-		 * How long should we wait between busy events
-		 */
-		History.options.busyDelay = History.options.busyDelay || 250;
-
-		/**
-		 * History.options.debug
-		 * If true will enable debug messages to be logged
-		 */
-		History.options.debug = History.options.debug || false;
-
-		/**
-		 * History.options.initialTitle
-		 * What is the title of the initial state
-		 */
-		History.options.initialTitle = History.options.initialTitle || document.title;
+		History.options = History.extend(  {
+			/**
+			 * History.options.hashChangeInterval
+			 * How long should the interval be before hashchange checks
+			 */
+			hashChangeInterval: 100,
+			/**
+			 * History.options.safariPollInterval
+			 * How long should the interval be before safari poll checks
+			 */
+			safariPollInterval: 500,
+			/**
+			 * History.options.doubleCheckInterval
+			 * How long should the interval be before we perform a double check
+			 */
+			doubleCheckInterval: 500,
+			/**
+			 * History.options.busyDelay
+			 * How long should we wait between busy events
+			 */
+			busyDelay: 250,
+			/**
+			 * History.options.debug
+			 * If true will enable debug messages to be logged
+			 */
+			debug: false,
+			/**
+			 * History.options.maxStore
+			 * Maximum data in in string.length to be saved to localStorage
+			 */
+			maxStore: 50000,
+			/**
+			 * History.options.storeExpires
+			 * When does the story expire (currently only available with amplify)
+			 * defaults to 120 days
+			 * storeExpires isn't that important, because history.js adds the hole data into one key
+			 */
+			storeExpires: 86400000 * 120,
+			/**
+			 * History.options.initialTitle
+			 * What is the title of the initial state
+			 */
+			initialTitle: document.title
+		}, History.options || {} );
 
 
 		// ----------------------------------------------------------------------
@@ -188,6 +207,71 @@
 			// Return true
 			return true;
 		};
+		
+		// ----------------------------------------------------------------------
+		// Implement Storage
+		
+		History.storage = false;
+		
+		
+		var reduceStorage = function(name){
+			History.storage(name, null);
+			//try to add only collected data from this pageview
+			if(name == 'History.store'){
+				History.storage(name, {
+					idToState: History.idToState || {},
+					urlToId: History.urlToId || {},
+					stateToId: History.stateToId || {}
+				});
+			}
+		};
+		
+		if( 'localStorage' in window ){
+			History.storage = function(name, value, testLength){
+				if(value === undefined){
+					try {
+						return JSON.parse(localStorage.getItem(name));
+					} catch(er){
+						return {};
+					}
+				} else if( value === null ) {
+					try {
+						localStorage.removeItem(name);
+					} catch(er){}
+				} else {
+					try {
+						value = JSON.stringify(value);
+						//if we want to store too much items, we try to reduce data 
+						if( testLength && value.length > testLength ){
+							reduceStorage( name );
+							return;
+						}
+						
+						localStorage.setItem(name, value);
+					} catch(er){
+						//if storage is exceeded we remove everything
+						History.storage(name, null);
+					}
+				}
+			};
+		} else if( window.amplify && amplify.store ){
+			History.storage = function(name, value, testLength){
+				//value !== null and !== undefined
+				if( value != null && testLength ){
+					var stringVal = '';
+					try {
+						stringVal = JSON.stringify( value );
+					} catch(er){}
+					if( stringVal > testLength ){
+						reduceStorage( name );
+						return;
+					}
+				}
+				amplify.store( name, value, {
+					expires: History.storeExpires
+				} );
+			};
+		}
 
 		// ----------------------------------------------------------------------
 		// Emulated Status
@@ -305,15 +389,8 @@
 		 * @return {Object}
 		 */
 		History.cloneObject = function(obj) {
-			var hash,newObj;
-			if ( obj ) {
-				hash = JSON.stringify(obj);
-				newObj = JSON.parse(hash);
-			}
-			else {
-				newObj = {};
-			}
-			return newObj;
+			//should be faster in old browsers without native stringify/parse
+			return History.extend({}, obj || {});
 		};
 
 		// ----------------------------------------------------------------------
@@ -497,11 +574,16 @@
 		 * History.store
 		 * The store for all session specific data
 		 */
-		History.store = amplify ? (amplify.store('History.store')||{}) : {};
-		History.store.idToState = History.store.idToState||{};
-		History.store.urlToId = History.store.urlToId||{};
-		History.store.stateToId = History.store.stateToId||{};
-
+		History.store = History.extend(
+			{
+				idToState: {},
+				urlToId: {},
+				stateToId: {}
+			}, 
+			History.storage ? ( History.storage('History.store')||{} ) : {}
+		);
+		
+		
 		/**
 		 * History.idToState
 		 * 1-1: State ID to State Object
@@ -1522,50 +1604,40 @@
 		/**
 		 * Bind for Saving Store
 		 */
-		if ( amplify ) {
-			History.onUnload = function(){
-				// Prepare
-				var
-					currentStore = amplify.store('History.store')||{},
-					item;
-
-				// Ensure
-				currentStore.idToState = currentStore.idToState || {};
-				currentStore.urlToId = currentStore.urlToId || {};
-				currentStore.stateToId = currentStore.stateToId || {};
-
-				// Sync
-				for ( item in History.idToState ) {
-					if ( !History.idToState.hasOwnProperty(item) ) {
-						continue;
+		if ( History.storage ) {
+			
+			//privateWindowBindMethod for beforeunload, because this needs special treatment in IE and not all libs have normalized this
+			var windowBind = function(name, fn){
+				var old = window[name];
+				window[name] = function(e){
+					if(old && old.call){
+						old.call(this, e || window.event);
 					}
-					currentStore.idToState[item] = History.idToState[item];
-				}
-				for ( item in History.urlToId ) {
-					if ( !History.urlToId.hasOwnProperty(item) ) {
-						continue;
-					}
-					currentStore.urlToId[item] = History.urlToId[item];
-				}
-				for ( item in History.stateToId ) {
-					if ( !History.stateToId.hasOwnProperty(item) ) {
-						continue;
-					}
-					currentStore.stateToId[item] = History.stateToId[item];
-				}
-
-				// Update
-				History.store = currentStore;
-
-				// Store
-				amplify.store('History.store',currentStore);
+					fn.call(this, e || window.event);
+				};
 			};
-			// For Internet Explorer
-			setInterval(History.onUnload,History.options.storeInterval);
-			// For Other Browsers
-			History.Adapter.bind(window,'beforeunload',History.onUnload);
-			History.Adapter.bind(window,'unload',History.onUnload);
-			// Both are enabled for consistency
+			
+			//private flag
+			var isUnloadSaveHandled;
+			
+			History.onUnload = function(){
+				
+				//handled save, no need to do anything
+				if(isUnloadSaveHandled){return;}
+				
+				// Sync
+				History.extend( History.store.idToState, History.idToState );
+				History.extend( History.store.urlToId, History.urlToId );
+				History.extend( History.store.stateToId, History.stateToId );
+				
+				// Store
+				History.storage('History.store', History.store, History.options.maxStore);
+				isUnloadSaveHandled = true;
+			};
+			
+			
+			windowBind('onbeforeunload', History.onUnload);
+			windowBind('onunload', History.onUnload);
 		}
 
 
