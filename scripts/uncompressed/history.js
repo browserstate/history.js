@@ -135,12 +135,14 @@
 		 * Clears all setInterval instances.
 		 */
 		History.clearAllIntervals = function(){
-			var i;
-			for (i = 0; i < History.intervalList.length; i++) {
-				clearInterval(History.intervalList[i]);
+			var i, il = History.intervalList;
+			if (typeof il !== "undefined" && il !== null) {
+				for (i = 0; i < il.length; i++) {
+					clearInterval(il[i]);
+				}
+				History.intervalList = null;
 			}
-			History.intervalList = null;
- 		};
+		};
 		History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
 		History.Adapter.bind(window,"unload",History.clearAllIntervals);
 
