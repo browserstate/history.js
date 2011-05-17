@@ -131,7 +131,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
 
-> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just remove the `history.html4.js` include in step #4 file and the JSON2 include in step #2 [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
+> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just remove the `history.html4.js` file include in step #5 and the JSON2 (`json2.js`) file include in step #2 [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
 
 
 ## Subscribe to Updates
