@@ -364,7 +364,7 @@
 				}
 
 				// Apply the checker function
-				setInterval(History.checkerFunction, History.options.hashChangeInterval);
+				History.intervalList.push(setInterval(History.checkerFunction, History.options.hashChangeInterval));
 
 				// Done
 				return true;
