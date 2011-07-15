@@ -156,8 +156,7 @@ If you'd love to give some support back and make a difference; here are a few gr
 - Give it your honest rating on its [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js) and its [Ohloh Page](https://www.ohloh.net/p/history-js)
 - If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/History.js/issues) - so that I can ensure you get the best experience!
 - Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
-- [Make a donation - every cent truly does help!](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=balupton%40gmail%2ecom&lc=AU&item_name=Donation%20to%20Benjamin%20Lupton&currency_code=AUD&bn=PP%2dDonationsBF%3adonate%2egif%3aNonHosted)
-- Make it easier for me to let you know about future releases and updates by subscribing via the signup form inside the demo page
+- [Make a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=balupton%40gmail%2ecom&lc=AU&item_name=Donation%20to%20Benjamin%20Lupton&currency_code=AUD&bn=PP%2dDonationsBF%3adonate%2egif%3aNonHosted) - every cent truly does help!
 - Watch it via clicking the "watch" button up the top of its [Project Page](https://github.com/balupton/History.js)
 
 Thanks! every bit of help really does make a difference. Again thank you.
