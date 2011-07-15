@@ -157,6 +157,7 @@ If you'd love to give some support back and make a difference; here are a few gr
 - If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/history.js/issues) - so that I can ensure you get the best experience!
 - Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
 - [Make a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=balupton%40gmail%2ecom&lc=AU&item_name=Donation%20to%20Benjamin%20Lupton&currency_code=AUD&bn=PP%2dDonationsBF%3adonate%2egif%3aNonHosted) - every cent truly does help!
+- Add your website or app which is using History.js to the [Showcase](https://github.com/balupton/history.js/wiki/Showcase)
 - Watch it via clicking the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js)
 
 Thanks! every bit of help really does make a difference. Again thank you.
