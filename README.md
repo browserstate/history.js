@@ -6,7 +6,7 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 
 - Follow the [HTML5 History API](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
-- Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
+- Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
 - Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/)
 
@@ -60,7 +60,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 1. www.mysite.com
 1. www.mysite.com/?state=3
 
-> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling).
+> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling).
 
 ### How would they look in a HTML4 Browser?
 
@@ -78,7 +78,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 >
 > Note 2: These urls will be automatically url-encoded in IE6 to prevent certain browser-specific bugs.
 >
-> Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
+> Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 
 ### What's the deal with the SUIDs used in the HTML4 States?
 
@@ -96,7 +96,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 ## Download & Installation
 
-1. Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/History.js/tarball/master) or [zip](https://github.com/balupton/History.js/zipball/master)
+1. Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/history.js/tarball/master) or [zip](https://github.com/balupton/history.js/zipball/master)
 
 2. Include [JSON2](http://www.json.org/js.html) for HTML4 Browsers Only *(replace www.yourwebsite.com)*
 
@@ -131,7 +131,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
 
-> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just remove the `history.html4.js` file include in step #5 and the JSON2 (`json2.js`) file include in step #2 [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/History.js/wiki/Intelligent-State-Handling)
+> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just remove the `history.html4.js` file include in step #5 and the JSON2 (`json2.js`) file include in step #2 [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 
 
 ## Subscribe to Updates
@@ -139,14 +139,14 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 - For Email Updates:
 	- You can subscribe via the subscription form included in the demo page
 - For Commit RSS/Atom Updates:
-	- You can subscribe via the [GitHub Commit Atom Feed](https://github.com/balupton/History.js/commits/master.atom)
+	- You can subscribe via the [GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
 - For GitHub News Feed Updates:
-	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/History.js)
+	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
 
 
 ## Getting Support
 
-History.js is an actively developed, supported and maintained project. You can grab support via its [GitHub Issue Tracker](https://github.com/balupton/History.js/issues). Alternatively you can reach [Benjamin Lupton](http://balupton.com) (the core developer) via [twitter](http://twitter.com/balupton), skype (balupton) or email (contact@balupton.com).
+History.js is an actively developed, supported and maintained project. You can grab support via its [GitHub Issue Tracker](https://github.com/balupton/history.js/issues). Alternatively you can reach [Benjamin Lupton](http://balupton.com) (the core developer) via [twitter](http://twitter.com/balupton), skype (balupton) or email (contact@balupton.com).
 
 
 ## Giving Support
@@ -154,10 +154,10 @@ History.js is an actively developed, supported and maintained project. You can g
 If you'd love to give some support back and make a difference; here are a few great ways you can give back!
 
 - Give it your honest rating on its [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js) and its [Ohloh Page](https://www.ohloh.net/p/history-js)
-- If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/History.js/issues) - so that I can ensure you get the best experience!
+- If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/history.js/issues) - so that I can ensure you get the best experience!
 - Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
 - [Make a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=balupton%40gmail%2ecom&lc=AU&item_name=Donation%20to%20Benjamin%20Lupton&currency_code=AUD&bn=PP%2dDonationsBF%3adonate%2egif%3aNonHosted) - every cent truly does help!
-- Watch it via clicking the "watch" button up the top of its [Project Page](https://github.com/balupton/History.js)
+- Watch it via clicking the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js)
 
 Thanks! every bit of help really does make a difference. Again thank you.
 
@@ -238,8 +238,8 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - v1.7.0 - April 01 2011
 	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.
 	- Added (optional but recommended) Data Persistance and Synchronisation Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/) (refer to installation and compatibility sections for details)
-	- Made HTML5 SUIDs more transparent - [Reported](https://github.com/balupton/History.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
-	- Fixed Session Storage Issue - Reported by a whole bunch of different people; [one](https://github.com/balupton/History.js/issues#issue/36), [two](https://github.com/balupton/History.js/issues#issue/37), [three](http://getsatisfaction.com/balupton/topics/history_js_1_6_losing_state_after_manual_page_reload)
+	- Made HTML5 SUIDs more transparent - [Reported](https://github.com/balupton/history.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
+	- Fixed Session Storage Issue - Reported by a whole bunch of different people; [one](https://github.com/balupton/history.js/issues#issue/36), [two](https://github.com/balupton/history.js/issues#issue/37), [three](http://getsatisfaction.com/balupton/topics/history_js_1_6_losing_state_after_manual_page_reload)
 	- Fixed URL Encoding Issue - [Reported](https://github.com/balupton/history.js/issues/#issue/33) by [Rob Madole](http://robmadole.com/)
 	- Disabled support for IE6,7,8 when using the Prototype Adapter (there is nothing we can do about this, it is due to a bug in the prototype library) - [Reported](https://github.com/balupton/history.js/issues#issue/39) by [Sindre Wimberger](http://sindre.at/)
 	- URLs in the State Hashes for HTML4 Browsers are now even shorter - [Discussion](https://github.com/balupton/history.js/issues#issue/28)
@@ -282,7 +282,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 	- Support for cleaner HTML4 States
 
 - v1.2.1 - January 30 2011
-	- Fixed History.log always being called - [reported by dlee](https://github.com/balupton/History.js/issues/#issue/2)
+	- Fixed History.log always being called - [reported by dlee](https://github.com/balupton/history.js/issues/#issue/2)
 	- Re-Added `History.go(index)` support
 
 - v1.2.0 - January 25 2011
@@ -307,4 +307,4 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - Add an Ajax extension to succeed the [jQuery Ajaxy](http://balupton.com/projects/jquery-ajaxy) project
 - Add a compilation test to ensure `.debug = false` and no `History.log` or `console.xxx` calls exist.
 
-It's likely these features and/or others have been included in the latest [dev branch](https://github.com/balupton/History.js/tree/dev). If you are wanting to fork and help out, then be sure to work on the dev branch and not master.
+It's likely these features and/or others have been included in the latest [dev branch](https://github.com/balupton/history.js/tree/dev). If you are wanting to fork and help out, then be sure to work on the dev branch and not master.
