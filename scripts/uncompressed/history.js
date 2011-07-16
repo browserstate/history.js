@@ -20,6 +20,7 @@
 		setTimeout = window.setTimeout,
 		clearTimeout = window.clearTimeout,
 		setInterval = window.setInterval,
+		clearInterval = window.clearInterval,
 		JSON = window.JSON,
 		alert = window.alert,
 		History = window.History = window.History||{}, // Public History Object
@@ -138,6 +139,32 @@
 			same: false,
 			anchor: false
 		};
+
+		// ----------------------------------------------------------------------
+		// Interval record
+
+		/**
+		 * History.intervalList
+		 * List of intervals set, to be cleared when document is unloaded.
+		 */
+		History.intervalList = [];
+
+		/**
+		 * History.clearAllIntervals
+		 * Clears all setInterval instances.
+		 */
+		History.clearAllIntervals = function(){
+			var i, il = History.intervalList;
+			if (typeof il !== "undefined" && il !== null) {
+				for (i = 0; i < il.length; i++) {
+					clearInterval(il[i]);
+				}
+				History.intervalList = null;
+			}
+		};
+		History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
+		History.Adapter.bind(window,"unload",History.clearAllIntervals);
+
 
 		// ----------------------------------------------------------------------
 		// Debug
@@ -1753,7 +1780,7 @@
 				amplify.store('History.store',currentStore);
 			};
 			// For Internet Explorer
-			setInterval(History.onUnload,History.options.storeInterval);
+			History.intervalList.push(setInterval(History.onUnload,History.options.storeInterval));
 			// For Other Browsers
 			History.Adapter.bind(window,'beforeunload',History.onUnload);
 			History.Adapter.bind(window,'unload',History.onUnload);
@@ -2014,7 +2041,7 @@
 			 * Setup Safari Poll Fix
 			 */
 			if ( History.bugs.safariPoll ) {
-				setInterval(History.safariStatePoll, History.options.safariPollInterval);
+				History.intervalList.push(setInterval(History.safariStatePoll, History.options.safariPollInterval));
 			}
 
 			/**
