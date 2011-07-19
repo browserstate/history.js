@@ -1659,10 +1659,10 @@
 					else if ( typeof event.event !== 'undefined' && typeof event.event.state !== 'undefined' ) {
 						event.state = event.event.state||false;
 					}
+					// Ensure
+					event.state = (event.state||false);
 				}
 
-				// Ensure
-				event.state = (event.state||false);
 
 				// Fetch State
 				if ( event.state ) {
