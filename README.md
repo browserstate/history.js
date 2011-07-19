@@ -192,10 +192,14 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Subscribe to Updates
 
-- For Commit RSS/Atom Updates:
-	- You can subscribe via the [GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
+- For Twitter Updates:
+	- [Follow Benjamin Lupton on Twitter](https://twitter.com/balupton)
+- For Weekly Meetups:
+	- [Hangout with Benjamin Lupton on Google+](https://twitter.com/balupton)
 - For GitHub News Feed Updates:
-	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
+	- Click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
+- For Commit RSS/Atom Updates:
+	- [Subscribe via the GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
 
 
 ## Getting Support
