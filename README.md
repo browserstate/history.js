@@ -18,56 +18,58 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ### Working with History.js:
 
-	(function(window,undefined){
+``` javascript
+(function(window,undefined){
 
-		// Prepare
-		var History = window.History; // Note: We are using a capital H instead of a lower h
-		if ( !History.enabled ) {
-			 // History.js is disabled for this browser.
-			 // This is because we can optionally choose to support HTML4 browsers or not.
-			return false;
-		}
+	// Prepare
+	var History = window.History; // Note: We are using a capital H instead of a lower h
+	if ( !History.enabled ) {
+		 // History.js is disabled for this browser.
+		 // This is because we can optionally choose to support HTML4 browsers or not.
+		return false;
+	}
 
-		// Bind to StateChange Event
-		History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
-			var State = History.getState(); // Note: We are using History.getState() instead of event.state
-			History.log(State.data, State.title, State.url);
-		});
+	// Bind to StateChange Event
+	History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+		var State = History.getState(); // Note: We are using History.getState() instead of event.state
+		History.log(State.data, State.title, State.url);
+	});
 
-		// Check the Initial State
-		var initialState = History.getState();
-		History.log(initialState.data, initialState.title, initialState.url);
-		// ^ Logs: {}, "Home Page", "?"
+	// Check the Initial State
+	var initialState = History.getState();
+	History.log(initialState.data, initialState.title, initialState.url);
+	// ^ Logs: {}, "Home Page", "?"
 
-		// Add our States
-		History.pushState({state:1}, "State 1", "?state=1");
-		// ^ Logs: {state:1}, "State 1", "?state=1"
-		History.pushState({state:2}, "State 2", "?state=2");
-		// ^ Logs: {state:2}, "State 2", "?state=2"
-		History.replaceState({state:3}, "State 3", "?state=3");
-		// ^ Logs: {state:3}, "State 3", "?state=3"
-		History.pushState(null, null, "?state=4");
-		// ^ Logs: {}, '', "?state=4"
+	// Add our States
+	History.pushState({state:1}, "State 1", "?state=1");
+	// ^ Logs: {state:1}, "State 1", "?state=1"
+	History.pushState({state:2}, "State 2", "?state=2");
+	// ^ Logs: {state:2}, "State 2", "?state=2"
+	History.replaceState({state:3}, "State 3", "?state=3");
+	// ^ Logs: {state:3}, "State 3", "?state=3"
+	History.pushState(null, null, "?state=4");
+	// ^ Logs: {}, '', "?state=4"
 
-		// Notice how the above calls trigger statechange events, if for some reason you do not want this to happen
-		// then inside your statechange handler you can use the following:
-		// if ( History.getState().internal ) { return; }
+	// Notice how the above calls trigger statechange events, if for some reason you do not want this to happen
+	// then inside your statechange handler you can use the following:
+	// if ( History.getState().internal ) { return; }
 
-		// Other special variables include:
-		// `History.getState().anchor` for when the state includes a traditional anchor
-		// and `History.getState().same` for when the state is the same as the last state (no change)
+	// Other special variables include:
+	// `History.getState().anchor` for when the state includes a traditional anchor
+	// and `History.getState().same` for when the state is the same as the last state (no change)
 
-		// Traverse our States
-		History.back();
-		// ^ Logs: {state:3}, "State 3", "?state=3"
-		History.back();
-		// ^ Logs: {state:1}, "State 1", "?state=1"
-		History.back();
-		// ^ Logs: {}, "Home Page", "?"
-		History.go(2);
-		// ^ Logs: logs {state:3}, "State 3", "?state=3"
+	// Traverse our States
+	History.back();
+	// ^ Logs: {state:3}, "State 3", "?state=3"
+	History.back();
+	// ^ Logs: {state:1}, "State 1", "?state=1"
+	History.back();
+	// ^ Logs: {}, "Home Page", "?"
+	History.go(2);
+	// ^ Logs: logs {state:3}, "State 3", "?state=3"
 
-	})(window);
+})(window);
+```
 
 For solutions to ajaxify your entire website with zero-configuration, there are these pre-made scripts:
 
@@ -120,8 +122,7 @@ For solutions to ajaxify your entire website with zero-configuration, there are 
 
 ### Is there a working demo?
 
-- Sure is, give it a download and navigate to the demo directory in your browser :-)
-- If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports.
+Sure is, [you can try the official demo right here](http://balupton.github.com/history.js/demo/), or [check out how other people are using History.js in their own web sites and apps right here](https://github.com/balupton/history.js/wiki/Showcase). If you're feeling even more adventurous you can [check out the History.js Test Suite right here](http://balupton.github.com/history.js/tests/) - it'll rock your world and [show all the vast use cases that History.js supports](https://github.com/balupton/history.js/blob/dev/tests/tests.js#L172).
 
 
 ## Download & Installation
@@ -166,13 +167,11 @@ For solutions to ajaxify your entire website with zero-configuration, there are 
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.zepto.js"></script>
 		```
 
-	- Native (for use with-any/without-any javascript framework)
+	- Native (works with all frameworks, even without a framework)
 
 		``` html
 		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.native.js"></script>
 		```
-
-	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
 1. Include History.js
 
@@ -180,13 +179,13 @@ For solutions to ajaxify your entire website with zero-configuration, there are 
 	<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
 	```
 
-1. _Optional:_ Include support for HTML4 browsers
+1. _Optional: Include support for HTML4 browsers_
 
 	``` html
 	<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
 	```
 
-	> Note: It is recommended to only include support for HTML4 browsers if you _really_ have to [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+	> Note: It is recommended to include support for HTML4 browsers _only if you **really** need to_ [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 
 
 ## Subscribe to Updates
@@ -294,10 +293,11 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 - v1.8.0 - ???
 	- Added [RightJS](http://rightjs.org/) Adapter
-	- Added [Native](http://rightjs.org/) Adapter - So you can now use History.js without any javascript framework! PrototypeJS users rejoice!
+	- Added [Native](http://rightjs.org/) Adapter for use with any, or without any framework!
 	- Fixed using History.js inside an iFrame with Safari 5 - [Reported](https://github.com/balupton/history.js/issues/#issue/40) by [desaintflorent](https://github.com/desaintflorent)
 	- Fixed using History.js inside an iFrame with IE8 and IE9 (not yet done)
 	- Fixed pushing states which contain traditional anchors (not yet done) - [Reported](https://github.com/balupton/history.js/issues#issue/42) by [Mark Jaquith](http://markjaquith.com/)
+	- Added the flags `internal`, `same` and `anchor` to `History.getState()` - see Exposed API section of this readme
 	- Fixed compatibility with Env.js - [Submitted](https://github.com/balupton/history.js/pull/60) by [Ryan Lee](http://zepheira.com/about/people/ryan-lee/)
 
 - v1.7.0 - April 01 2011
