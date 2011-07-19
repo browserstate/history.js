@@ -1,4 +1,4 @@
-Welcome to History.js (v1.7.0 - April 01 2011)
+Welcome to History.js (v1.8.0 - ???)
 ==================
 
 
@@ -8,7 +8,7 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
-- Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/), [RightJS](http://rightjs.org/) and [Zepto](http://zeptojs.com/)
+- Provide native support for native javascript (without any framework) as well as native support for the folowing javascript frameworks [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [RightJS](http://rightjs.org/) and [Zepto](http://zeptojs.com/)
 
 Licensed under the [New BSD License](http://creativecommons.org/licenses/BSD/)
 Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
@@ -128,50 +128,69 @@ For solutions to ajaxify your entire website with zero-configuration, there are 
 
 1. Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/history.js/tarball/master) or [zip](https://github.com/balupton/history.js/zipball/master)
 
-2. Include [JSON2](http://www.json.org/js.html) for HTML4 Browsers Only *(replace www.yourwebsite.com)*
+1. Include [JSON2](http://www.json.org/js.html) for HTML4 Browsers Only *(replace www.yourwebsite.com)*
 
-		<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="http://www.yourwebsite.com/history.js/scripts/compressed/json2.js"><\/script>'); }</script>
+	``` html
+	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="http://www.yourwebsite.com/history.js/scripts/compressed/json2.js"><\/script>'); }</script>
+	```
 
-3. Include [Amplify.js Store](http://amplifyjs.com/api/store) for Data Persistance and Synchronisation Support (optional but recommended)
+1. Include [Amplify.js Store](http://amplifyjs.com/api/store) for Data Persistance and Synchronisation Support (optional but recommended)
 
-		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/amplify.store.js"></script>
+	``` html
+	<script src="http://www.yourwebsite.com/history.js/scripts/compressed/amplify.store.js"></script>
+	```
 
-4. Include the Adapter for your Framework:
+1. Include the Adapter for your Framework:
 
 	- [jQuery](http://jquery.com/) v1.3+
 
-			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.jquery.js"></script>
+		```
 
 	- [Mootools](http://mootools.net/) v1.3+
 
-			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
-
-	- [Prototype](http://www.prototypejs.org/) v1.7+ (does not support versions of IE prior to 9 due to a bug in the prototype library)
-
-			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.prototype.js"></script>
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.mootools.js"></script>
+		```
 
 	- [RightJS](http://rightjs.org/) v2.2+
 
-			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.right.js"></script>
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.right.js"></script>
+		```
 
 	- [Zepto](http://zeptojs.com/) v0.5+
 
-			<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.zepto.js"></script>
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.zepto.js"></script>
+		```
+
+	- Native (for use with-any/without-any javascript framework)
+
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.adapter.native.js"></script>
+		```
 
 	- _Would you like to support another framework? No problem! It's very easy to create adapters, and I'll be happy to include them or help out if you [let me know](https://github.com/balupton/history.js/issues) :-)_
 
-5. Include History.js
+1. Include History.js
 
-		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
-		<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
+	``` html
+	<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.js"></script>
+	```
 
-> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just remove the `history.html4.js` file include in step #5 and the JSON2 (`json2.js`) file include in step #2 [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+1. _Optional:_ Include support for HTML4 browsers
+
+	``` html
+	<script src="http://www.yourwebsite.com/history.js/scripts/compressed/history.html4.js"></script>
+	```
+
+	> Note: It is recommended to only include support for HTML4 browsers if you _really_ have to [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 
 
 ## Subscribe to Updates
 
-- For Email Updates:
-	- You can subscribe via the subscription form included in the demo page
 - For Commit RSS/Atom Updates:
 	- You can subscribe via the [GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
 - For GitHub News Feed Updates:
@@ -273,11 +292,13 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ## Changelog
 
-- v1.7.1 - ???
+- v1.8.0 - ???
 	- Added [RightJS](http://rightjs.org/) Adapter
+	- Added [Native](http://rightjs.org/) Adapter - So you can now use History.js without any javascript framework! PrototypeJS users rejoice!
 	- Fixed using History.js inside an iFrame with Safari 5 - [Reported](https://github.com/balupton/history.js/issues/#issue/40) by [desaintflorent](https://github.com/desaintflorent)
 	- Fixed using History.js inside an iFrame with IE8 and IE9 (not yet done)
 	- Fixed pushing states which contain traditional anchors (not yet done) - [Reported](https://github.com/balupton/history.js/issues#issue/42) by [Mark Jaquith](http://markjaquith.com/)
+	- Fixed compatibility with Env.js - [Submitted](https://github.com/balupton/history.js/pull/60) by [Ryan Lee](http://zepheira.com/about/people/ryan-lee/)
 
 - v1.7.0 - April 01 2011
 	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.

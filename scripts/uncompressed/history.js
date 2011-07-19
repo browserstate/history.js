@@ -1362,6 +1362,7 @@
 			// Prepare
 			var
 				title = (typeof input === 'string') ? (input) : (input.title),
+				titleElements,
 				firstState;
 
 			// Initial
@@ -1373,10 +1374,15 @@
 			}
 
 			// Apply
-			try {
-				document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
+			titleElements = document.getElementsByTagName('title');
+			if ( titleElements.length === 1 ) {
+				try {
+					titleElements[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
+				}
+				catch ( err ) {
+					// ignore err
+				}
 			}
-			catch ( Exception ) { }
 			document.title = title;
 
 			// Chain
