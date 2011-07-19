@@ -298,7 +298,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 	- Added [Native](http://rightjs.org/) Adapter for use with any, or without any framework!
 	- Fixed using History.js inside an iFrame with Safari 5 - [Reported](https://github.com/balupton/history.js/issues/#issue/40) by [desaintflorent](https://github.com/desaintflorent)
 	- Fixed using History.js inside an iFrame with IE8 and IE9 (not yet done)
-	- Fixed pushing states which contain traditional anchors (not yet done) - [Reported](https://github.com/balupton/history.js/issues#issue/42) by [Mark Jaquith](http://markjaquith.com/)
+	- Fixed pushing states which contain traditional anchors (needs testing) - [Reported](https://github.com/balupton/history.js/issues#issue/42) by [Mark Jaquith](http://markjaquith.com/)
 	- Added the flags `internal`, `same` and `anchor` to `History.getState()` - see Exposed API section of this readme
 	- Fixed compatibility with Env.js - [Submitted](https://github.com/balupton/history.js/pull/60) by [Ryan Lee](http://zepheira.com/about/people/ryan-lee/)
 
