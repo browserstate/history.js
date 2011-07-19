@@ -204,7 +204,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Getting Support
 
-**History.js is an actively supported, maintained and developed project.** You can grab support via its **[GitHub Issue Tracker](https://github.com/balupton/history.js/issues)** and contact its core developer [Benjamin Lupton](http://balupton.com) via [twitter](http://twitter.com/balupton), skype (balupton) and email (b@lupton.cc). Benjamin is also available for [bookings](http://speakerrate.com/speakers/11963-benjamin-lupton) (trainings, seminars, talks), [consulting](http://careers.stackoverflow.com/balupton) (development, advisory), sponsorship (angels, investors, donations, advertisement), interviews, chats, hackathons, socials and mentoring.
+**History.js is an actively supported, maintained and developed project.** You can grab support via its **[GitHub Issue Tracker](https://github.com/balupton/history.js/issues)** and contact its core developer [Benjamin Lupton](http://balupton.com) via [twitter](http://twitter.com/balupton), skype (balupton) and email (b@lupton.cc). Benjamin is also available for [bookings](http://speakerrate.com/speakers/11963-benjamin-lupton) (trainings, seminars, talks), [consulting](http://careers.stackoverflow.com/balupton) (development, advisory, implementations), sponsorship (angels, investors, donations, advertisement), interviews, chats, hackathons, socials and mentoring.
 
 
 ## Giving Support
@@ -243,8 +243,8 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ### Functions
 
-- `History.pushState(data,title,url)` <br/> Pushes a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
-- `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
+- `History.pushState(data,title,url)` <br/> Pushes a new state to the browser; `data` can be null or a serializable object, `title` can be null or a string, `url` must be a string
+- `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser; `data` can be null or a serializable object, `title` can be null or a string, `url` must be a string
 - `History.getState()` <br/> Gets the current state of the browser, returns a State object with the keys:
 	- `data`: object: the state data that was pushed
 	- `title`: string or `null`: the state title that was pushed
