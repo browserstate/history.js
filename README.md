@@ -8,7 +8,7 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
-- Provide native support for native javascript (without any framework) as well as native support for the folowing javascript frameworks [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [RightJS](http://rightjs.org/) and [Zepto](http://zeptojs.com/)
+- Provide support for use without any javascript framework, as well as native support for popular javascript frameworks - including [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [RightJS](http://rightjs.org/) and [Zepto](http://zeptojs.com/)
 
 Licensed under the [New BSD License](http://creativecommons.org/licenses/BSD/)
 Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
