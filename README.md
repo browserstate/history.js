@@ -16,7 +16,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Usage
 
-### Working with History.js:
+### Working with History.js
 
 ``` javascript
 (function(window,undefined){
@@ -71,7 +71,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 })(window);
 ```
 
-For solutions to ajaxify your entire website with zero-configuration, there are these pre-made scripts:
+**For solutions to ajaxify your entire website with zero-configuration, there are these pre-made scripts:**
 
 - [This snippet of jQuery code](https://gist.github.com/854622) which you can drop into your website
 - [This bookmarklet](https://gist.github.com/919358) which you can use to see what your website (or others) looks like with History.js enabled
@@ -120,9 +120,11 @@ For solutions to ajaxify your entire website with zero-configuration, there are 
 - It works with domains, subdomains, subdirectories, whatever - doesn't matter where you put it. It's smart.
 - Safari 5 will also have a SUID appended to the URL, it is entirely transparent but just a visible side-effect. It is required to fix a bug with Safari 5.
 
-### Is there a working demo?
+### Is there a working demo? Sure is.
 
-Sure is, [you can try the official demo right here](http://balupton.github.com/history.js/demo/), or [check out how other people are using History.js in their own web sites and apps right here](https://github.com/balupton/history.js/wiki/Showcase). If you're feeling even more adventurous you can [check out the History.js Test Suite right here](http://balupton.github.com/history.js/tests/) - it'll rock your world and [show all the vast use cases that History.js supports](https://github.com/balupton/history.js/blob/dev/tests/tests.js#L172).
+- [You can try the official demo right here](http://balupton.github.com/history.js/demo/)
+- or [check out how other people are using History.js in their own web sites and apps right here](https://github.com/balupton/history.js/wiki/Showcase)
+- if you're feeling even more adventurous you can [check out the History.js Test Suite right here](http://balupton.github.com/history.js/tests/) - it'll rock your world and [show all the vast use cases that History.js supports](https://github.com/balupton/history.js/blob/dev/tests/tests.js#L172).
 
 
 ## Download & Installation
