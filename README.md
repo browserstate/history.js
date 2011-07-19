@@ -192,12 +192,12 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ## Subscribe to Updates
 
-- For Twitter Updates:
-	- [Follow Benjamin Lupton on Twitter](https://twitter.com/balupton)
-- For Weekly Meetups:
-	- [Hangout with Benjamin Lupton on Google+](https://plus.google.com/117485112588440259770/about)
 - For GitHub News Feed Updates:
 	- Click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
+- For Weekly Meetups:
+	- [Hangout with Benjamin Lupton on Google+](https://plus.google.com/117485112588440259770/about)
+- For Twitter Updates:
+	- [Follow Benjamin Lupton on Twitter](https://twitter.com/balupton)
 - For Commit RSS/Atom Updates:
 	- [Subscribe via the GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
 
