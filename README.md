@@ -190,7 +190,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 	> Note: It is recommended to include support for HTML4 browsers _only if you **really** need to_ [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 
 
-## Subscribe to Updates
+## Getting Updates
 
 - For GitHub News Feed Updates:
 	- Click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
