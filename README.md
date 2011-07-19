@@ -195,7 +195,7 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 - For Twitter Updates:
 	- [Follow Benjamin Lupton on Twitter](https://twitter.com/balupton)
 - For Weekly Meetups:
-	- [Hangout with Benjamin Lupton on Google+](https://twitter.com/balupton)
+	- [Hangout with Benjamin Lupton on Google+](https://plus.google.com/117485112588440259770/about)
 - For GitHub News Feed Updates:
 	- Click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
 - For Commit RSS/Atom Updates:
