@@ -28,7 +28,9 @@
 	</script>
 
 	<!-- Framework -->
-	<script src="../vendor/<?=$adapter?>.js"></script>
+	<?php if ( $adapter !== 'native' ) : ?>
+		<script src="../vendor/<?=$adapter?>.js"></script>
+	<?php endif; ?>
 
 	<!-- QUnit -->
 	<link rel="stylesheet" href="../vendor/qunit/qunit.css" type="text/css" media="screen">
@@ -48,12 +50,12 @@
 	<!-- History.js -->
 	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$compression?>/json2.js"><\/script>'); }</script>
 	<?php if ( $persist === 'persistant' ) : ?>
-	<script src="../scripts/<?=$compression?>/amplify.store.js"></script>
+		<script src="../scripts/<?=$compression?>/amplify.store.js"></script>
 	<?php endif; ?>
 	<script src="../scripts/<?=$compression?>/history.adapter.<?=$adapter?>.js"></script>
 	<script src="../scripts/<?=$compression?>/history.js"></script>
 	<?php if ( $support === 'html4' ) : ?>
-	<script src="../scripts/<?=$compression?>/history.html4.js"></script>
+		<script src="../scripts/<?=$compression?>/history.html4.js"></script>
 	<?php endif; ?>
 
 	<!-- Tests -->
