@@ -31,8 +31,8 @@
 	<script src="../vendor/<?=$adapter?>.js"></script>
 
 	<!-- QUnit -->
-	<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css" type="text/css" media="screen">
-	<script src="../vendor/qunit/qunit/qunit.js"></script>
+	<link rel="stylesheet" href="../vendor/qunit/qunit.css" type="text/css" media="screen">
+	<script src="../vendor/qunit/qunit.js"></script>
 </head>
 <body>
 	<!-- Elements -->
