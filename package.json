@@ -1,6 +1,6 @@
 {
 	"name": "history.js",
-	"version": "1.6.0",
+	"version": "1.8.0",
 	"description": "History.js gracefully supports the HTML5 History/State APIs (pushState, replaceState, onPopState) in all browsers. Including continued support for data, titles, replaceState. Supports jQuery, MooTools and Prototype.  For HTML5 browsers this means that you can modify the URL directly, without needing to use hashes anymore. For HTML4 browsers it will revert back to using the old onhashchange functionality.",
 	"homepage": "https://github.com/balupton/history.js",
 	"keywords": [
@@ -46,47 +46,12 @@
 		"url" : "http://github.com/balupton/history.js.git"
 	},
 	"dependencies": {
-		"buildr": "=0.2.9"
+		"buildr": "=0.6.4"
 	},
 	"engines" : {
 	},
 	"directories": {
 		"out": "./scripts/compressed",
 		"src": "./scripts/uncompressed"
-	},
-	"buildr": {
-		"compress": {
-			"js": true,
-			"css": false,
-			"img": false,
-			"html": false
-		},
-		"check": {
-			"js": true,
-			"jsOptions": {
-				"browser": true,
-				"laxbreak": true,
-				"boss": true,
-				"undef": true,
-				"onevar": true,
-				"strict": true
-			}
-		},
-		"ignore": {
-			"check": [
-				"json2.js",
-				"amplify.store.js"
-			]
-		},
-		"bundle": false,
-		"directories": {
-			"out": "./scripts/compressed",
-			"src": "./scripts/uncompressed"
-		},
-		"files": {
-			"js": true,
-			"css": false,
-			"img": false
-		}
 	}
 }
