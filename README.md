@@ -1,4 +1,4 @@
-Welcome to History.js (v1.7.0 - April 01 2011)
+Welcome to History.js (v1.7.1 - September 06 2011)
 ==================
 
 
@@ -235,6 +235,8 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 
 ## Changelog
+
+- v1.7.1 - September 06 2011
 
 - v1.7.0 - April 01 2011
 	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.

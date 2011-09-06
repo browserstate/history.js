@@ -1,3 +1,1217 @@
+/*
+    http://www.JSON.org/json2.js
+    2011-01-18
+
+    Public Domain.
+
+    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+
+    See http://www.JSON.org/js.html
+
+
+    This code should be minified before deployment.
+    See http://javascript.crockford.com/jsmin.html
+
+    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
+    NOT CONTROL.
+
+
+    This file creates a global JSON object containing two methods: stringify
+    and parse.
+
+        JSON.stringify(value, replacer, space)
+            value       any JavaScript value, usually an object or array.
+
+            replacer    an optional parameter that determines how object
+                        values are stringified for objects. It can be a
+                        function or an array of strings.
+
+            space       an optional parameter that specifies the indentation
+                        of nested structures. If it is omitted, the text will
+                        be packed without extra whitespace. If it is a number,
+                        it will specify the number of spaces to indent at each
+                        level. If it is a string (such as '\t' or '&nbsp;'),
+                        it contains the characters used to indent at each level.
+
+            This method produces a JSON text from a JavaScript value.
+
+            When an object value is found, if the object contains a toJSON
+            method, its toJSON method will be called and the result will be
+            stringified. A toJSON method does not serialize: it returns the
+            value represented by the name/value pair that should be serialized,
+            or undefined if nothing should be serialized. The toJSON method
+            will be passed the key associated with the value, and this will be
+            bound to the value
+
+            For example, this would serialize Dates as ISO strings.
+
+                Date.prototype.toJSON = function (key) {
+                    function f(n) {
+                        // Format integers to have at least two digits.
+                        return n < 10 ? '0' + n : n;
+                    }
+
+                    return this.getUTCFullYear()   + '-' +
+                         f(this.getUTCMonth() + 1) + '-' +
+                         f(this.getUTCDate())      + 'T' +
+                         f(this.getUTCHours())     + ':' +
+                         f(this.getUTCMinutes())   + ':' +
+                         f(this.getUTCSeconds())   + 'Z';
+                };
+
+            You can provide an optional replacer method. It will be passed the
+            key and value of each member, with this bound to the containing
+            object. The value that is returned from your method will be
+            serialized. If your method returns undefined, then the member will
+            be excluded from the serialization.
+
+            If the replacer parameter is an array of strings, then it will be
+            used to select the members to be serialized. It filters the results
+            such that only members with keys listed in the replacer array are
+            stringified.
+
+            Values that do not have JSON representations, such as undefined or
+            functions, will not be serialized. Such values in objects will be
+            dropped; in arrays they will be replaced with null. You can use
+            a replacer function to replace those with JSON values.
+            JSON.stringify(undefined) returns undefined.
+
+            The optional space parameter produces a stringification of the
+            value that is filled with line breaks and indentation to make it
+            easier to read.
+
+            If the space parameter is a non-empty string, then that string will
+            be used for indentation. If the space parameter is a number, then
+            the indentation will be that many spaces.
+
+            Example:
+
+            text = JSON.stringify(['e', {pluribus: 'unum'}]);
+            // text is '["e",{"pluribus":"unum"}]'
+
+
+            text = JSON.stringify(['e', {pluribus: 'unum'}], null, '\t');
+            // text is '[\n\t"e",\n\t{\n\t\t"pluribus": "unum"\n\t}\n]'
+
+            text = JSON.stringify([new Date()], function (key, value) {
+                return this[key] instanceof Date ?
+                    'Date(' + this[key] + ')' : value;
+            });
+            // text is '["Date(---current time---)"]'
+
+
+        JSON.parse(text, reviver)
+            This method parses a JSON text to produce an object or array.
+            It can throw a SyntaxError exception.
+
+            The optional reviver parameter is a function that can filter and
+            transform the results. It receives each of the keys and values,
+            and its return value is used instead of the original value.
+            If it returns what it received, then the structure is not modified.
+            If it returns undefined then the member is deleted.
+
+            Example:
+
+            // Parse the text. Values that look like ISO date strings will
+            // be converted to Date objects.
+
+            myData = JSON.parse(text, function (key, value) {
+                var a;
+                if (typeof value === 'string') {
+                    a =
+/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
+                    if (a) {
+                        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4],
+                            +a[5], +a[6]));
+                    }
+                }
+                return value;
+            });
+
+            myData = JSON.parse('["Date(09/09/2001)"]', function (key, value) {
+                var d;
+                if (typeof value === 'string' &&
+                        value.slice(0, 5) === 'Date(' &&
+                        value.slice(-1) === ')') {
+                    d = new Date(value.slice(5, -1));
+                    if (d) {
+                        return d;
+                    }
+                }
+                return value;
+            });
+
+
+    This is a reference implementation. You are free to copy, modify, or
+    redistribute.
+*/
+
+/*jslint evil: true, strict: false, regexp: false */
+
+/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
+    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
+    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
+    lastIndex, length, parse, prototype, push, replace, slice, stringify,
+    test, toJSON, toString, valueOf
+*/
+
+
+// Create a JSON object only if one does not already exist. We create the
+// methods in a closure to avoid creating global variables.
+
+if (!window.JSON) {
+    window.JSON = {};
+}
+
+(function () {
+    "use strict";
+
+    function f(n) {
+        // Format integers to have at least two digits.
+        return n < 10 ? '0' + n : n;
+    }
+
+    if (typeof Date.prototype.toJSON !== 'function') {
+
+        Date.prototype.toJSON = function (key) {
+
+            return isFinite(this.valueOf()) ?
+                this.getUTCFullYear()     + '-' +
+                f(this.getUTCMonth() + 1) + '-' +
+                f(this.getUTCDate())      + 'T' +
+                f(this.getUTCHours())     + ':' +
+                f(this.getUTCMinutes())   + ':' +
+                f(this.getUTCSeconds())   + 'Z' : null;
+        };
+
+        String.prototype.toJSON      =
+            Number.prototype.toJSON  =
+            Boolean.prototype.toJSON = function (key) {
+                return this.valueOf();
+            };
+    }
+
+    var JSON = window.JSON,
+        cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        gap,
+        indent,
+        meta = {    // table of character substitutions
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"' : '\\"',
+            '\\': '\\\\'
+        },
+        rep;
+
+
+    function quote(string) {
+
+// If the string contains no control characters, no quote characters, and no
+// backslash characters, then we can safely slap some quotes around it.
+// Otherwise we must also replace the offending characters with safe escape
+// sequences.
+
+        escapable.lastIndex = 0;
+        return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
+            var c = meta[a];
+            return typeof c === 'string' ? c :
+                '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+        }) + '"' : '"' + string + '"';
+    }
+
+
+    function str(key, holder) {
+
+// Produce a string from holder[key].
+
+        var i,          // The loop counter.
+            k,          // The member key.
+            v,          // The member value.
+            length,
+            mind = gap,
+            partial,
+            value = holder[key];
+
+// If the value has a toJSON method, call it to obtain a replacement value.
+
+        if (value && typeof value === 'object' &&
+                typeof value.toJSON === 'function') {
+            value = value.toJSON(key);
+        }
+
+// If we were called with a replacer function, then call the replacer to
+// obtain a replacement value.
+
+        if (typeof rep === 'function') {
+            value = rep.call(holder, key, value);
+        }
+
+// What happens next depends on the value's type.
+
+        switch (typeof value) {
+        case 'string':
+            return quote(value);
+
+        case 'number':
+
+// JSON numbers must be finite. Encode non-finite numbers as null.
+
+            return isFinite(value) ? String(value) : 'null';
+
+        case 'boolean':
+        case 'null':
+
+// If the value is a boolean or null, convert it to a string. Note:
+// typeof null does not produce 'null'. The case is included here in
+// the remote chance that this gets fixed someday.
+
+            return String(value);
+
+// If the type is 'object', we might be dealing with an object or an array or
+// null.
+
+        case 'object':
+
+// Due to a specification blunder in ECMAScript, typeof null is 'object',
+// so watch out for that case.
+
+            if (!value) {
+                return 'null';
+            }
+
+// Make an array to hold the partial results of stringifying this object value.
+
+            gap += indent;
+            partial = [];
+
+// Is the value an array?
+
+            if (Object.prototype.toString.apply(value) === '[object Array]') {
+
+// The value is an array. Stringify every element. Use null as a placeholder
+// for non-JSON values.
+
+                length = value.length;
+                for (i = 0; i < length; i += 1) {
+                    partial[i] = str(i, value) || 'null';
+                }
+
+// Join all of the elements together, separated with commas, and wrap them in
+// brackets.
+
+                v = partial.length === 0 ? '[]' : gap ?
+                    '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']' :
+                    '[' + partial.join(',') + ']';
+                gap = mind;
+                return v;
+            }
+
+// If the replacer is an array, use it to select the members to be stringified.
+
+            if (rep && typeof rep === 'object') {
+                length = rep.length;
+                for (i = 0; i < length; i += 1) {
+                    k = rep[i];
+                    if (typeof k === 'string') {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            } else {
+
+// Otherwise, iterate through all of the keys in the object.
+
+                for (k in value) {
+                    if (Object.hasOwnProperty.call(value, k)) {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            }
+
+// Join all of the member texts together, separated with commas,
+// and wrap them in braces.
+
+            v = partial.length === 0 ? '{}' : gap ?
+                '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}' :
+                '{' + partial.join(',') + '}';
+            gap = mind;
+            return v;
+        }
+    }
+
+// If the JSON object does not yet have a stringify method, give it one.
+
+    if (typeof JSON.stringify !== 'function') {
+        JSON.stringify = function (value, replacer, space) {
+
+// The stringify method takes a value and an optional replacer, and an optional
+// space parameter, and returns a JSON text. The replacer can be a function
+// that can replace values, or an array of strings that will select the keys.
+// A default replacer method can be provided. Use of the space parameter can
+// produce text that is more easily readable.
+
+            var i;
+            gap = '';
+            indent = '';
+
+// If the space parameter is a number, make an indent string containing that
+// many spaces.
+
+            if (typeof space === 'number') {
+                for (i = 0; i < space; i += 1) {
+                    indent += ' ';
+                }
+
+// If the space parameter is a string, it will be used as the indent string.
+
+            } else if (typeof space === 'string') {
+                indent = space;
+            }
+
+// If there is a replacer, it must be a function or an array.
+// Otherwise, throw an error.
+
+            rep = replacer;
+            if (replacer && typeof replacer !== 'function' &&
+                    (typeof replacer !== 'object' ||
+                    typeof replacer.length !== 'number')) {
+                throw new Error('JSON.stringify');
+            }
+
+// Make a fake root object containing our value under the key of ''.
+// Return the result of stringifying the value.
+
+            return str('', {'': value});
+        };
+    }
+
+
+// If the JSON object does not yet have a parse method, give it one.
+
+    if (typeof JSON.parse !== 'function') {
+        JSON.parse = function (text, reviver) {
+
+// The parse method takes a text and an optional reviver function, and returns
+// a JavaScript value if the text is a valid JSON text.
+
+            var j;
+
+            function walk(holder, key) {
+
+// The walk method is used to recursively walk the resulting structure so
+// that modifications can be made.
+
+                var k, v, value = holder[key];
+                if (value && typeof value === 'object') {
+                    for (k in value) {
+                        if (Object.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
+                            }
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            }
+
+
+// Parsing happens in four stages. In the first stage, we replace certain
+// Unicode characters with escape sequences. JavaScript handles many characters
+// incorrectly, either silently deleting them, or treating them as line endings.
+
+            text = String(text);
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function (a) {
+                    return '\\u' +
+                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+// In the second stage, we run the text against regular expressions that look
+// for non-JSON patterns. We are especially concerned with '()' and 'new'
+// because they can cause invocation, and '=' because it can cause mutation.
+// But just to be safe, we want to reject all unexpected forms.
+
+// We split the second stage into 4 regexp operations in order to work around
+// crippling inefficiencies in IE's and Safari's regexp engines. First we
+// replace the JSON backslash pairs with '@' (a non-JSON character). Second, we
+// replace all simple value tokens with ']' characters. Third, we delete all
+// open brackets that follow a colon or comma or that begin the text. Finally,
+// we look to see that the remaining characters are only whitespace or ']' or
+// ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
+
+            if (/^[\],:{}\s]*$/
+                    .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
+                        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+                        .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+// In the third stage we use the eval function to compile the text into a
+// JavaScript structure. The '{' operator is subject to a syntactic ambiguity
+// in JavaScript: it can begin a block or an object literal. We wrap the text
+// in parens to eliminate the ambiguity.
+
+                j = eval('(' + text + ')');
+
+// In the optional fourth stage, we recursively walk the new structure, passing
+// each name/value pair to a reviver function for possible transformation.
+
+                return typeof reviver === 'function' ?
+                    walk({'': j}, '') : j;
+            }
+
+// If the text is not JSON parseable, then a SyntaxError is thrown.
+
+            throw new SyntaxError('JSON.parse');
+        };
+    }
+}());
+/**
+ * History.js Native Adapter
+ * @author Benjamin Arthur Lupton <contact@balupton.com>
+ * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+ * @license New BSD License <http://creativecommons.org/licenses/BSD/>
+ */
+
+// Closure
+(function(window,undefined){
+	"use strict";
+
+	// Localise Globals
+	var History = window.History = window.History||{};
+
+	// Check Existence
+	if ( typeof History.Adapter !== 'undefined' ) {
+		throw new Error('History.js Adapter has already been loaded...');
+	}
+
+	// Add the Adapter
+	History.Adapter = {
+		/**
+		 * History.Adapter.handlers[uid][eventName] = Array
+		 */
+		handlers: {},
+
+		/**
+		 * History.Adapter._uid
+		 * The current element unique identifier
+		 */
+		_uid: 1,
+
+		/**
+		 * History.Adapter.uid(element)
+		 * @param {Element} element
+		 * @return {String} uid
+		 */
+		 uid: function(element){
+			return element._uid || (element._uid = History.Adapter._uid++);
+		 },
+
+		/**
+		 * History.Adapter.bind(el,event,callback)
+		 * @param {Element} element
+		 * @param {String} eventName - custom and standard events
+		 * @param {Function} callback
+		 * @return
+		 */
+		bind: function(element,eventName,callback){
+			// Prepare
+			var uid = History.Adapter.uid(element);
+
+			// Apply Listener
+			History.Adapter.handlers[uid] = History.Adapter.handlers[uid] || {};
+			History.Adapter.handlers[uid][eventName] = History.Adapter.handlers[uid][eventName] || [];
+			History.Adapter.handlers[uid][eventName].push(callback);
+
+			// Bind Global Listener
+			element['on'+eventName] = (function(element,eventName){
+				return function(event){
+					History.Adapter.trigger(element,eventName,event);
+				};
+			})(element,eventName);
+		},
+
+		/**
+		 * History.Adapter.trigger(el,event)
+		 * @param {Element} element
+		 * @param {String} eventName - custom and standard events
+		 * @param {Object} event - a object of event data
+		 * @return
+		 */
+		trigger: function(element,eventName,event){
+			// Prepare
+			event = event || {};
+			var uid = History.Adapter.uid(element),
+				i,n;
+
+			// Apply Listener
+			History.Adapter.handlers[uid] = History.Adapter.handlers[uid] || {};
+			History.Adapter.handlers[uid][eventName] = History.Adapter.handlers[uid][eventName] || [];
+
+			// Fire Listeners
+			for ( i=0,n=History.Adapter.handlers[uid][eventName].length; i<n; ++i ) {
+				History.Adapter.handlers[uid][eventName][i].apply(this,[event]);
+			}
+		},
+
+		/**
+		 * History.Adapter.extractEventData(key,event,extra)
+		 * @param {String} key - key for the event data to extract
+		 * @param {String} event - custom and standard events
+		 * @return {mixed}
+		 */
+		extractEventData: function(key,event){
+			var result = (event && event[key]) || undefined;
+			return result;
+		},
+
+		/**
+		 * History.Adapter.trigger(el,event,data)
+		 * @param {Function} callback
+		 * @return
+		 */
+		onDomLoad: function(callback) {
+			window.onload = callback;
+		}
+	};
+
+	// Try and Initialise History
+	if ( typeof History.init !== 'undefined' ) {
+		History.init();
+	}
+
+})(window);
+/**
+ * History.js HTML4 Support
+ * Depends on the HTML5 Support
+ * @author Benjamin Arthur Lupton <contact@balupton.com>
+ * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+ * @license New BSD License <http://creativecommons.org/licenses/BSD/>
+ */
+
+(function(window,undefined){
+	"use strict";
+
+	// ========================================================================
+	// Initialise
+
+	// Localise Globals
+	var
+		document = window.document, // Make sure we are using the correct document
+		setTimeout = window.setTimeout||setTimeout,
+		clearTimeout = window.clearTimeout||clearTimeout,
+		setInterval = window.setInterval||setInterval,
+		History = window.History = window.History||{}; // Public History Object
+
+	// Check Existence
+	if ( typeof History.initHtml4 !== 'undefined' ) {
+		throw new Error('History.js HTML4 Support has already been loaded...');
+	}
+
+
+	// ========================================================================
+	// Initialise HTML4 Support
+
+	// Initialise HTML4 Support
+	History.initHtml4 = function(){
+		// Initialise
+		if ( typeof History.initHtml4.initialized !== 'undefined' ) {
+			// Already Loaded
+			return false;
+		}
+		else {
+			History.initHtml4.initialized = true;
+		}
+
+
+		// ====================================================================
+		// Properties
+
+		/**
+		 * History.enabled
+		 * Is History enabled?
+		 */
+		History.enabled = true;
+
+
+		// ====================================================================
+		// Hash Storage
+
+		/**
+		 * History.savedHashes
+		 * Store the hashes in an array
+		 */
+		History.savedHashes = [];
+
+		/**
+		 * History.isLastHash(newHash)
+		 * Checks if the hash is the last hash
+		 * @param {string} newHash
+		 * @return {boolean} true
+		 */
+		History.isLastHash = function(newHash){
+			// Prepare
+			var oldHash = History.getHashByIndex(),
+				isLast;
+
+			// Check
+			isLast = newHash === oldHash;
+
+			// Return isLast
+			return isLast;
+		};
+
+		/**
+		 * History.saveHash(newHash)
+		 * Push a Hash
+		 * @param {string} newHash
+		 * @return {boolean} true
+		 */
+		History.saveHash = function(newHash){
+			// Check Hash
+			if ( History.isLastHash(newHash) ) {
+				return false;
+			}
+
+			// Push the Hash
+			History.savedHashes.push(newHash);
+
+			// Return true
+			return true;
+		};
+
+		/**
+		 * History.getHashByIndex()
+		 * Gets a hash by the index
+		 * @param {integer} index
+		 * @return {string}
+		 */
+		History.getHashByIndex = function(index){
+			// Prepare
+			var hash = null;
+
+			// Handle
+			if ( typeof index === 'undefined' ) {
+				// Get the last inserted
+				hash = History.savedHashes[History.savedHashes.length-1];
+			}
+			else if ( index < 0 ) {
+				// Get from the end
+				hash = History.savedHashes[History.savedHashes.length+index];
+			}
+			else {
+				// Get from the beginning
+				hash = History.savedHashes[index];
+			}
+
+			// Return hash
+			return hash;
+		};
+
+
+		// ====================================================================
+		// Discarded States
+
+		/**
+		 * History.discardedHashes
+		 * A hashed array of discarded hashes
+		 */
+		History.discardedHashes = {};
+
+		/**
+		 * History.discardedStates
+		 * A hashed array of discarded states
+		 */
+		History.discardedStates = {};
+
+		/**
+		 * History.discardState(State)
+		 * Discards the state by ignoring it through History
+		 * @param {object} State
+		 * @return {true}
+		 */
+		History.discardState = function(discardedState,forwardState,backState){
+			//History.debug('History.discardState', arguments);
+			// Prepare
+			var discardedStateHash = History.getHashByState(discardedState),
+				discardObject;
+
+			// Create Discard Object
+			discardObject = {
+				'discardedState': discardedState,
+				'backState': backState,
+				'forwardState': forwardState
+			};
+
+			// Add to DiscardedStates
+			History.discardedStates[discardedStateHash] = discardObject;
+
+			// Return true
+			return true;
+		};
+
+		/**
+		 * History.discardHash(hash)
+		 * Discards the hash by ignoring it through History
+		 * @param {string} hash
+		 * @return {true}
+		 */
+		History.discardHash = function(discardedHash,forwardState,backState){
+			//History.debug('History.discardState', arguments);
+			// Create Discard Object
+			var discardObject = {
+				'discardedHash': discardedHash,
+				'backState': backState,
+				'forwardState': forwardState
+			};
+
+			// Add to discardedHash
+			History.discardedHashes[discardedHash] = discardObject;
+
+			// Return true
+			return true;
+		};
+
+		/**
+		 * History.discardState(State)
+		 * Checks to see if the state is discarded
+		 * @param {object} State
+		 * @return {bool}
+		 */
+		History.discardedState = function(State){
+			// Prepare
+			var StateHash = History.getHashByState(State),
+				discarded;
+
+			// Check
+			discarded = History.discardedStates[StateHash]||false;
+
+			// Return true
+			return discarded;
+		};
+
+		/**
+		 * History.discardedHash(hash)
+		 * Checks to see if the state is discarded
+		 * @param {string} State
+		 * @return {bool}
+		 */
+		History.discardedHash = function(hash){
+			// Check
+			var discarded = History.discardedHashes[hash]||false;
+
+			// Return true
+			return discarded;
+		};
+
+		/**
+		 * History.recycleState(State)
+		 * Allows a discarded state to be used again
+		 * @param {object} data
+		 * @param {string} title
+		 * @param {string} url
+		 * @return {true}
+		 */
+		History.recycleState = function(State){
+			//History.debug('History.recycleState', arguments);
+			// Prepare
+			var StateHash = History.getHashByState(State);
+
+			// Remove from DiscardedStates
+			if ( History.discardedState(State) ) {
+				delete History.discardedStates[StateHash];
+			}
+
+			// Return true
+			return true;
+		};
+
+
+		// ====================================================================
+		// HTML4 HashChange Support
+
+		if ( History.emulated.hashChange ) {
+			/*
+			 * We must emulate the HTML4 HashChange Support by manually checking for hash changes
+			 */
+
+			/**
+			 * History.hashChangeInit()
+			 * Init the HashChange Emulation
+			 */
+			History.hashChangeInit = function(){
+				// Define our Checker Function
+				History.checkerFunction = null;
+
+				// Define some variables that will help in our checker function
+				var lastDocumentHash = '',
+					iframeId, iframe,
+					lastIframeHash, checkerRunning;
+
+				// Handle depending on the browser
+				if ( History.isInternetExplorer() ) {
+					// IE6 and IE7
+					// We need to use an iframe to emulate the back and forward buttons
+
+					// Create iFrame
+					iframeId = 'historyjs-iframe';
+					iframe = document.createElement('iframe');
+
+					// Adjust iFarme
+					iframe.setAttribute('id', iframeId);
+					iframe.style.display = 'none';
+
+					// Append iFrame
+					document.body.appendChild(iframe);
+
+					// Create initial history entry
+					iframe.contentWindow.document.open();
+					iframe.contentWindow.document.close();
+
+					// Define some variables that will help in our checker function
+					lastIframeHash = '';
+					checkerRunning = false;
+
+					// Define the checker function
+					History.checkerFunction = function(){
+						// Check Running
+						if ( checkerRunning ) {
+							return false;
+						}
+
+						// Update Running
+						checkerRunning = true;
+
+						// Fetch
+						var documentHash = History.getHash()||'',
+							iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash)||'';
+
+						// The Document Hash has changed (application caused)
+						if ( documentHash !== lastDocumentHash ) {
+							// Equalise
+							lastDocumentHash = documentHash;
+
+							// Create a history entry in the iframe
+							if ( iframeHash !== documentHash ) {
+								//History.debug('hashchange.checker: iframe hash change', 'documentHash (new):', documentHash, 'iframeHash (old):', iframeHash);
+
+								// Equalise
+								lastIframeHash = iframeHash = documentHash;
+
+								// Create History Entry
+								iframe.contentWindow.document.open();
+								iframe.contentWindow.document.close();
+
+								// Update the iframe's hash
+								iframe.contentWindow.document.location.hash = History.escapeHash(documentHash);
+							}
+
+							// Trigger Hashchange Event
+							History.Adapter.trigger(window,'hashchange');
+						}
+
+						// The iFrame Hash has changed (back button caused)
+						else if ( iframeHash !== lastIframeHash ) {
+							//History.debug('hashchange.checker: iframe hash out of sync', 'iframeHash (new):', iframeHash, 'documentHash (old):', documentHash);
+
+							// Equalise
+							lastIframeHash = iframeHash;
+
+							// Update the Hash
+							History.setHash(iframeHash,false);
+						}
+
+						// Reset Running
+						checkerRunning = false;
+
+						// Return true
+						return true;
+					};
+				}
+				else {
+					// We are not IE
+					// Firefox 1 or 2, Opera
+
+					// Define the checker function
+					History.checkerFunction = function(){
+						// Prepare
+						var documentHash = History.getHash();
+
+						// The Document Hash has changed (application caused)
+						if ( documentHash !== lastDocumentHash ) {
+							// Equalise
+							lastDocumentHash = documentHash;
+
+							// Trigger Hashchange Event
+							History.Adapter.trigger(window,'hashchange');
+						}
+
+						// Return true
+						return true;
+					};
+				}
+
+				// Apply the checker function
+				History.intervalList.push(setInterval(History.checkerFunction, History.options.hashChangeInterval));
+
+				// Done
+				return true;
+			}; // History.hashChangeInit
+
+			// Bind hashChangeInit
+			History.Adapter.onDomLoad(History.hashChangeInit);
+
+		} // History.emulated.hashChange
+
+
+		// ====================================================================
+		// HTML5 State Support
+
+		// Non-Native pushState Implementation
+		if ( History.emulated.pushState ) {
+			/*
+			 * We must emulate the HTML5 State Management by using HTML4 HashChange
+			 */
+
+			/**
+			 * History.onHashChange(event)
+			 * Trigger HTML5's window.onpopstate via HTML4 HashChange Support
+			 */
+			History.onHashChange = function(event){
+				//History.debug('History.onHashChange', arguments);
+
+				// Prepare
+				var currentUrl = ((event && event.newURL) || document.location.href),
+					currentHash = History.getHashByUrl(currentUrl),
+					currentState = null,
+					currentStateHash = null,
+					currentStateHashExits = null,
+					discardObject;
+
+				// Check if we are the same state
+				if ( History.isLastHash(currentHash) ) {
+					// There has been no change (just the page's hash has finally propagated)
+					//History.debug('History.onHashChange: no change');
+					History.busy(false);
+					return false;
+				}
+
+				// Reset the double check
+				History.doubleCheckComplete();
+
+				// Store our location for use in detecting back/forward direction
+				History.saveHash(currentHash);
+
+				// Expand Hash
+				if ( currentHash && History.isTraditionalAnchor(currentHash) ) {
+					//History.debug('History.onHashChange: traditional anchor', currentHash);
+					// Traditional Anchor Hash
+					History.Adapter.trigger(window,'anchorchange');
+					History.busy(false);
+					return false;
+				}
+
+				// Create State
+				currentState = History.extractState(History.getFullUrl(currentHash||document.location.href,false),true);
+
+				// Check if we are the same state
+				if ( History.isLastSavedState(currentState) ) {
+					//History.debug('History.onHashChange: no change');
+					// There has been no change (just the page's hash has finally propagated)
+					History.busy(false);
+					return false;
+				}
+
+				// Create the state Hash
+				currentStateHash = History.getHashByState(currentState);
+
+				// Check if we are DiscardedState
+				discardObject = History.discardedState(currentState);
+				if ( discardObject ) {
+					// Ignore this state as it has been discarded and go back to the state before it
+					if ( History.getHashByIndex(-2) === History.getHashByState(discardObject.forwardState) ) {
+						// We are going backwards
+						//History.debug('History.onHashChange: go backwards');
+						History.back(false);
+					} else {
+						// We are going forwards
+						//History.debug('History.onHashChange: go forwards');
+						History.forward(false);
+					}
+					return false;
+				}
+
+				// Push the new HTML5 State
+				//History.debug('History.onHashChange: success hashchange');
+				History.pushState(currentState.data,currentState.title,currentState.url,false);
+
+				// End onHashChange closure
+				return true;
+			};
+			History.Adapter.bind(window,'hashchange',History.onHashChange);
+
+			/**
+			 * History.pushState(data,title,url)
+			 * Add a new State to the history object, become it, and trigger onpopstate
+			 * We have to trigger for HTML4 compatibility
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {true}
+			 */
+			History.pushState = function(data,title,url,queue){
+				//History.debug('History.pushState: called', arguments);
+
+				// Check the State
+				if ( History.getHashByUrl(url) ) {
+					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
+				}
+
+				// Handle Queueing
+				if ( queue !== false && History.busy() ) {
+					// Wait + Push to Queue
+					//History.debug('History.pushState: we must wait', arguments);
+					History.pushQueue({
+						scope: History,
+						callback: History.pushState,
+						args: arguments,
+						queue: queue
+					});
+					return false;
+				}
+
+				// Make Busy
+				History.busy(true);
+
+				// Fetch the State Object
+				var newState = History.createStateObject(data,title,url),
+					newStateHash = History.getHashByState(newState),
+					oldState = History.getState(false),
+					oldStateHash = History.getHashByState(oldState),
+					html4Hash = History.getHash();
+
+				// Store the newState
+				History.storeState(newState);
+				History.expectedStateId = newState.id;
+
+				// Recycle the State
+				History.recycleState(newState);
+
+				// Force update of the title
+				History.setTitle(newState);
+
+				// Check if we are the same State
+				if ( newStateHash === oldStateHash ) {
+					//History.debug('History.pushState: no change', newStateHash);
+					History.busy(false);
+					return false;
+				}
+
+				// Update HTML4 Hash
+				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
+					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
+					History.setHash(newStateHash,false);
+					return false;
+				}
+
+				// Update HTML5 State
+				History.saveState(newState);
+
+				// Fire HTML5 Event
+				//History.debug('History.pushState: trigger popstate');
+				History.Adapter.trigger(window,'statechange');
+				History.busy(false);
+
+				// End pushState closure
+				return true;
+			};
+
+			/**
+			 * History.replaceState(data,title,url)
+			 * Replace the State and trigger onpopstate
+			 * We have to trigger for HTML4 compatibility
+			 * @param {object} data
+			 * @param {string} title
+			 * @param {string} url
+			 * @return {true}
+			 */
+			History.replaceState = function(data,title,url,queue){
+				//History.debug('History.replaceState: called', arguments);
+
+				// Check the State
+				if ( History.getHashByUrl(url) ) {
+					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
+				}
+
+				// Handle Queueing
+				if ( queue !== false && History.busy() ) {
+					// Wait + Push to Queue
+					//History.debug('History.replaceState: we must wait', arguments);
+					History.pushQueue({
+						scope: History,
+						callback: History.replaceState,
+						args: arguments,
+						queue: queue
+					});
+					return false;
+				}
+
+				// Make Busy
+				History.busy(true);
+
+				// Fetch the State Objects
+				var newState        = History.createStateObject(data,title,url),
+					oldState        = History.getState(false),
+					previousState   = History.getStateByIndex(-2);
+
+				// Discard Old State
+				History.discardState(oldState,newState,previousState);
+
+				// Alias to PushState
+				History.pushState(newState.data,newState.title,newState.url,false);
+
+				// End replaceState closure
+				return true;
+			};
+
+		} // History.emulated.pushState
+
+
+
+		// ====================================================================
+		// Initialise
+
+		// Non-Native pushState Implementation
+		if ( History.emulated.pushState ) {
+			/**
+			 * Ensure initial state is handled correctly
+			 */
+			if ( History.getHash() && !History.emulated.hashChange ) {
+				History.Adapter.onDomLoad(function(){
+					History.Adapter.trigger(window,'hashchange');
+				});
+			}
+
+		} // History.emulated.pushState
+
+	}; // History.initHtml4
+
+	// Try and Initialise History
+	History.init();
+
+})(window);
 /**
  * History.js Core
  * @author Benjamin Arthur Lupton <contact@balupton.com>

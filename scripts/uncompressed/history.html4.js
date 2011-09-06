@@ -9,7 +9,7 @@
 (function(window,undefined){
 	"use strict";
 
-	// --------------------------------------------------------------------------
+	// ========================================================================
 	// Initialise
 
 	// Localise Globals
@@ -25,7 +25,8 @@
 		throw new Error('History.js HTML4 Support has already been loaded...');
 	}
 
-	// --------------------------------------------------------------------------
+
+	// ========================================================================
 	// Initialise HTML4 Support
 
 	// Initialise HTML4 Support
@@ -39,7 +40,8 @@
 			History.initHtml4.initialized = true;
 		}
 
-		// ----------------------------------------------------------------------
+
+		// ====================================================================
 		// Properties
 
 		/**
@@ -49,7 +51,7 @@
 		History.enabled = true;
 
 
-		// ----------------------------------------------------------------------
+		// ====================================================================
 		// Hash Storage
 
 		/**
@@ -66,10 +68,11 @@
 		 */
 		History.isLastHash = function(newHash){
 			// Prepare
-			var oldHash = History.getHashByIndex();
+			var oldHash = History.getHashByIndex(),
+				isLast;
 
 			// Check
-			var isLast = newHash === oldHash;
+			isLast = newHash === oldHash;
 
 			// Return isLast
 			return isLast;
@@ -122,7 +125,8 @@
 			return hash;
 		};
 
-		// ----------------------------------------------------------------------
+
+		// ====================================================================
 		// Discarded States
 
 		/**
@@ -146,10 +150,11 @@
 		History.discardState = function(discardedState,forwardState,backState){
 			//History.debug('History.discardState', arguments);
 			// Prepare
-			var discardedStateHash = History.getHashByState(discardedState);
+			var discardedStateHash = History.getHashByState(discardedState),
+				discardObject;
 
 			// Create Discard Object
-			var discardObject = {
+			discardObject = {
 				'discardedState': discardedState,
 				'backState': backState,
 				'forwardState': forwardState
@@ -192,10 +197,11 @@
 		 */
 		History.discardedState = function(State){
 			// Prepare
-			var StateHash = History.getHashByState(State);
+			var StateHash = History.getHashByState(State),
+				discarded;
 
 			// Check
-			var discarded = History.discardedStates[StateHash]||false;
+			discarded = History.discardedStates[StateHash]||false;
 
 			// Return true
 			return discarded;
@@ -237,7 +243,8 @@
 			return true;
 		};
 
-		// ----------------------------------------------------------------------
+
+		// ====================================================================
 		// HTML4 HashChange Support
 
 		if ( History.emulated.hashChange ) {
@@ -254,8 +261,9 @@
 				History.checkerFunction = null;
 
 				// Define some variables that will help in our checker function
-				var
-					lastDocumentHash = '';
+				var lastDocumentHash = '',
+					iframeId, iframe,
+					lastIframeHash, checkerRunning;
 
 				// Handle depending on the browser
 				if ( History.isInternetExplorer() ) {
@@ -263,9 +271,8 @@
 					// We need to use an iframe to emulate the back and forward buttons
 
 					// Create iFrame
-					var
-						iframeId = 'historyjs-iframe',
-						iframe = document.createElement('iframe');
+					iframeId = 'historyjs-iframe';
+					iframe = document.createElement('iframe');
 
 					// Adjust iFarme
 					iframe.setAttribute('id', iframeId);
@@ -279,9 +286,8 @@
 					iframe.contentWindow.document.close();
 
 					// Define some variables that will help in our checker function
-					var
-						lastIframeHash = '',
-						checkerRunning = false;
+					lastIframeHash = '';
+					checkerRunning = false;
 
 					// Define the checker function
 					History.checkerFunction = function(){
@@ -294,8 +300,7 @@
 						checkerRunning = true;
 
 						// Fetch
-						var
-							documentHash = History.getHash()||'',
+						var documentHash = History.getHash()||'',
 							iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash)||'';
 
 						// The Document Hash has changed (application caused)
@@ -376,9 +381,10 @@
 		} // History.emulated.hashChange
 
 
-		// ----------------------------------------------------------------------
+		// ====================================================================
 		// HTML5 State Support
 
+		// Non-Native pushState Implementation
 		if ( History.emulated.pushState ) {
 			/*
 			 * We must emulate the HTML5 State Management by using HTML4 HashChange
@@ -392,12 +398,12 @@
 				//History.debug('History.onHashChange', arguments);
 
 				// Prepare
-				var
-					currentUrl						= ((event && event.newURL) || document.location.href),
-					currentHash						= History.getHashByUrl(currentUrl),
-					currentState					= null,
-					currentStateHash			= null,
-					currentStateHashExits	= null;
+				var currentUrl = ((event && event.newURL) || document.location.href),
+					currentHash = History.getHashByUrl(currentUrl),
+					currentState = null,
+					currentStateHash = null,
+					currentStateHashExits = null,
+					discardObject;
 
 				// Check if we are the same state
 				if ( History.isLastHash(currentHash) ) {
@@ -437,7 +443,7 @@
 				currentStateHash = History.getHashByState(currentState);
 
 				// Check if we are DiscardedState
-				var discardObject = History.discardedState(currentState);
+				discardObject = History.discardedState(currentState);
 				if ( discardObject ) {
 					// Ignore this state as it has been discarded and go back to the state before it
 					if ( History.getHashByIndex(-2) === History.getHashByState(discardObject.forwardState) ) {
@@ -495,8 +501,7 @@
 				History.busy(true);
 
 				// Fetch the State Object
-				var
-					newState = History.createStateObject(data,title,url),
+				var newState = History.createStateObject(data,title,url),
 					newStateHash = History.getHashByState(newState),
 					oldState = History.getState(false),
 					oldStateHash = History.getHashByState(oldState),
@@ -572,8 +577,7 @@
 				History.busy(true);
 
 				// Fetch the State Objects
-				var
-					newState        = History.createStateObject(data,title,url),
+				var newState        = History.createStateObject(data,title,url),
 					oldState        = History.getState(false),
 					previousState   = History.getStateByIndex(-2);
 
@@ -587,6 +591,15 @@
 				return true;
 			};
 
+		} // History.emulated.pushState
+
+
+
+		// ====================================================================
+		// Initialise
+
+		// Non-Native pushState Implementation
+		if ( History.emulated.pushState ) {
 			/**
 			 * Ensure initial state is handled correctly
 			 */

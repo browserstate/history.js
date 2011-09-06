@@ -1,5 +1,5 @@
 /**
- * History.js YUI Adapter [NOT WORKING]
+ * History.js RightJS Adapter
  * @author Benjamin Arthur Lupton <contact@balupton.com>
  * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
@@ -7,10 +7,14 @@
 
 // Closure
 (function(window,undefined){
+	"use strict";
+
 	// Localise Globals
 	var
 		History = window.History = window.History||{},
-		YUI = window.YUI;
+		document = window.document,
+		RightJS = window.RightJS,
+		$ = RightJS.$;
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -24,35 +28,45 @@
 		 * @param {Element|Selector} el
 		 * @param {String} event - custom and standard events
 		 * @param {Function} callback
-		 * @return {element}
+		 * @return
 		 */
 		bind: function(el,event,callback){
-			YUI().use('node-base', function(Y){
-				Y.one(el).on(event,callback);
-			});
+			$(el).on(event,callback);
 		},
 
 		/**
 		 * History.Adapter.trigger(el,event)
 		 * @param {Element|Selector} el
 		 * @param {String} event - custom and standard events
-		 * @return {element}
+		 * @param {Object} extraEventData - a object of extra event data
+		 * @return
 		 */
-		trigger: function(el,event){
-			YUI().use('node-event-simulate', function(Y){
-				Y.one(el).simulate(event);
-			});
+		trigger: function(el,event,extraEventData){
+			$(el).fire(event,extraEventData);
+		},
+
+		/**
+		 * History.Adapter.extractEventData(key,event,extra)
+		 * @param {String} key - key for the event data to extract
+		 * @param {String} event - custom and standard events
+		 * @return {mixed}
+		 */
+		extractEventData: function(key,event){
+			// Right.js Native
+			// Right.js Custom
+			var result = (event && event[key]) || undefined;
+
+			// Return
+			return result;
 		},
 
 		/**
 		 * History.Adapter.trigger(el,event,data)
 		 * @param {Function} callback
-		 * @return {true}
+		 * @return
 		 */
 		onDomLoad: function(callback) {
-			YUI().use('event', function(Y){
-				Y.on('domready', callback);
-			});
+			$(document).onReady(callback);
 		}
 	};
 

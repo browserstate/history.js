@@ -7,6 +7,8 @@
 
 // Closure
 (function(window,undefined){
+	"use strict";
+
 	// Localise Globals
 	var
 		History = window.History = window.History||{},
@@ -21,32 +23,46 @@
 	History.Adapter = {
 		/**
 		 * History.Adapter.bind(el,event,callback)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @param {Function} callback
-		 * @return
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		bind: function(el,event,callback){
-			Zepto(el).bind(event,callback);
+			new Zepto(el).bind(event,callback);
 		},
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @return
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @return {void}
 		 */
 		trigger: function(el,event){
-			Zepto(el).trigger(event);
+			new Zepto(el).trigger(event);
+		},
+
+		/**
+		 * History.Adapter.extractEventData(key,event,extra)
+		 * @param {string} key - key for the event data to extract
+		 * @param {string} event - custom and standard events
+		 * @return {mixed}
+		 */
+		extractEventData: function(key,event){
+			// Zepto Native
+			var result = (event && event[key]) || undefined;
+
+			// Return
+			return result;
 		},
 
 		/**
 		 * History.Adapter.trigger(el,event,data)
-		 * @param {Function} callback
-		 * @return
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		onDomLoad: function(callback) {
-			Zepto(callback);
+			new Zepto(callback);
 		}
 	};
 
