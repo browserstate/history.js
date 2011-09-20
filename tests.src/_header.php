@@ -1,9 +1,4 @@
 <?php
-	# Check
-	if ( empty($_SERVER['REQUEST_URI']) ) {
-		die('run this in your browser');
-	}
-
 	# Locations
 	$dir = dirname(__FILE__);
 	$out = "$dir/../tests";
@@ -24,5 +19,5 @@
 	$supports = array('html5','html4');
 
 	# Adapter
-	$adapters = array('jquery','mootools','prototype','zepto');
+	$adapters = array('jquery','mootools','right','zepto','native');
 

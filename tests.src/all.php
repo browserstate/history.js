@@ -9,12 +9,9 @@
 			outline:none;
 			border:none;
 		}
-		.compress {
-			padding-bottom:1em;
-		}
-		.support {
-			padding-bottom:1em;
-		}
+		.item,
+		.compress,
+		.support,
 		.persist {
 			padding-bottom:1em;
 		}
@@ -55,5 +52,9 @@
 		echo '</div>';
 	endforeach;
 	?>
+	<div class="item">
+		<a href="iframe-tests.html">iframe tests</a>
+		<a href="iframe-demo.html">iframe demo</a>
+	</div>
 </body>
 </html>

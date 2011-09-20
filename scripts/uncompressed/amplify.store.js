@@ -14,7 +14,7 @@ JSON.stringify = JSON.stringify||JSON.encode;
 JSON.parse = JSON.parse||JSON.decode;
 
 var store = amplify.store = function( key, value, options, type ) {
-	var type = store.type;
+	type = store.type;
 	if ( options && options.type && options.type in store.types ) {
 		type = options.type;
 	}
@@ -34,7 +34,7 @@ store.addType = function( type, storage ) {
 		options.type = type;
 		return store( key, value, options );
 	};
-}
+};
 store.error = function() {
 	return "amplify.store quota exceeded";
 };
@@ -49,16 +49,16 @@ function createSimpleStorage( storageType, storage ) {
 
 		if ( !key ) {
 			ret = {};
-			for ( key in values ) {
-				storedValue = storage[ key ];
+			for ( var i in values ) { if ( values.hasOwnProperty(i) ) {
+				storedValue = storage[ i ];
 				parsed = storedValue ? JSON.parse( storedValue ) : { expires: -1 };
 				if ( parsed.expires && parsed.expires <= now ) {
-					delete storage[ key ];
-					delete values[ key ];
+					delete storage[ i ];
+					delete values[ i ];
 				} else {
-					ret[ key.replace( /^__amplify__/, "" ) ] = parsed.data;
+					ret[ i.replace( /^__amplify__/, "" ) ] = parsed.data;
 				}
-			}
+			}}
 			storage.__amplify__ = JSON.stringify( values );
 			return ret;
 		}
@@ -96,7 +96,7 @@ function createSimpleStorage( storageType, storage ) {
 					try {
 						storage[ key ] = parsed;
 						values[ key ] = true;
-					} catch( error ) {
+					} catch( error2 ) {
 						throw store.error();
 					}
 				}
@@ -110,14 +110,15 @@ function createSimpleStorage( storageType, storage ) {
 
 // localStorage + sessionStorage
 // IE 8+, Firefox 3.5+, Safari 4+, Chrome 4+, Opera 10.5+, iPhone 2+, Android 2+
-for ( var webStorageType in { localStorage: 1, sessionStorage: 1 } ) {
+var lsss = { localStorage: 1, sessionStorage: 1 };
+for ( var webStorageType in lsss ) { if ( lsss.hasOwnProperty(webStorageType) ) {
 	// try/catch for file protocol in Firefox
 	try {
 		if ( window[ webStorageType ].getItem ) {
 			createSimpleStorage( webStorageType, window[ webStorageType ] );
 		}
 	} catch( e ) {}
-}
+}}
 
 // globalStorage
 // non-standard: Firefox 2+
@@ -157,16 +158,16 @@ if ( window.globalStorage ) {
 
 			if ( !key ) {
 				ret = {};
-				for ( key in attrs ) {
-					attr = div.getAttribute( key );
+				for ( var i in attrs ) { if ( attrs.hasOwnProperty(i) ) {
+					attr = div.getAttribute( i );
 					parsed = attr ? JSON.parse( attr ) : { expires: -1 };
 					if ( parsed.expires && parsed.expires <= now ) {
-						div.removeAttribute( key );
-						delete attrs[ key ];
+						div.removeAttribute( i );
+						delete attrs[ i ];
 					} else {
-						ret[ key ] = parsed.data;
+						ret[ i ] = parsed.data;
 					}
-				}
+				}}
 				div.setAttribute( attrKey, JSON.stringify( attrs ) );
 				div.save( attrKey );
 				return ret;
@@ -176,7 +177,7 @@ if ( window.globalStorage ) {
 			// http://www.w3.org/TR/REC-xml/#NT-Name
 			// simplified to assume the starting character is valid
 			// also removed colon as it is invalid in HTML attribute names
-			key = key.replace( /[^-._0-9A-Za-z\xb7\xc0-\xd6\xd8-\xf6\xf8-\u037d\u37f-\u1fff\u200c-\u200d\u203f\u2040\u2070-\u218f]/g, "-" );
+			key = key.replace( /[^\-._0-9A-Za-z\xb7\xc0-\xd6\xd8-\xf6\xf8-\u037d\u37f-\u1fff\u200c-\u200d\u203f\u2040\u2070-\u218f]/g, "-" );
 
 			if ( value === undefined ) {
 				if ( key in attrs ) {
@@ -224,7 +225,7 @@ if ( window.globalStorage ) {
 					div.setAttribute( key, parsed );
 					attrs[ key ] = true;
 					div.save( attrKey );
-				} catch ( error ) {
+				} catch ( error2 ) {
 					// roll the value back to the previous value
 					if ( prevValue === null ) {
 						div.removeAttribute( key );

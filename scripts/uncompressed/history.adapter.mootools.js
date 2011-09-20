@@ -1,16 +1,19 @@
 /**
- * History.js jQuery Adapter
+ * History.js MooTools Adapter
  * @author Benjamin Arthur Lupton <contact@balupton.com>
- * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+ * Copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
  */
 
 // Closure
 (function(window,undefined){
+	"use strict";
+
 	// Localise Globals
 	var
 		History = window.History = window.History||{},
-		MooTools = window.MooTools;
+		MooTools = window.MooTools,
+		Element = window.Element;
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -27,10 +30,10 @@
 	History.Adapter = {
 		/**
 		 * History.Adapter.bind(el,event,callback)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @param {Function} callback
-		 * @return
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		bind: function(el,event,callback){
 			var El = typeof el === 'string' ? document.id(el) : el;
@@ -39,19 +42,34 @@
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Element|Selector} el
-		 * @param {String} event - custom and standard events
-		 * @return
+		 * @param {Element|string} el
+		 * @param {string} event - custom and standard events
+		 * @param {Object=} extra - a object of extra event data (optional)
+		 * @return void
 		 */
-		trigger: function(el,event){
+		trigger: function(el,event,extra){
 			var El = typeof el === 'string' ? document.id(el) : el;
-			El.fireEvent(event);
+			El.fireEvent(event,extra);
+		},
+
+		/**
+		 * History.Adapter.extractEventData(key,event,extra)
+		 * @param {string} key - key for the event data to extract
+		 * @param {string} event - custom and standard events
+		 * @return {mixed}
+		 */
+		extractEventData: function(key,event){
+			// MooTools Native then MooTools Custom
+			var result = (event && event.event && event.event[key]) || (event && event[key]) || undefined;
+
+			// Return
+			return result;
 		},
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Function} callback
-		 * @return
+		 * @param {function} callback
+		 * @return {void}
 		 */
 		onDomLoad: function(callback) {
 			window.addEvent('domready',callback);

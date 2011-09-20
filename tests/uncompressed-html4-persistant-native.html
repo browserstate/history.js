@@ -5,7 +5,7 @@
 	<meta http-equiv="PRAGMA" CONTENT="NO-CACHE" />
 	<meta http-equiv="CACHE-CONTROL" CONTENT="NO-CACHE" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<title>History.js Uncompressed HTML5 Persistant Prototype Test Suite</title>
+	<title>History.js Uncompressed HTML4 Persistant Native Test Suite</title>
 
 	<!-- Check -->
 	<script>
@@ -18,15 +18,14 @@
 	</script>
 
 	<!-- Framework -->
-	<script src="../vendor/prototype.js"></script>
-
+	
 	<!-- QUnit -->
-	<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css" type="text/css" media="screen">
-	<script src="../vendor/qunit/qunit/qunit.js"></script>
+	<link rel="stylesheet" href="../vendor/qunit/qunit.css" type="text/css" media="screen">
+	<script src="../vendor/qunit/qunit.js"></script>
 </head>
 <body>
 	<!-- Elements -->
-	<h1 id="qunit-header">History.js Uncompressed HTML5 Persistant Prototype Test Suite</h1>
+	<h1 id="qunit-header">History.js Uncompressed HTML4 Persistant Native Test Suite</h1>
 	<h2 id="qunit-banner"></h2>
 	<div id="qunit-testrunner-toolbar"></div>
 	<h2 id="qunit-userAgent"></h2>
@@ -37,9 +36,10 @@
 
 	<!-- History.js -->
 	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/uncompressed/json2.js"><\/script>'); }</script>
-		<script src="../scripts/uncompressed/amplify.store.js"></script>
-		<script src="../scripts/uncompressed/history.adapter.prototype.js"></script>
+			<script src="../scripts/uncompressed/amplify.store.js"></script>
+		<script src="../scripts/uncompressed/history.adapter.native.js"></script>
 	<script src="../scripts/uncompressed/history.js"></script>
+			<script src="../scripts/uncompressed/history.html4.js"></script>
 	
 	<!-- Tests -->
 	<script src="tests.js"></script>
