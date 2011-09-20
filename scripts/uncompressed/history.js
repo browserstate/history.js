@@ -21,14 +21,14 @@
 		clearTimeout = window.clearTimeout,
 		setInterval = window.setInterval,
 		clearInterval = window.clearInterval,
-		JSON = window.JSON,
+		json = window.JSON,
 		alert = window.alert,
 		History = window.History = window.History||{}, // Public History Object
 		history = window.history; // Old History Object
 
 	// MooTools Compatibility
-	JSON.stringify = JSON.stringify||JSON.encode;
-	JSON.parse = JSON.parse||JSON.decode;
+	json.stringify = json.stringify||json.encode;
+	json.parse = json.parse||json.decode;
 
 	// Check Existence
 	if ( typeof History.init !== 'undefined' ) {
@@ -212,9 +212,9 @@
 			// Write to log
 			for ( i=1,n=arguments.length; i<n; ++i ) {
 				arg = arguments[i];
-				if ( typeof arg === 'object' && typeof JSON !== 'undefined' ) {
+				if ( typeof arg === 'object' && typeof json !== 'undefined' ) {
 					try {
-						arg = JSON.stringify(arg);
+						arg = json.stringify(arg);
 					}
 					catch ( Exception ) {
 						// Recursive Object
@@ -378,8 +378,8 @@
 		History.cloneObject = function(obj) {
 			var hash,newObj;
 			if ( obj ) {
-				hash = JSON.stringify(obj);
-				newObj = JSON.parse(hash);
+				hash = json.stringify(obj);
+				newObj = json.parse(hash);
 			}
 			else {
 				newObj = {};
@@ -828,7 +828,7 @@
 			};
 
 			// Fetch
-			str = JSON.stringify(cleanedState);
+			str = json.stringify(cleanedState);
 
 			// Return
 			return str;
@@ -1105,7 +1105,7 @@
 					};
 
 					// Check
-					isLast = (JSON.stringify(newFriendly) === JSON.stringify(oldFriendly));
+					isLast = (json.stringify(newFriendly) === json.stringify(oldFriendly));
 				}
 				else {
 					// Compare ids
