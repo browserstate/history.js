@@ -6,6 +6,10 @@
  */
 
 // Closure
+/**
+  * @param {Window} window
+  * @param {undefined=} undefined
+ */
 (function(window,undefined){
 	"use strict";
 
@@ -23,9 +27,9 @@
 	History.Adapter = {
 		/**
 		 * History.Adapter.bind(el,event,callback)
-		 * @param {Element|string} el
+		 * @param {Element|jQuerySelector} el
 		 * @param {string} event - custom and standard events
-		 * @param {function} callback
+		 * @param {function()} callback
 		 * @return {void}
 		 */
 		bind: function(el,event,callback){
@@ -34,7 +38,7 @@
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Element|string} el
+		 * @param {Element|jQuerySelector} el
 		 * @param {string} event - custom and standard events
 		 * @param {Object=} extra - a object of extra event data (optional)
 		 * @return {void}
@@ -48,7 +52,7 @@
 		 * @param {string} key - key for the event data to extract
 		 * @param {string} event - custom and standard events
 		 * @param {Object=} extra - a object of extra event data (optional)
-		 * @return {mixed}
+		 * @return {*}
 		 */
 		extractEventData: function(key,event,extra){
 			// jQuery Native then jQuery Custom
@@ -60,7 +64,7 @@
 
 		/**
 		 * History.Adapter.trigger(el,event,data)
-		 * @param {function} callback
+		 * @param {function()} callback
 		 * @return {void}
 		 */
 		onDomLoad: function(callback) {

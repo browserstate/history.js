@@ -6,6 +6,10 @@
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
  */
 
+/**
+  * @param {Window} window
+  * @param {undefined=} undefined
+ */
 (function(window,undefined){
 	"use strict";
 
@@ -99,7 +103,7 @@
 		/**
 		 * History.getHashByIndex()
 		 * Gets a hash by the index
-		 * @param {integer} index
+		 * @param {number=} index
 		 * @return {string}
 		 */
 		History.getHashByIndex = function(index){
@@ -142,7 +146,7 @@
 		/**
 		 * History.discardState(State)
 		 * Discards the state by ignoring it through History
-		 * @param {object} State
+		 * @param {HistoryState} discardedState
 		 * @return {void}
 		 */
 		History.discardState = function(discardedState,forwardState,backState){
@@ -166,7 +170,7 @@
 		/**
 		 * History.discardHash(hash)
 		 * Discards the hash by ignoring it through History
-		 * @param {string} hash
+		 * @param {string} discardedHash
 		 * @return {void}
 		 */
 		History.discardHash = function(discardedHash,forwardState,backState){
@@ -185,8 +189,8 @@
 		/**
 		 * History.discardState(State)
 		 * Checks to see if the state is discarded
-		 * @param {object} State
-		 * @return {boolean}
+		 * @param {HistoryState} State
+		 * @return {HistoryState|boolean}
 		 */
 		History.discardedState = function(State){
 			// Prepare
@@ -204,7 +208,7 @@
 		/**
 		 * History.discardedHash(hash)
 		 * Checks to see if the state is discarded
-		 * @param {string} State
+		 * @param {string} hash
 		 * @return {boolean}
 		 */
 		History.discardedHash = function(hash){
@@ -218,9 +222,7 @@
 		/**
 		 * History.recycleState(State)
 		 * Allows a discarded state to be used again
-		 * @param {object} data
-		 * @param {string} title
-		 * @param {string} url
+		 * @param {HistoryState} State
 		 * @return {void}
 		 */
 		History.recycleState = function(State){
@@ -468,7 +470,10 @@
 			History.Adapter.bind(window,'hashchange',History.onHashChange);
 
 			/**
-			 *
+			 * @param {*} data
+			 * @param {string|null} title
+			 * @param {string} url
+			 * @param {string=} caller
 			 */
 			History.addState = function(data,title,url,caller){
 				// Fetch the State Object
@@ -544,10 +549,11 @@
 			 * History.pushState(data,title,url)
 			 * Add a new State to the history object, become it, and trigger onpopstate
 			 * We have to trigger for HTML4 compatibility
-			 * @param {object} data
+			 * @param {Object} data
 			 * @param {string} title
 			 * @param {string} url
-			 * @return {boolean}
+			 * @param {boolean|number=} queue
+                         * @return {boolean}
 			 */
 			History.pushState = function(data,title,url,queue){
 				//History.debug('History.pushState: called', arguments);
@@ -579,10 +585,11 @@
 			 * History.replaceState(data,title,url)
 			 * Replace the State and trigger onpopstate
 			 * We have to trigger for HTML4 compatibility
-			 * @param {object} data
+			 * @param {Object} data
 			 * @param {string} title
 			 * @param {string} url
-			 * @return {boolean}
+			 * @param {boolean|number=} queue
+                         * @return {boolean}
 			 */
 			History.replaceState = function(data,title,url,queue){
 				//History.debug('History.replaceState: called', arguments);
