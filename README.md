@@ -1,4 +1,4 @@
-Welcome to History.js (v1.7.1 - September 06 2011)
+Welcome to History.js (v1.7.1-dev - September 27 2011)
 ==================
 
 
@@ -18,33 +18,35 @@ Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 ### Working with History.js:
 
-	(function(window,undefined){
+``` javascript
+(function(window,undefined){
 
-		// Prepare
-		var History = window.History; // Note: We are using a capital H instead of a lower h
-		if ( !History.enabled ) {
-			 // History.js is disabled for this browser.
-			 // This is because we can optionally choose to support HTML4 browsers or not.
-			return false;
-		}
+	// Prepare
+	var History = window.History; // Note: We are using a capital H instead of a lower h
+	if ( !History.enabled ) {
+		 // History.js is disabled for this browser.
+		 // This is because we can optionally choose to support HTML4 browsers or not.
+		return false;
+	}
 
-		// Bind to StateChange Event
-		History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
-			var State = History.getState(); // Note: We are using History.getState() instead of event.state
-			History.log(State.data, State.title, State.url);
-		});
+	// Bind to StateChange Event
+	History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+		var State = History.getState(); // Note: We are using History.getState() instead of event.state
+		History.log(State.data, State.title, State.url);
+	});
 
-		// Change our States
-		History.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"
-		History.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"
-		History.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"
-		History.pushState(null, null, "?state=4"); // logs {}, '', "?state=4"
-		History.back(); // logs {state:3}, "State 3", "?state=3"
-		History.back(); // logs {state:1}, "State 1", "?state=1"
-		History.back(); // logs {}, "Home Page", "?"
-		History.go(2); // logs {state:3}, "State 3", "?state=3"
+	// Change our States
+	History.pushState({state:1}, "State 1", "?state=1"); // logs {state:1}, "State 1", "?state=1"
+	History.pushState({state:2}, "State 2", "?state=2"); // logs {state:2}, "State 2", "?state=2"
+	History.replaceState({state:3}, "State 3", "?state=3"); // logs {state:3}, "State 3", "?state=3"
+	History.pushState(null, null, "?state=4"); // logs {}, '', "?state=4"
+	History.back(); // logs {state:3}, "State 3", "?state=3"
+	History.back(); // logs {state:1}, "State 1", "?state=1"
+	History.back(); // logs {}, "Home Page", "?"
+	History.go(2); // logs {state:3}, "State 3", "?state=3"
 
-	})(window);
+})(window);
+```
 
 To ajaxify your entire website with the HTML5 History API, History.js and jQuery [this snippet of code](https://gist.github.com/854622) is all you need. It's that easy.
 
@@ -234,7 +236,11 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ## Changelog
 
-- v1.7.1 - September 06 2011
+- v1.7.1-dev - September 27 2011
+	- Added native adapter to support any/no framework
+	- Some bugfixes that should be documented
+	- Provided bundled files
+	- Added sessionStorage support in core instead of optional Amplify.js Store support
 
 - v1.7.0 - April 01 2011
 	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.
