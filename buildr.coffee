@@ -1,10 +1,13 @@
 # Requires
 buildr = require 'buildr'
+util = require 'util'
 
 # Configs
 configs =
-	# Standard
 	standard:
+		# Options
+		name: 'standard'
+
 		# Paths
 		srcPath: __dirname+'/scripts/uncompressed'
 		outPath: __dirname+'/scripts/compressed'
@@ -22,54 +25,241 @@ configs =
 
 		# Compression (without outPath only the generated bundle files are compressed)
 		compressScripts: true # Array or true or false
+	
+	other: [
 
-	'json2,native,html4,history.js':
-		# Paths
-		srcPath: __dirname+'/scripts/uncompressed'
+		# -----------------------------
+		# JQUERY
 
-		# Compression (without outPath only the generated bundle files are compressed)
-		compressScripts: true # Array or true or false
+		{
+			# Options
+			name: 'html4+html5+jquery'
 
-		# Order
-		scriptsOrder: [
-			'json2.js'
-			'history.adapter.native.js'
-			'history.html4.js'
-			'history.js'
-		]
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
 
-		# Bundling
-		bundleScriptPath: __dirname+'/scripts/bundled/json2,native,html4,history.js'
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
 
-	'native,history.js':
-		# Paths
-		srcPath: __dirname+'/scripts/uncompressed'
+			# Order
+			scriptsOrder: [
+				'json2.js'
+				'history.adapter.jquery.js'
+				'history.html4.js'
+				'history.js'
+			]
 
-		# Compression (without outPath only the generated bundle files are compressed)
-		compressScripts: true # Array or true or false
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html4+html5/jquery.history.js'
+		}
+		{
+			# Options
+			name: 'html5+jquery'
 
-		# Order
-		scriptsOrder: [
-			'json2.js'
-			'history.adapter.native.js'
-			'history.html4.js'
-			'history.js'
-		]
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
 
-		# Bundling
-		bundleScriptPath: __dirname+'/scripts/bundled/native,history.js'
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
 
-# Handle
-for own name, config of configs
-	# Defaults
-	config.processHandler ?= (err) ->
-		if err
-			console.log err
-		else
-			console.log "Building #{name} completed\n"
+			# Order
+			scriptsOrder: [
+				'history.adapter.jquery.js'
+				'history.js'
+			]
 
-	# Create
-	buildrInstance = buildr.createInstance config
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html5/jquery.history.js'
+		}
 
-	# Process
-	buildrInstance.process()
+
+		# -----------------------------
+		# MOOTOOLS
+
+		{
+			# Options
+			name: 'html4+html5+mootools'
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'json2.js'
+				'history.adapter.mootools.js'
+				'history.html4.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html4+html5/mootools.history.js'
+		}
+		{
+			# Options
+			name: 'html5+mootools'
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'history.adapter.mootools.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html5/mootools.history.js'
+		}
+
+
+		# -----------------------------
+		# NATIVE
+
+		{
+			# Options
+			name: 'html4+html5+native'
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'json2.js'
+				'history.adapter.native.js'
+				'history.html4.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html4+html5/native.history.js'
+		}
+		{
+			# Options
+			name: 'html5+native'
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'history.adapter.native.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html5/native.history.js'
+		}
+
+
+		# -----------------------------
+		# RIGHT.JS
+
+		{
+			# Options
+			name: 'html4+html5+right'
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'json2.js'
+				'history.adapter.right.js'
+				'history.html4.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html4+html5/right.history.js'
+		}
+		{
+			# Options
+			name: 'html5+right'
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'history.adapter.right.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html5/right.history.js'
+		}
+
+
+		# -----------------------------
+		# ZEPTO
+
+		{
+			# Options
+			name: 'html4+html5+zepto'
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'json2.js'
+				'history.adapter.zepto.js'
+				'history.html4.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html4+html5/zepto.history.js'
+		}
+		{
+			# Options
+			name: 'html5+zepto'
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: true # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'history.adapter.zepto.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html5/zepto.history.js'
+		}
+	]
+
+# Standard
+standardConfig = configs.standard
+standardConfig.successHandler = ->
+	for config in configs.other
+		buildrInstance = buildr.createInstance config
+		buildrInstance.process()
+
+# Process
+standardBuildr = buildr.createInstance configs.standard
+standardBuildr.process()
