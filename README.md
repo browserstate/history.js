@@ -1,4 +1,4 @@
-Welcome to History.js (v1.7.1-dev - September 27 2011)
+Welcome to History.js (v1.7.1 - October 4 2011)
 ==================
 
 
