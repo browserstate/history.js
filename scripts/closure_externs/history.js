@@ -1,5 +1,5 @@
 /**
- * @typedef {{data:(Object|null),title:string,url:string,queue:(boolean|number|undefined),internal:(boolean|undefined)}}
+ * @typedef {{data:(Object|null),title:(string|null),url:string,queue:(boolean|number|undefined),internal:(boolean|undefined)}}
  */
 var HistoryState;
 
