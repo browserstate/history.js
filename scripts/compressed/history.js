@@ -626,7 +626,7 @@
 				else {
 					// Generate a new ID
 					while ( true ) {
-						id = String(Math.floor(Math.random()*1000));
+						id = (new Date()).getTime() + String(Math.random()).replace(/\D/g,'');
 						if ( typeof History.idToState[id] === 'undefined' && typeof History.store.idToState[id] === 'undefined' ) {
 							break;
 						}

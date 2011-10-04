@@ -239,12 +239,13 @@ Thanks! every bit of help really does make a difference. Again thank you.
 - v1.7.1 - October 4 2011
 	- Added a new native adapter which is framework agnostic (can be used with, or without any framework)
 	- Provided bundled files
-	- Added sessionStorage support in core instead of optional Amplify.js Store support
 	- Added RightJS adapter
 	- Updated supported browser listing
+	- Added sessionStorage support in core instead of optional Amplify.js Store support
+	- Fixed issue with state id generation growing slower over time
 	- Closes #104, #95, #102, #92, #81, #90, #94, #93, #91, #67, #83, #54, #45
 
-- v1.7.0 - April 01 2011
+- v1.7.0 - April 1 2011
 	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.
 	- Added (optional but recommended) Data Persistance and Synchronisation Support thanks to [AppendTo's](http://appendto.com/) [Amplify.js](http://amplifyjs.com/) (refer to installation and compatibility sections for details)
 	- Made HTML5 SUIDs more transparent - [Reported](https://github.com/balupton/history.js/issues#issue/34) by [azago](https://github.com/azago) and [Mark Jaquith](http://markjaquith.com/)
@@ -284,7 +285,7 @@ Thanks! every bit of help really does make a difference. Again thank you.
 	- Included a Subscribe Form in the Demo for Version Updates via Email
 	- Small updates to Documentation
 
-- v1.3.1 - February 04 2011
+- v1.3.1 - February 4 2011
 	- Improved Documentation
 
 - v1.3.0 - January 31 2011
