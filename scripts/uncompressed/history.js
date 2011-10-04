@@ -100,6 +100,12 @@
 		History.options.doubleCheckInterval = History.options.doubleCheckInterval || 500;
 
 		/**
+		 * History.options.disableSuid
+		 * Force History not to append suid
+		 */
+		History.options.disableSuid = History.options.disableSuid || false;
+
+		/**
 		 * History.options.storeInterval
 		 * How long should we wait between store calls
 		 */
@@ -690,7 +696,7 @@
 			dataNotEmpty = !History.isEmptyObject(newState.data);
 
 			// Apply
-			if ( newState.title || dataNotEmpty ) {
+			if ( (newState.title || dataNotEmpty) && History.options.disableSuid != true ) {
 				// Add ID to Hash
 				newState.hash = History.getShortUrl(newState.url).replace(/\??\&_suid.*/,'');
 				if ( !/\?/.test(newState.hash) ) {
