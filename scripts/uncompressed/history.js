@@ -655,7 +655,7 @@
 			var newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(History.unescapeString(oldState.url||document.location.href));
+			newState.url = History.getFullUrl(oldState.url?decodeURIComponent(oldState.url):document.location.href);
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -710,7 +710,7 @@
 			var State = {
 				'data': data,
 				'title': title,
-				'url': url
+				'url': encodeURIComponent(url||"")
 			};
 
 			// Expand the State
@@ -1007,36 +1007,15 @@
 
 		/**
 		 * History.getHash()
+		 * @param {Location=} location
 		 * Gets the current document hash
+		 * Note: unlike location.hash, this is guaranteed to return the escaped hash in all browsers
 		 * @return {string}
 		 */
-		History.getHash = function(){
-			var hash = History.unescapeHash(document.location.hash);
-			return hash;
-		};
-
-		/**
-		 * History.unescapeString()
-		 * Unescape a string
-		 * @param {String} str
-		 * @return {string}
-		 */
-		History.unescapeString = function(str){
-			// Prepare
-			var result = str;
-
-			// Unescape hash
-			var tmp;
-			while ( true ) {
-				tmp = window.unescape(result);
-				if ( tmp === result ) {
-					break;
-				}
-				result = tmp;
-			}
-
-			// Return result
-			return result;
+		History.getHash = function(location){
+			if ( !location ) location = document.location;
+			var href = location.href.replace( /^[^#]*/, "" );
+			return href.substr(1);
 		};
 
 		/**
@@ -1050,7 +1029,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			result = History.unescapeString(result);
+			result = decodeURIComponent(result);
 
 			// Return result
 			return result;
@@ -1091,9 +1070,6 @@
 			// Log
 			//History.debug('History.setHash: called',hash);
 
-			// Prepare
-			var adjustedHash = History.escapeHash(hash);
-
 			// Make Busy + Continue
 			History.busy(true);
 
@@ -1106,7 +1082,7 @@
 				// PushState
 				History.pushState(State.data,State.title,State.url,false);
 			}
-			else if ( document.location.hash !== adjustedHash ) {
+			else if ( History.getHash() !== hash ) {
 				// Hash is a proper hash, so apply it
 
 				// Handle browser bugs
@@ -1117,11 +1093,11 @@
 					var pageUrl = History.getPageUrl();
 
 					// Safari hash apply
-					History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
+					History.pushState(null,null,pageUrl+'#'+hash,false);
 				}
 				else {
 					// Normal hash apply
-					document.location.hash = adjustedHash;
+					document.location.hash = hash;
 				}
 			}
 
@@ -1138,7 +1114,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			result = window.escape(result);
+			result = window.encodeURIComponent(result);
 
 			// IE6 Escape Bug
 			if ( !History.bugs.hashEscape ) {
