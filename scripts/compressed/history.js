@@ -388,7 +388,9 @@
 
 			// Adjust trailing slash
 			baseHref = baseHref.replace(/\/+$/,'');
-			if ( baseHref ) baseHref += '/';
+			if ( baseHref ) {
+				baseHref += '/';
+			}
 
 			// Return
 			return baseHref;
@@ -1269,10 +1271,14 @@
 				clearTimeout(History.busy.timeout);
 				var fireNext = function(){
 					var i, queue, item;
-					if ( History.busy.flag ) return;
+					if ( History.busy.flag ) {
+						return;
+					}
 					for ( i=History.queues.length-1; i >= 0; --i ) {
 						queue = History.queues[i];
-						if ( queue.length === 0 ) continue;
+						if ( queue.length === 0 ) {
+							continue;
+						}
 						item = queue.shift();
 						History.fireQueueItem(item);
 						History.busy.timeout = setTimeout(fireNext,History.options.busyDelay);
