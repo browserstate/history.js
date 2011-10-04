@@ -146,8 +146,6 @@
 				History.intervalList = null;
 			}
 		};
-		History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
-		History.Adapter.bind(window,"unload",History.clearAllIntervals);
 
 
 		// ====================================================================
@@ -533,9 +531,6 @@
 		 * The store for all session specific data
 		 */
 		History.store = {};
-		History.store.idToState = History.store.idToState||{};
-		History.store.urlToId = History.store.urlToId||{};
-		History.store.stateToId = History.store.stateToId||{};
 
 		/**
 		 * History.idToState
@@ -566,6 +561,16 @@
 		 * Saved the states in an array
 		 */
 		History.savedStates = History.savedStates||[];
+
+		/**
+		 * History.noramlizeStore()
+		 * Noramlize the store by adding necessary values
+		 */
+		History.normalizeStore = function(){
+			History.store.idToState = History.store.idToState||{};
+			History.store.urlToId = History.store.urlToId||{};
+			History.store.stateToId = History.store.stateToId||{};
+		};
 
 		/**
 		 * History.getState()
@@ -1281,6 +1286,11 @@
 		};
 
 		/**
+		 * History.busy.flag
+		 */
+		History.busy.flag = false;
+
+		/**
 		 * History.fireQueueItem(item)
 		 * Fire a Queue Item
 		 * @param {Object} item
@@ -1596,9 +1606,9 @@
 			 * History.onPopState(event,extra)
 			 * Refresh the Current State
 			 */
-			History.onPopState = function(event){
+			History.onPopState = function(event,extra){
 				// Prepare
-				var newState, currentHash, currentState;
+				var stateId = false, newState = false, currentHash, currentState;
 
 				// Reset the double check
 				History.doubleCheckComplete();
@@ -1626,29 +1636,13 @@
 					return false;
 				}
 
-				// Prepare
-				newState = false;
-
-				// Prepare
-				event = event||{};
-				if ( typeof event.state === 'undefined' ) {
-					// jQuery
-					if ( typeof event.originalEvent !== 'undefined' && typeof event.originalEvent.state !== 'undefined' ) {
-						event.state = event.originalEvent.state||false;
-					}
-					// MooTools
-					else if ( typeof event.event !== 'undefined' && typeof event.event.state !== 'undefined' ) {
-						event.state = event.event.state||false;
-					}
-				}
-
 				// Ensure
-				event.state = (event.state||false);
+				stateId = History.Adapter.extractEventData('state',event,extra) || false;
 
 				// Fetch State
-				if ( event.state ) {
+				if ( stateId ) {
 					// Vanilla: Back/forward button was used
-					newState = History.getStateById(event.state);
+					newState = History.getStateById(stateId);
 				}
 				else if ( History.expectedStateId ) {
 					// Vanilla: A new state was pushed, and popstate was called manually
@@ -1813,7 +1807,7 @@
 		// Initialise
 
 		/**
-		 * Load from storage
+		 * Load the Store
 		 */
 		if ( sessionStorage ) {
 			// Fetch
@@ -1823,7 +1817,21 @@
 			catch ( err ) {
 				History.store = {};
 			}
+
+			// Normalize
+			History.normalizeStore();
 		}
+		else {
+			// Default Load
+			History.store = {};
+			History.normalizeStore();
+		}
+
+		/**
+		 * Clear Intervals on exit to prevent memory leaks
+		 */
+		History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
+		History.Adapter.bind(window,"unload",History.clearAllIntervals);
 
 		/**
 		 * Create the initial State
@@ -1874,6 +1882,7 @@
 
 				// Update
 				History.store = currentStore;
+				History.normalizeStore();
 
 				// Store
 				sessionStorage.setItem('History.store',JSON.stringify(currentStore));

@@ -10,15 +10,13 @@
 	file_put_contents($out.'/index.html', $contents);
 
 	# Each
-	foreach ( $compress as $compression )
-	foreach ( $supports as $support )
-	foreach ( $persists as $persist )
+	foreach ( $browsers as $browser )
 	foreach ( $adapters as $adapter ) {
 		ob_start();
 		require($dir.'/each.php');
 		$contents = ob_get_contents();
 		ob_end_clean();
-		file_put_contents($out."/${filename}", $contents);
+		file_put_contents($out."/${url}", $contents);
 	}
 
 	# Done

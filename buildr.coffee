@@ -2,11 +2,17 @@
 buildr = require 'buildr'
 util = require 'util'
 
+# Options
+options =
+	watch: false
+	compress: false
+
 # Configs
 configs =
 	standard:
 		# Options
 		name: 'standard'
+		watch: options.watch
 
 		# Paths
 		srcPath: __dirname+'/scripts/uncompressed'
@@ -24,7 +30,7 @@ configs =
 			noarg: true
 
 		# Compression (without outPath only the generated bundle files are compressed)
-		compressScripts: true # Array or true or false
+		compressScripts: false # Array or true or false
 	
 	other: [
 
@@ -34,12 +40,13 @@ configs =
 		{
 			# Options
 			name: 'html4+html5+jquery'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -55,12 +62,13 @@ configs =
 		{
 			# Options
 			name: 'html5+jquery'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -79,12 +87,13 @@ configs =
 		{
 			# Options
 			name: 'html4+html5+mootools'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -100,12 +109,13 @@ configs =
 		{
 			# Options
 			name: 'html5+mootools'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -124,12 +134,13 @@ configs =
 		{
 			# Options
 			name: 'html4+html5+native'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -145,12 +156,13 @@ configs =
 		{
 			# Options
 			name: 'html5+native'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -169,12 +181,13 @@ configs =
 		{
 			# Options
 			name: 'html4+html5+right'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -190,12 +203,13 @@ configs =
 		{
 			# Options
 			name: 'html5+right'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -214,12 +228,13 @@ configs =
 		{
 			# Options
 			name: 'html4+html5+zepto'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [
@@ -235,12 +250,13 @@ configs =
 		{
 			# Options
 			name: 'html5+zepto'
+			watch: options.watch
 
 			# Paths
 			srcPath: __dirname+'/scripts/uncompressed'
 
 			# Compression (without outPath only the generated bundle files are compressed)
-			compressScripts: true # Array or true or false
+			compressScripts: options.compress # Array or true or false
 
 			# Order
 			scriptsOrder: [

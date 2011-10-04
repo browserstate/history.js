@@ -1,13 +1,11 @@
 <?php
 	# Url
-	$filename = "${compression}-${support}-${persist}-${adapter}.html";
+	$url = "${browser}.${adapter}.html";
 
 	# Titles
-	$Support = strtoupper($support);
+	$Browser = strtoupper($browser);
 	$Adapter = ucwords($adapter);
-	$Persist = ucwords($persist);
-	$Compression = ucwords($compression);
-	$title = "History.js ${Compression} ${Support} ${Persist} ${Adapter} Test Suite";
+	$title = "History.js ${Browser} ${Adapter} Test Suite";
 ?><!DOCTYPE html>
 <html debug="true">
 <head>
@@ -19,8 +17,7 @@
 
 	<!-- Check -->
 	<script>
-		var
-			href = window.document.location.href,
+		var href = window.document.location.href,
 			test_url = href.replace(/(history\.js\/tests\/[^\/\?\#]+).*/,'$1');
 		if ( test_url !== href ) {
 			window.document.location.href = test_url;
@@ -46,15 +43,7 @@
 	<textarea id="log" style="width:100%;height:400px"></textarea>
 
 	<!-- History.js -->
-	<script>if ( typeof window.JSON === 'undefined' ) { document.write('<script src="../scripts/<?=$compression?>/json2.js"><\/script>'); }</script>
-	<?php if ( $persist === 'persistant' ) : ?>
-	<script src="../scripts/<?=$compression?>/amplify.store.js"></script>
-	<?php endif; ?>
-	<script src="../scripts/<?=$compression?>/history.adapter.<?=$adapter?>.js"></script>
-	<script src="../scripts/<?=$compression?>/history.js"></script>
-	<?php if ( $support === 'html4' ) : ?>
-	<script src="../scripts/<?=$compression?>/history.html4.js"></script>
-	<?php endif; ?>
+	<script src="../scripts/bundled/<?=$browser?>/<?=$adapter?>.history.js"></script>
 
 	<!-- Tests -->
 	<script src="tests.js"></script>

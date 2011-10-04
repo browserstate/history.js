@@ -41,34 +41,17 @@
 			"url": "http://creativecommons.org/licenses/BSD/"
 		}
 	],
-	"repository" : {
-		"type" : "git",
-		"url" : "http://github.com/balupton/history.js.git"
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/balupton/history.js.git"
 	},
 	"dependencies": {
+		"buildr": "0.8.x"
 	},
-	"engines" : {
+	"engines": {
 	},
 	"directories": {
 		"out": "./scripts/compressed",
 		"src": "./scripts/uncompressed"
-	},
-	"buildr": {
-		"compress": {
-			"js": true,
-			"css": false,
-			"img": false,
-			"html": false
-		},
-		"bundle": false,
-		"directories": {
-			"out": "./scripts/compressed",
-			"src": "./scripts/uncompressed"
-		},
-		"files": {
-			"js": true,
-			"css": false,
-			"img": false
-		}
 	}
 }

@@ -67,7 +67,7 @@
 		},
 
 		/**
-		 * History.Adapter.trigger(el,event)
+		 * History.Adapter.onDomLoad(callback)
 		 * @param {function} callback
 		 * @return {void}
 		 */

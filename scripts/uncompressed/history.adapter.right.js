@@ -54,14 +54,14 @@
 		extractEventData: function(key,event){
 			// Right.js Native
 			// Right.js Custom
-			var result = (event && event[key]) || undefined;
+			var result = (event && event._ && event._[key]) || undefined;
 
 			// Return
 			return result;
 		},
 
 		/**
-		 * History.Adapter.trigger(el,event,data)
+		 * History.Adapter.onDomLoad(callback)
 		 * @param {Function} callback
 		 * @return
 		 */

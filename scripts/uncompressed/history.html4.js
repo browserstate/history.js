@@ -614,6 +614,8 @@
 	}; // History.initHtml4
 
 	// Try and Initialise History
-	History.init();
+	if ( typeof History.init !== 'undefined' ) {
+		History.init();
+	}
 
 })(window);

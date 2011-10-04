@@ -59,7 +59,7 @@
 		},
 
 		/**
-		 * History.Adapter.trigger(el,event,data)
+		 * History.Adapter.onDomLoad(callback)
 		 * @param {function} callback
 		 * @return {void}
 		 */

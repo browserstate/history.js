@@ -98,12 +98,18 @@
 		},
 
 		/**
-		 * History.Adapter.trigger(el,event,data)
+		 * History.Adapter.onDomLoad(callback)
 		 * @param {Function} callback
 		 * @return
 		 */
 		onDomLoad: function(callback) {
-			window.onload = callback;
+			var timeout = window.setTimeout(function(){
+				callback();
+			},2000);
+			window.onload = function(){
+				clearTimeout(timeout);
+				callback();
+			};
 		}
 	};
 

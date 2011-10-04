@@ -236,11 +236,13 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 ## Changelog
 
-- v1.7.1-dev - September 27 2011
-	- Added native adapter to support any/no framework
-	- Some bugfixes that should be documented
+- v1.7.1 - October 4 2011
+	- Added a new native adapter which is framework agnostic (can be used with, or without any framework)
 	- Provided bundled files
 	- Added sessionStorage support in core instead of optional Amplify.js Store support
+	- Added RightJS adapter
+	- Updated supported browser listing
+	- Closes #104, #95, #102, #92, #81, #90, #94, #93, #91, #67, #83, #54, #45
 
 - v1.7.0 - April 01 2011
 	- Added `History.enabled` property (refer to usage section). This reflects whether or not History.js is enabled for our particular browser. For instance, if we have not included support for a HTML4 browser and we are accessing through a HTML4 browser then `History.enabled` will be `false`.
