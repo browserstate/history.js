@@ -30,7 +30,7 @@ configs =
 			noarg: true
 
 		# Compression (without outPath only the generated bundle files are compressed)
-		compressScripts: false # Array or true or false
+		compressScripts: options.compress # Array or true or false
 	
 	other: [
 
