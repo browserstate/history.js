@@ -664,25 +664,17 @@
 			if ( !id ) {
 				// Find ID via State String
 				str = History.getStateString(newState);
-				if ( typeof History.stateToId[str] !== 'undefined' ) {
-					id = History.stateToId[str];
-				}
-				else if ( typeof History.store.stateToId[str] !== 'undefined' ) {
-					id = History.store.stateToId[str];
-				}
-				else {
-					// Generate a new ID
-					while ( true ) {
-						id = String(Math.floor(Math.random()*1000));
-						if ( typeof History.idToState[id] === 'undefined' && typeof History.store.idToState[id] === 'undefined' ) {
-							break;
-						}
+				// Generate a new ID
+				while ( true ) {
+					id = String(Math.floor(Math.random()*1000));
+					if ( typeof History.idToState[id] === 'undefined' && typeof History.store.idToState[id] === 'undefined' ) {
+						break;
 					}
-
-					// Apply the new State to the ID
-					History.stateToId[str] = id;
-					History.idToState[id] = newState;
 				}
+
+				// Apply the new State to the ID
+				History.stateToId[str] = id;
+				History.idToState[id] = newState;
 			}
 
 			// Return ID
