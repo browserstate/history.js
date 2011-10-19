@@ -454,7 +454,7 @@
 
 				// Push the new HTML5 State
 				//History.debug('History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,currentState.url,false);
+				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false);
 
 				// End onHashChange closure
 				return true;
@@ -472,6 +472,11 @@
 			 */
 			History.pushState = function(data,title,url,queue){
 				//History.debug('History.pushState: called', arguments);
+
+				// We assume that the URL passed in is URI-encoded, but this makes
+				// sure that it's fully URI encoded; any '%'s that are encoded are
+				// converted back into '%'s
+				url = encodeURI(url).replace(/%25/g, "%");
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
@@ -549,6 +554,11 @@
 			 */
 			History.replaceState = function(data,title,url,queue){
 				//History.debug('History.replaceState: called', arguments);
+
+				// We assume that the URL passed in is URI-encoded, but this makes
+				// sure that it's fully URI encoded; any '%'s that are encoded are
+				// converted back into '%'s
+				url = encodeURI(url).replace(/%25/g, "%");
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
