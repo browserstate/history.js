@@ -1005,6 +1005,17 @@
 		// ----------------------------------------------------------------------
 		// Hash Helpers
 
+
+		/**
+		 * History.escapeString()
+		 * Escape a string
+		 * @param {String} str
+		 * @return {string}
+		 */
+		History.escapeString = function(str){
+			return encodeURI(url).replace(/%25/g, "%", "g");
+		};
+
 		/**
 		 * History.getHash()
 		 * @param {Location=} location

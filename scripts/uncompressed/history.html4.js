@@ -393,7 +393,7 @@
 
 				// Prepare
 				var
-					currentUrl						= ((event && event.newURL) || document.URL || document.location.href),
+					currentUrl						= ((event && event.newURL) || document.location.href),
 					currentHash						= History.getHashByUrl(currentUrl),
 					currentState					= null,
 					currentStateHash			= null,
@@ -423,7 +423,7 @@
 				}
 
 				// Create State
-				currentState = History.extractState(History.getFullUrl(currentHash||document.URL||document.location.href,false),true);
+				currentState = History.extractState(History.getFullUrl(currentHash||document.location.href,false),true);
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(currentState) ) {
@@ -454,7 +454,7 @@
 
 				// Push the new HTML5 State
 				//History.debug('History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false);
+				History.pushState(currentState.data,currentState.title,History.escapeString(currentState.url),false);
 
 				// End onHashChange closure
 				return true;
@@ -476,7 +476,7 @@
 				// We assume that the URL passed in is URI-encoded, but this makes
 				// sure that it's fully URI encoded; any '%'s that are encoded are
 				// converted back into '%'s
-				url = encodeURI(url).replace(/%25/g, "%");
+				url = History.escapeString(url);
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
@@ -525,7 +525,7 @@
 				}
 
 				// Update HTML4 Hash
-				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.URL || document.location.href) ) {
+				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
 					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
 					return false;
@@ -558,7 +558,7 @@
 				// We assume that the URL passed in is URI-encoded, but this makes
 				// sure that it's fully URI encoded; any '%'s that are encoded are
 				// converted back into '%'s
-				url = encodeURI(url).replace(/%25/g, "%");
+				url = History.escapeString(url);
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
