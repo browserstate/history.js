@@ -412,7 +412,7 @@
 			// Fetch
 			var
 				State = History.getState(false,false),
-				stateUrl = (State||{}).url||document.location.href;
+				stateUrl = (State||{}).url||document.URL||document.location.href;
 
 			// Create
 			var pageUrl = stateUrl.replace(/\/+$/,'').replace(/[^\/]+$/,function(part,index,string){
@@ -430,7 +430,7 @@
 		 */
 		History.getBasePageUrl = function(){
 			// Create
-			var basePageUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+			var basePageUrl = (document.URL||document.location.href).replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
 				return (/[^\/]$/).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
@@ -655,7 +655,7 @@
 			var newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(oldState.url?decodeURIComponent(oldState.url):document.location.href);
+			newState.url = History.getFullUrl(oldState.url?decodeURIComponent(oldState.url):(document.URL||document.location.href));
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -1380,7 +1380,7 @@
 
 			// Get the Last State which has the new URL
 			var
-				urlState = History.extractState(document.location.href),
+				urlState = History.extractState(document.URL||document.location.href),
 				newState;
 
 			// Check for a difference
@@ -1520,7 +1520,7 @@
 		/**
 		 * Create the initial State
 		 */
-		History.saveState(History.storeState(History.extractState(document.location.href,true)));
+		History.saveState(History.storeState(History.extractState(document.URL||document.location.href,true)));
 
 		/**
 		 * Bind for Saving Store
@@ -1602,7 +1602,7 @@
 				var currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					var currentState = History.extractState(currentHash||document.location.href,true);
+					var currentState = History.extractState(currentHash||document.URL||document.location.href,true);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
@@ -1651,13 +1651,13 @@
 				}
 				else {
 					// Initial State
-					newState = History.extractState(document.location.href);
+					newState = History.extractState(document.URL||document.location.href);
 				}
 
 				// The State did not exist in our store
 				if ( !newState ) {
 					// Regenerate the State
-					newState = History.createStateObject(null,null,document.location.href);
+					newState = History.createStateObject(null,null,document.URL||document.location.href);
 				}
 
 				// Clean
