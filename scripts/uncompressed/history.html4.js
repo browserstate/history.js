@@ -278,13 +278,18 @@
 					iframe.setAttribute('id', iframeId);
 					iframe.style.display = 'none';
 
+                    // Changing document.domain if needed, because IE7 has own opinion
+                    // @see https://github.com/balupton/history.js/issues/74
+                    if (document.domain && location.hostname != document.domain) {
+                        iframe.src = 'javascript:(function(){document.open();document.domain="' + document.domain + '";document.close();})()';
+                    }
+
 					// Append iFrame
 					document.body.appendChild(iframe);
-                    
-					// Create initial history entry.
-					// Also changing document.domain, because IE7 has own opinion
-					// @see https://github.com/balupton/history.js/issues/74 
-					iframe.src = 'javascript:(function(){document.open();document.domain="' + document.domain + '";document.close();})()';
+
+                    // Create initial history entry
+                    iframe.contentWindow.document.open();
+                    iframe.contentWindow.document.close();
 
 					// Define some variables that will help in our checker function
 					lastIframeHash = '';
