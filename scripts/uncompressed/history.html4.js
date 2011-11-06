@@ -398,7 +398,7 @@
 				//History.debug('History.onHashChange', arguments);
 
 				// Prepare
-				var currentUrl = ((event && event.newURL) || document.location.href),
+				var currentUrl = ((event && event.newURL) || History.getLocationHref()),
 					currentHash = History.getHashByUrl(currentUrl),
 					currentState = null,
 					currentStateHash = null,
@@ -429,7 +429,7 @@
 				}
 
 				// Create State
-				currentState = History.extractState(History.getFullUrl(currentHash||document.location.href,false),true);
+				currentState = History.extractState(History.getFullUrl(currentHash||History.getLocationHref(),false),true);
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(currentState) ) {
@@ -525,7 +525,7 @@
 				}
 
 				// Update HTML4 Hash
-				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
+				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(History.getLocationHref()) ) {
 					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
 					return false;

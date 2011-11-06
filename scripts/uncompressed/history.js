@@ -424,7 +424,7 @@
 			// Fetch
 			var
 				State = History.getState(false,false),
-				stateUrl = (State||{}).url||document.location.href,
+				stateUrl = (State||{}).url||History.getLocationHref(),
 				pageUrl;
 
 			// Create
@@ -443,7 +443,7 @@
 		 */
 		History.getBasePageUrl = function(){
 			// Create
-			var basePageUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+			var basePageUrl = (History.getLocationHref()).replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
 				return (/[^\/]$/).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
@@ -528,6 +528,36 @@
 
 			// Return
 			return shortUrl;
+		};
+
+		/**
+		 * History.getLocationHref(document)
+		 * Returns a normalized version of document.location.href
+		 * accounting for browser inconsistencies, etc.
+		 * 
+		 * This URL will be URI-encoded and will include the hash
+		 *
+		 * @param {object} document
+		 * @return {string} url
+		 */
+		History.getLocationHref = function(doc) {
+			doc = doc || document;
+
+			// most of the time, this will be true
+			if (doc.URL === doc.location.href)
+				return doc.location.href;
+
+			// some versions of webkit URI-decode document.location.href
+			// but they leave document.URL in an encoded state
+			if (doc.location.href === decodeURIComponent(doc.URL))
+				return doc.URL;
+
+			// FF 3.6 only updates document.URL when a page is reloaded
+			// document.location.href is updated correctly
+			if (doc.location.hash && decodeURIComponent(doc.location.href.replace(/^[^#]+/, "")) === doc.location.hash)
+				return doc.location.href;
+
+			return doc.URL || doc.location.href;
 		};
 
 
@@ -681,7 +711,7 @@
 			newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(History.unescapeString(oldState.url||document.location.href));
+			newState.url = History.getFullUrl(oldState.url?decodeURIComponent(oldState.url):(History.getLocationHref()));
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -1454,7 +1484,7 @@
 
 			// Get the Last State which has the new URL
 			var
-				urlState = History.extractState(document.location.href),
+				urlState = History.extractState(History.getLocationHref()),
 				newState;
 
 			// Check for a difference
@@ -1625,7 +1655,7 @@
 				currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					currentState = History.extractState(currentHash||document.location.href,true);
+					currentState = History.extractState(currentHash||History.getLocationHref(),true);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
@@ -1658,13 +1688,13 @@
 				}
 				else {
 					// Initial State
-					newState = History.extractState(document.location.href);
+					newState = History.extractState(History.getLocationHref());
 				}
 
 				// The State did not exist in our store
 				if ( !newState ) {
 					// Regenerate the State
-					newState = History.createStateObject(null,null,document.location.href);
+					newState = History.createStateObject(null,null,History.getLocationHref());
 				}
 
 				// Clean
@@ -1843,7 +1873,7 @@
 		/**
 		 * Create the initial State
 		 */
-		History.saveState(History.storeState(History.extractState(document.location.href,true)));
+		History.saveState(History.storeState(History.extractState(History.getLocationHref(),true)));
 
 		/**
 		 * Bind for Saving Store
