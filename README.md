@@ -10,7 +10,7 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
 - Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/)
 
-Licensed under the [New BSD License](http://creativecommons.org/licenses/BSD/)
+Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
 Copyright 2011 [Benjamin Arthur Lupton](http://balupton.com)
 
 
