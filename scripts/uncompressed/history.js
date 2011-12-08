@@ -1608,7 +1608,7 @@
 			 */
 			History.onPopState = function(event,extra){
 				// Prepare
-				var stateId = false, newState = false, currentHash, currentState;
+				var stateId = false, newState = false, currentHash, currentState, wasExpected;
 
 				// Reset the double check
 				History.doubleCheckComplete();
@@ -1647,10 +1647,12 @@
 				else if ( History.expectedStateId ) {
 					// Vanilla: A new state was pushed, and popstate was called manually
 					newState = History.getStateById(History.expectedStateId);
+					wasExpected = !! newState;
 				}
 				else {
 					// Initial State
 					newState = History.extractState(document.location.href);
+					wasExpected = !! newState;
 				}
 
 				// The State did not exist in our store
@@ -1677,8 +1679,10 @@
 				// Force update of the title
 				History.setTitle(newState);
 
-				// Fire Our Event
-				History.Adapter.trigger(window,'statechange');
+				// Fire Our Event .. match popstate semantics 
+				if ( ! wasExpected )
+					History.Adapter.trigger(window,'statechange');
+
 				History.busy(false);
 
 				// Return true
