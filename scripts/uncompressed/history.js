@@ -1652,7 +1652,6 @@
 				else {
 					// Initial State
 					newState = History.extractState(document.location.href);
-					wasExpected = !! newState;
 				}
 
 				// The State did not exist in our store
