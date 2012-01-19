@@ -386,7 +386,7 @@
 				baseHref = baseElement.href.replace(/[^\/]+$/,'');
 			}
 
-			// Adjust trailing slash
+			// Adjusts trailing slash
 			baseHref = baseHref.replace(/\/+$/,'');
 			if ( baseHref ) baseHref += '/';
 
@@ -1442,8 +1442,12 @@
 		 * @return {History}
 		 */
 		History.safariStatePoll = function(){
-			// Poll the URL
+			// check if we just pushed state, if so.. bail
+			if (History.waitForPropagation) {
+				return;
+			}
 
+			// Poll the URL
 			// Get the Last State which has the new URL
 			var
 				urlState = History.extractState(document.location.href),
@@ -1470,6 +1474,19 @@
 
 			// Chain
 			return History;
+		};
+
+		History.blockSafariPollUntilPropagation = function(newState){
+			History.waitForPropagation = true;
+			History.waitForPropagationInterval = setInterval(function() {
+				var urlState = History.extractState(document.location.href);
+				if (!urlState || (urlState.id == newState.id)) {
+					//History.debug('url state propagated, un-blocking Safari poll');
+					History.waitForPropagation = false;
+					clearInterval(History.waitForPropagationInterval);
+				}
+			}, 250);
+			History.intervalList.push(History.waitForPropagationInterval);
 		};
 
 
@@ -1613,7 +1630,7 @@
 				// Reset the double check
 				History.doubleCheckComplete();
 
-				// Check for a Hash, and handle apporiatly
+				// Check for a Hash, and handle appropriately
 				currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
@@ -1728,6 +1745,11 @@
 					History.busy(false);
 				}
 				else {
+					if (History.bugs.safariPoll) {
+						//History.debug('Blocking safariPoll until url state propagation');
+						History.blockSafariPollUntilPropagation(newState);
+					}
+
 					// Store the newState
 					History.storeState(newState);
 					History.expectedStateId = newState.id;
@@ -1908,6 +1930,7 @@
 			 * Setup Safari Fix
 			 */
 			if ( History.bugs.safariPoll ) {
+				History.waitForPropagation = false;
 				History.intervalList.push(setInterval(History.safariStatePoll, History.options.safariPollInterval));
 			}
 
