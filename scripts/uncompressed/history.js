@@ -1477,6 +1477,10 @@
 		};
 
 		History.blockSafariPollUntilPropagation = function(newState){
+			// clear existing interval in preparation for the new one
+			if (History.waitForPropagationInterval) {
+				clearInterval(History.waitForPropagationInterval);
+			}
 			History.waitForPropagation = true;
 			History.waitForPropagationInterval = setInterval(function() {
 				var urlState = History.extractState(document.location.href);
