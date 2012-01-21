@@ -895,7 +895,9 @@
 		 */
 		History.getIdByUrl = function(url){
 			// Fetch
-			var id = History.urlToId[url] || History.store.urlToId[url] || undefined;
+			var unescaped = History.unescapeString(url);
+			var id = History.urlToId[url] || History.store.urlToId[url] ||
+                                 History.urlToId[unescaped] || History.store.urlToId[unescaped] || undefined;
 
 			// Return
 			return id;
@@ -948,7 +950,9 @@
 		 */
 		History.storeState = function(newState){
 			// Store the State
-			History.urlToId[newState.url] = newState.id;
+			History.urlToId[newState.cleanUrl] = newState.id;
+			History.idToState[newState.id] = newState;
+			History.stateToId[History.getStateString(newState)] = newState.id;
 
 			// Push the State
 			History.storedStates.push(History.cloneObject(newState));
@@ -1749,14 +1753,14 @@
 					History.busy(false);
 				}
 				else {
+					// Store the newState
+					History.storeState(newState);
+					History.expectedStateId = newState.id;
+
 					if (History.bugs.safariPoll) {
 						//History.debug('Blocking safariPoll until url state propagation');
 						History.blockSafariPollUntilPropagation(newState);
 					}
-
-					// Store the newState
-					History.storeState(newState);
-					History.expectedStateId = newState.id;
 
 					// Push the newState
 					history.pushState(newState.id,newState.title,newState.url);
