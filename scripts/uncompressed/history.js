@@ -1043,7 +1043,9 @@
 		 * @return {string}
 		 */
 		History.getHash = function(location){
-			if ( !location ) location = document.location;
+			if ( !location ) {
+            location = document.location;
+         }
 			var href = location.href.replace( /^[^#]*/, "" );
 			return href.substr(1);
 		};
