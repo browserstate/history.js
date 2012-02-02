@@ -262,13 +262,16 @@
 
 				// Define some variables that will help in our checker function
 				var lastDocumentHash = '',
-					iframeId, iframe,
+					iframeId, iframe, docDomainChanged,
 					lastIframeHash, checkerRunning;
 
 				// Handle depending on the browser
 				if ( History.isInternetExplorer() ) {
 					// IE6 and IE7
 					// We need to use an iframe to emulate the back and forward buttons
+					
+					// if a domain of document changed, we should know (IE7)
+					docDomainChanged = (document.domain && document.location.hostname != document.domain);
 
 					// Create iFrame
 					iframeId = 'historyjs-iframe';
@@ -277,6 +280,11 @@
 					// Adjust iFarme
 					iframe.setAttribute('id', iframeId);
 					iframe.style.display = 'none';
+
+					// Changing document.domain if needed, because IE7 has own opinion
+					if (docDomainChanged) {
+						iframe.src = 'javascript:(function(){document.open();document.domain="' + document.domain + '";document.close();})()';
+					}
 
 					// Append iFrame
 					document.body.appendChild(iframe);
@@ -314,6 +322,11 @@
 
 								// Equalise
 								lastIframeHash = iframeHash = documentHash;
+
+								// Changing document.domain once again
+								if (docDomainChanged) {
+									iframe.src = 'javascript:(function(){document.open();document.domain="' + document.domain + '";document.close();})()';
+								}
 
 								// Create History Entry
 								iframe.contentWindow.document.open();
