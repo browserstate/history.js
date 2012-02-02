@@ -1,6 +1,8 @@
 Welcome to History.js (v1.7.1 - October 4 2011)
 ==================
 
+[![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/balupton/history.js&title=History.js&language=&tags=github&category=software) 
+
 
 This project is the successor of [jQuery History](http://balupton.com/projects/jquery-history), it aims to:
 
