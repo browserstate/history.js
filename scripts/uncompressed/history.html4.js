@@ -79,6 +79,19 @@
 		};
 
 		/**
+		 * History.isHashEqual(newHash, oldHash)
+		 * Checks to see if two hashes are functionally equal
+		 * @param {string} newHash
+		 * @param {string} oldHash
+		 * @return {boolean} true
+		 */
+		History.isHashEqual = function(newHash, oldHash){
+			newHash = encodeURIComponent(newHash).replace(/%25/g, "%");
+			oldHash = encodeURIComponent(oldHash).replace(/%25/g, "%");
+			return newHash === oldHash;
+		};
+
+		/**
 		 * History.saveHash(newHash)
 		 * Push a Hash
 		 * @param {string} newHash
@@ -531,7 +544,7 @@
 				}
 
 				// Update HTML4 Hash
-				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(History.getLocationHref()) ) {
+				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
 					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
 					return false;
