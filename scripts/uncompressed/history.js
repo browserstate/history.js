@@ -1899,8 +1899,17 @@
 				History.store = currentStore;
 				History.normalizeStore();
 
-				// Store
-				sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+				// In Safari, going into Private Browsing mode causes the
+				// Session Storage object to still exist but if you try and use
+				// or set any property/function of it it throws the exception
+				// "QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to
+				// add something to storage that exceeded the quota." infinitely
+				// every second.
+				try {
+					// Store
+					sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+				}
+				catch (e) {}
 			};
 
 			// For Internet Explorer
