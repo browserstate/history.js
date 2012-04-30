@@ -97,9 +97,9 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 ## Download & Installation
 
-- 1. Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/history.js/tarball/master) or [zip](https://github.com/balupton/history.js/zipball/master)
+- Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/history.js/tarball/master) or [zip](https://github.com/balupton/history.js/zipball/master)
 
-- 2. Include History.js
+- Include History.js
 
 	- For [jQuery](http://jquery.com/) v1.3+
 
