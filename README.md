@@ -154,7 +154,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 - If you've created a website that uses History.js, or know of one. Then be sure to add it to the [Showcase Wiki Page](https://github.com/balupton/history.js/wiki/Showcase).
 
-- If you'd love to "+1" or "like" this project, then be sure to tweet about it and click the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js).
+- If you'd love to +1 or like this project, then be sure to tweet about it and click the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js).
 
 - For anything else, refer to the [History.js GitHub Wiki Site](https://github.com/balupton/history.js/wiki).
 
