@@ -146,7 +146,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 - History.js is maintained by people like you. If you find a bug, report it to the [GitHub Issue Tracker](https://github.com/balupton/history.js/issues). If you've fixed a bug submit a [Pull Request](https://github.com/balupton/history.js/pulls) and add your fork to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network).
 
-- If you would like paid corporate support and trainings, or have job offers, then refer to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network). If you are qualified with History.js, then be sure to add your details to that page too.
+- If you would like paid support and trainings, or have job offers, then refer to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network). If you are qualified with History.js, then be sure to add your details to that page too.
 
 - If you're company use History.js on your projects, and would like to see it grow and prosper (better documentation, bugfixes, upgrades, maintenance, etc.) and would love to become a corporate sponsor then do email sponsor@bevry.me
 
