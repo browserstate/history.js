@@ -12,9 +12,6 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
 - Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/)
 
-Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
-<br/>Copyright &copy;  2011-2012 [Benjamin Arthur Lupton](http://balupton.com)
-
 
 ## Usage
 
@@ -145,23 +142,21 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
 
 
-## Getting Support
+## Support
 
-**History.js is an actively supported, maintained and developed project.** You can grab support via its **[GitHub Issue Tracker](https://github.com/balupton/history.js/issues)** and contact its core developer [Benjamin Lupton](http://balupton.com) via [twitter](http://twitter.com/balupton), skype (balupton) and email (b@lupton.cc). Benjamin is also available for [bookings](http://speakerrate.com/speakers/11963-benjamin-lupton) (trainings, seminars, talks), [consulting](http://careers.stackoverflow.com/balupton) (development, advisory), sponsorship (angels, investors, donations, advertisement), interviews, chats, hackathons, socials and mentoring.
+- History.js is maintained by people like you. If you find a bug, report it to the [GitHub Issue Tracker](https://github.com/balupton/history.js/issues). If you've fixed a bug submit a [Pull Request](https://github.com/balupton/history.js/pulls) and add your fork to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network)
 
+- If you would like paid corporate support and trainings, or have job offers, then refer to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network). If you are qualified with History.js, then be sure to add your details to that page too
 
-## Giving Support
+- If you would like free support for History.js, then [post your question](http://stackoverflow.com/questions/ask) on [Stackoverflow](http://stackoverflow.com/about) and be sure to use the `history.js` tag when asking your question
 
-If you'd love to give some support back and make a difference; here are a few great ways you can give back!
+- If you've created a website that uses History.js, or know of one. Then be sure to add it to the [Showcase Wiki Page](https://github.com/balupton/history.js/wiki/Showcase)
 
-- Give it your honest rating on its [jQuery Plugin's Page](http://plugins.jquery.com/project/history-js) and its [Ohloh Page](https://www.ohloh.net/p/history-js)
-- If you have any feedback or suggestions let me know via its [Issue Tracker](https://github.com/balupton/history.js/issues) - so that I can ensure you get the best experience!
-- Spread the word via tweets, blogs, tumblr, whatever - the more people talking about it the better!
-- [Make a donation](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=balupton%40gmail%2ecom&lc=AU&item_name=Donation%20to%20Benjamin%20Lupton&currency_code=AUD&bn=PP%2dDonationsBF%3adonate%2egif%3aNonHosted) - every cent truly does help!
-- Add your website or app which is using History.js to the [Showcase](https://github.com/balupton/history.js/wiki/Showcase)
-- Watch it via clicking the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js)
+- If you'd love to "+1" or "like" this project, then be sure to tweet about it and click the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js)
 
-Thanks! every bit of help really does make a difference. Again thank you.
+- For anything else, refer to the [History.js GitHub Wiki Site](https://github.com/balupton/history.js/wiki)
+
+Thanks! every bit of help really does make a difference!
 
 
 ## Browsers: Tested and Working In
@@ -241,3 +236,8 @@ Thanks! every bit of help really does make a difference. Again thank you.
 
 You can discover the history inside the [History.md](https://github.com/balupton/history.js/blob/master/History.md#files) file
 
+
+## License
+
+Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
+<br/>Copyright &copy;  2011-2012 [Benjamin Arthur Lupton](http://balupton.com)
