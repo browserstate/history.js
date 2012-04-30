@@ -134,7 +134,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 > Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`. [Why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 
 
-## Subscribe to Updates
+## Get Updates
 
 - For Commit RSS/Atom Updates:
 	- You can subscribe via the [GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
@@ -142,7 +142,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
 
 
-## Support
+## Get Support
 
 - History.js is maintained by people like you. If you find a bug, report it to the [GitHub Issue Tracker](https://github.com/balupton/history.js/issues). If you've fixed a bug submit a [Pull Request](https://github.com/balupton/history.js/pulls) and add your fork to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network).
 
