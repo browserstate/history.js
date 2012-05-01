@@ -148,7 +148,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 - If you would like paid support and trainings, or have job offers, then refer to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network). If you are qualified with History.js, then be sure to add your details to that page too.
 
-- If you're company use History.js on your projects, and would like to see it grow and prosper (better documentation, bugfixes, upgrades, maintenance, etc.) and would love to become a corporate sponsor then do email sponsor@bevry.me
+- If your company uses History.js on your projects, and would like to see it grow and prosper (better documentation, bugfixes, upgrades, maintenance, etc.) and would love to become a corporate sponsor then do email sponsor@bevry.me
 
 - If you would like free support for History.js, then [post your question](http://stackoverflow.com/questions/ask) on [Stackoverflow](http://stackoverflow.com/about) and be sure to use the `history.js` tag when asking your question.
 
