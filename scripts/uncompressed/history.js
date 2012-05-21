@@ -1830,7 +1830,6 @@
 		/**
 		 * Clear Intervals on exit to prevent memory leaks
 		 */
-		History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
 		History.Adapter.bind(window,"unload",History.clearAllIntervals);
 
 		/**
