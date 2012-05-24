@@ -418,7 +418,7 @@
 			// Fetch
 			var
 				State = History.getState(false,false),
-				stateUrl = (State||{}).url||document.URL||document.location.href,
+				stateUrl = (State||{}).url||document.location.href,
 				pageUrl;
 
 			// Create
@@ -437,7 +437,7 @@
 		 */
 		History.getBasePageUrl = function(){
 			// Create
-			var basePageUrl = (document.URL||document.location.href).replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+			var basePageUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
 				return (/[^\/]$/).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
@@ -675,7 +675,7 @@
 			newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(oldState.url?decodeURIComponent(oldState.url):(document.URL||document.location.href));
+			newState.url = History.getFullUrl(History.unescapeString(oldState.url||document.location.href));
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -730,7 +730,7 @@
 			var State = {
 				'data': data,
 				'title': title,
-				'url': encodeURIComponent(url||"")
+				'url': url
 			};
 
 			// Expand the State
@@ -1037,17 +1037,36 @@
 
 		/**
 		 * History.getHash()
-		 * @param {Location=} location
 		 * Gets the current document hash
-		 * Note: unlike location.hash, this is guaranteed to return the escaped hash in all browsers
 		 * @return {string}
 		 */
-		History.getHash = function(location){
-			if ( !location ) {
-            location = document.location;
-         }
-			var href = location.href.replace( /^[^#]*/, "" );
-			return href.substr(1);
+		History.getHash = function(){
+			var hash = History.unescapeHash(document.location.hash);
+			return hash;
+		};
+
+		/**
+		 * History.unescapeString()
+		 * Unescape a string
+		 * @param {String} str
+		 * @return {string}
+		 */
+		History.unescapeString = function(str){
+			// Prepare
+			var result = str,
+				tmp;
+
+			// Unescape hash
+			while ( true ) {
+			   tmp = window.unescape(window.decodeURI(result));//WH Added to decode weird characters in url
+				if ( tmp === result ) {
+					break;
+				}
+				result = tmp;
+			}
+
+			// Return result
+			return result;
 		};
 
 		/**
@@ -1061,7 +1080,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			result = decodeURIComponent(result);
+			result = History.unescapeString(result);
 
 			// Return result
 			return result;
@@ -1088,7 +1107,7 @@
 		 */
 		History.setHash = function(hash,queue){
 			// Prepare
-			var State, pageUrl;
+			var adjustedHash, State, pageUrl;
 
 			// Handle Queueing
 			if ( queue !== false && History.busy() ) {
@@ -1106,6 +1125,9 @@
 			// Log
 			//History.debug('History.setHash: called',hash);
 
+			// Prepare
+			adjustedHash = History.escapeHash(hash);
+
 			// Make Busy + Continue
 			History.busy(true);
 
@@ -1118,7 +1140,7 @@
 				// PushState
 				History.pushState(State.data,State.title,State.url,false);
 			}
-			else if ( History.getHash() !== hash ) {
+			else if ( document.location.hash !== adjustedHash ) {
 				// Hash is a proper hash, so apply it
 
 				// Handle browser bugs
@@ -1129,11 +1151,11 @@
 					pageUrl = History.getPageUrl();
 
 					// Safari hash apply
-					History.pushState(null,null,pageUrl+'#'+hash,false);
+					History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
 				}
 				else {
 					// Normal hash apply
-					document.location.hash = hash;
+					document.location.hash = adjustedHash;
 				}
 			}
 
@@ -1151,7 +1173,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			result = window.encodeURIComponent(result);
+			result = window.escape(result);
 
 			// IE6 Escape Bug
 			if ( !History.bugs.hashEscape ) {
@@ -1430,7 +1452,7 @@
 
 			// Get the Last State which has the new URL
 			var
-				urlState = History.extractState(document.URL||document.location.href),
+				urlState = History.extractState(document.location.href),
 				newState;
 
 			// Check for a difference
@@ -1601,7 +1623,7 @@
 				currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					currentState = History.extractState(currentHash||document.URL||document.location.href,true);
+					currentState = History.extractState(currentHash||document.location.href,true);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
@@ -1634,13 +1656,13 @@
 				}
 				else {
 					// Initial State
-					newState = History.extractState(document.URL||document.location.href);
+					newState = History.extractState(document.location.href);
 				}
 
 				// The State did not exist in our store
 				if ( !newState ) {
 					// Regenerate the State
-					newState = History.createStateObject(null,null,document.URL||document.location.href);
+					newState = History.createStateObject(null,null,document.location.href);
 				}
 
 				// Clean
@@ -1814,13 +1836,13 @@
 		/**
 		 * Clear Intervals on exit to prevent memory leaks
 		 */
-		History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
+		//History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
 		History.Adapter.bind(window,"unload",History.clearAllIntervals);
 
 		/**
 		 * Create the initial State
 		 */
-		History.saveState(History.storeState(History.extractState(document.URL||document.location.href,true)));
+		History.saveState(History.storeState(History.extractState(document.location.href,true)));
 
 		/**
 		 * Bind for Saving Store
@@ -1876,7 +1898,7 @@
 			History.intervalList.push(setInterval(History.onUnload,History.options.storeInterval));
 			
 			// For Other Browsers
-			History.Adapter.bind(window,'beforeunload',History.onUnload);
+			//History.Adapter.bind(window,'beforeunload',History.onUnload);
 			History.Adapter.bind(window,'unload',History.onUnload);
 			
 			// Both are enabled for consistency
