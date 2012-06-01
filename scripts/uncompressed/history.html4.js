@@ -190,7 +190,7 @@
 		};
 
 		/**
-		 * History.discardState(State)
+		 * History.discardedState(State)
 		 * Checks to see if the state is discarded
 		 * @param {object} State
 		 * @return {bool}
@@ -263,7 +263,8 @@
 				// Define some variables that will help in our checker function
 				var lastDocumentHash = '',
 					iframeId, iframe,
-					lastIframeHash, checkerRunning;
+					lastIframeHash, checkerRunning,
+					startedWithHash = Boolean(History.getHash());
 
 				// Handle depending on the browser
 				if ( History.isInternetExplorer() ) {
@@ -301,7 +302,7 @@
 
 						// Fetch
 						var documentHash = History.getHash()||'',
-							iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash)||'';
+							iframeHash = History.getHash(iframe.contentWindow.document)||'';
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -333,9 +334,19 @@
 
 							// Equalise
 							lastIframeHash = iframeHash;
-
-							// Update the Hash
-							History.setHash(iframeHash,false);
+							
+							// If there is no iframe hash that means we're at the original
+							// iframe state.
+							// And if there was a hash on the original request, the original
+							// iframe state was replaced instantly, so skip this state and take
+							// the user back to where they came from.
+							if (startedWithHash && iframeHash === '') {
+								History.back();
+							}
+							else {
+								// Update the Hash
+								History.setHash(iframeHash,false);
+							}
 						}
 
 						// Reset Running
@@ -352,7 +363,7 @@
 					// Define the checker function
 					History.checkerFunction = function(){
 						// Prepare
-						var documentHash = History.getHash();
+						var documentHash = History.getHash()||'';
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -578,14 +589,40 @@
 
 				// Fetch the State Objects
 				var newState        = History.createStateObject(data,title,url),
+					newStateHash = History.getHashByState(newState),
 					oldState        = History.getState(false),
+					oldStateHash = History.getHashByState(oldState),
 					previousState   = History.getStateByIndex(-2);
 
 				// Discard Old State
 				History.discardState(oldState,newState,previousState);
 
-				// Alias to PushState
-				History.pushState(newState.data,newState.title,newState.url,false);
+				// If the url hasn't changed, just store and save the state
+				// and fire a statechange event to be consistent with the
+				// html 5 api
+				if ( newStateHash === oldStateHash ) {
+					// Store the newState
+					History.storeState(newState);
+					History.expectedStateId = newState.id;
+	
+					// Recycle the State
+					History.recycleState(newState);
+	
+					// Force update of the title
+					History.setTitle(newState);
+					
+					// Update HTML5 State
+					History.saveState(newState);
+
+					// Fire HTML5 Event
+					//History.debug('History.pushState: trigger popstate');
+					History.Adapter.trigger(window,'statechange');
+					History.busy(false);
+				}
+				else {
+					// Alias to PushState
+					History.pushState(newState.data,newState.title,newState.url,false);
+				}
 
 				// End replaceState closure
 				return true;
@@ -613,7 +650,7 @@
 
 	}; // History.initHtml4
 
-	// Try and Initialise History
+	// Try to Initialise History
 	if ( typeof History.init !== 'undefined' ) {
 		History.init();
 	}

@@ -443,7 +443,7 @@
 		 */
 		History.getBasePageUrl = function(){
 			// Create
-			var basePageUrl = (History.getLocationHref()).replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+			var basePageUrl = History.getLocationHref().replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
 				return (/[^\/]$/).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
@@ -711,7 +711,7 @@
 			newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(oldState.url?decodeURIComponent(oldState.url):(History.getLocationHref()));
+			newState.url = History.getFullUrl(oldState.url||History.getLocationHref());
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -728,7 +728,7 @@
 			dataNotEmpty = !History.isEmptyObject(newState.data);
 
 			// Apply
-			if ( (newState.title || dataNotEmpty) && History.options.disableSuid != true ) {
+			if ( (newState.title || dataNotEmpty) && History.options.disableSuid !== true ) {
 				// Add ID to Hash
 				newState.hash = History.getShortUrl(newState.url).replace(/\??\&_suid.*/,'');
 				if ( !/\?/.test(newState.hash) ) {
@@ -864,10 +864,21 @@
 		 */
 		History.extractId = function ( url_or_hash ) {
 			// Prepare
-			var id,parts,url;
+			var id,parts,url, tmp;
 
 			// Extract
-			parts = /(.*)\&_suid=([0-9]+)$/.exec(url_or_hash);
+			
+			// If the URL has a #, use the id from before the #
+			if (url_or_hash.indexOf('#') != -1)
+			{
+				tmp = url_or_hash.split("#")[0];
+			}
+			else
+			{
+				tmp = url_or_hash;
+			}
+			
+			parts = /(.*)\&_suid=([0-9]+)$/.exec(tmp);
 			url = parts ? (parts[1]||url_or_hash) : url_or_hash;
 			id = parts ? String(parts[2]||'') : '';
 
@@ -1076,33 +1087,11 @@
 		 * Gets the current document hash
 		 * @return {string}
 		 */
-		History.getHash = function(){
-			var hash = History.unescapeHash(document.location.hash);
+		History.getHash = function(doc){
+			var url = History.getLocationHref(doc),
+				hash;
+			hash = History.getHashByUrl(url);
 			return hash;
-		};
-
-		/**
-		 * History.unescapeString()
-		 * Unescape a string
-		 * @param {String} str
-		 * @return {string}
-		 */
-		History.unescapeString = function(str){
-			// Prepare
-			var result = str,
-				tmp;
-
-			// Unescape hash
-			while ( true ) {
-				tmp = window.unescape(result);
-				if ( tmp === result ) {
-					break;
-				}
-				result = tmp;
-			}
-
-			// Return result
-			return result;
 		};
 
 		/**
@@ -1116,7 +1105,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			result = History.unescapeString(result);
+			result = decodeURI(result);
 
 			// Return result
 			return result;
@@ -1209,7 +1198,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			result = window.escape(result);
+			result = window.encodeURI(result);
 
 			// IE6 Escape Bug
 			if ( !History.bugs.hashEscape ) {
@@ -1652,7 +1641,7 @@
 				History.doubleCheckComplete();
 
 				// Check for a Hash, and handle apporiatly
-				currentHash	= History.getHash();
+				currentHash = History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
 					currentState = History.extractState(currentHash||History.getLocationHref(),true);
@@ -1974,7 +1963,7 @@
 
 	}; // History.initCore
 
-	// Try and Initialise History
+	// Try to Initialise History
 	History.init();
 
 })(window);
