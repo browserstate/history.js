@@ -1,0 +1,67 @@
+{
+  "name": "history.js",
+  "version": "1.8.0",
+  "description": "History.js gracefully supports the HTML5 History/State APIs (pushState, replaceState, onPopState) in all browsers. Including continued support for data, titles, replaceState. Supports jQuery, MooTools and Prototype.  For HTML5 browsers this means that you can modify the URL directly, without needing to use hashes anymore. For HTML4 browsers it will revert back to using the old onhashchange functionality.",
+  "homepage": "https://github.com/balupton/history.js",
+  "keywords": [
+    "javascript",
+    "html5 history api",
+    "hashchange",
+    "popstate",
+    "pushstate",
+    "replacestate",
+    "hashes",
+    "hashbang"
+  ],
+  "author": {
+    "name": "Benjamin Lupton",
+    "email": "b@lupton.cc",
+    "web": "http://balupton.com"
+  },
+  "maintainers": [
+    {
+      "name": "Matias Meno",
+      "email": "m@tias.me",
+      "web": "http://www.mmeno.com"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Benjamin Lupton",
+      "email": "b@lupton.cc",
+      "web": "http://balupton.com"
+    },
+    {
+      "name": "Matias Meno",
+      "email": "m@tias.me",
+      "web": "http://www.mmeno.com"
+    }
+  ],
+  "bugs": {
+    "web": "https://github.com/balupton/history.js/issues"
+  },
+  "licenses": [
+    {
+      "type": "New-BSD",
+      "url": "http://creativecommons.org/licenses/BSD/"
+    }
+  ],
+  "repository" : {
+    "type" : "git",
+    "url" : "http://github.com/enyo/history.js.git"
+  },
+  "dependencies": {
+    "bean": ">=0.4",
+    "domready": ">=0.2"
+  },
+  "main": [
+    "./history.js",
+    "./history.adapter.ender.js"
+  ],
+  "engines" : {
+  },
+  "directories": {
+    "out": "../scripts/compressed",
+    "src": "../scripts/uncompressed"
+  }
+}
