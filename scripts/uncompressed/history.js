@@ -557,6 +557,9 @@
 			if (doc.location.hash && decodeURIComponent(doc.location.href.replace(/^[^#]+/, "")) === doc.location.hash)
 				return doc.location.href;
 
+			if (doc.URL.indexOf('#') == -1 && doc.location.href.indexOf('#') != -1)
+				return doc.location.href;
+			
 			return doc.URL || doc.location.href;
 		};
 
