@@ -129,6 +129,12 @@
 		 */
 		 History.options.html4Mode = History.options.html4Mode || false;
 
+		/**
+		 * History.options.delayInit
+		 * Want to override default options and call init manually.
+		 */
+		 History.options.delayInit = History.options.delayInit || false;
+
 
 		// ====================================================================
 		// Interval record
@@ -1954,7 +1960,9 @@
 
 	}; // History.initCore
 
-	// Try and Initialise History
-	History.init();
+	if (!History.options || !History.options.delayInit) {
+		// Try and Initialise History
+		History.init();
+	}
 
 })(window);
