@@ -505,7 +505,8 @@
 					newStateHash = History.getHashByState(newState),
 					oldState = History.getState(false),
 					oldStateHash = History.getHashByState(oldState),
-					html4Hash = History.getHash();
+					html4Hash = History.getHash(),
+					wasExpected = History.expectedStateId == newState.id;
 
 				// Store the newState
 				History.storeState(newState);
@@ -536,7 +537,8 @@
 
 				// Fire HTML5 Event
 				//History.debug('History.pushState: trigger popstate');
-				History.Adapter.trigger(window,'statechange');
+				if(!wasExpected)
+					History.Adapter.trigger(window,'statechange');
 				History.busy(false);
 
 				// End pushState closure
