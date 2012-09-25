@@ -528,6 +528,7 @@
 				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
 					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
+					History.busy(false);
 					return false;
 				}
 
