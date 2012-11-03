@@ -131,7 +131,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/native.history.js"></script>
 		```
 
-> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`. [Why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`. See [why supporting HTML4 browsers could be either good or bad, based on your app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling).
 
 
 ## Get Updates
@@ -152,7 +152,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 - If you would like free support for History.js, then [post your question](http://stackoverflow.com/questions/ask) on [Stackoverflow](http://stackoverflow.com/about) and be sure to use the `history.js` tag when asking your question.
 
-- If you've created a website that uses History.js, or know of one. Then be sure to add it to the [Showcase Wiki Page](https://github.com/balupton/history.js/wiki/Showcase).
+- If you've created a website that uses History.js, or know of one, be sure to add it to the [Showcase Wiki Page](https://github.com/balupton/history.js/wiki/Showcase).
 
 - If you'd love to +1 or like this project, then be sure to tweet about it and click the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js).
 
