@@ -276,7 +276,10 @@
 					iframe = document.createElement('iframe');
 
 					// Adjust iFarme
+					// IE 6 requires iframe to have a src on HTTPS pages, otherwise it will throw a
+					// "This page contains both secure and nonsecure items" warning.
 					iframe.setAttribute('id', iframeId);
+					iframe.setAttribute('src', 'javascript:false');
 					iframe.style.display = 'none';
 
 					// Append iFrame
