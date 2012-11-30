@@ -26,6 +26,13 @@
 		History = window.History = window.History||{}, // Public History Object
 		history = window.history; // Old History Object
 
+	try {
+		sessionStorage.setItem('TEST', '1');
+		sessionStorage.removeItem('TEST');
+	} catch(e) {
+		sessionStorage = false;
+	}
+
 	// MooTools Compatibility
 	JSON.stringify = JSON.stringify||JSON.encode;
 	JSON.parse = JSON.parse||JSON.decode;
