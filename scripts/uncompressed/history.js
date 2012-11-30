@@ -1914,7 +1914,17 @@
 				History.normalizeStore();
 
 				// Store
-				sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+				try {
+					sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+				} catch (ex) {
+					//temporary fix, history may hiccup but won't completely break
+					if (/QUOTA_EXCEEDED_ERR/.test(ex.message)) {
+						sessionStorage.removeItem('History.store');
+					    sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+					} else {
+						throw ex;
+					}
+                }
 			};
 
 			// For Internet Explorer
