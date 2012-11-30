@@ -38,13 +38,19 @@ require(["dojo/on", "dojo/ready", "dojo/_base/lang"], function(on,ready, lang) {
 		 * @return {void}
 		 */
 		trigger: function(el,event,extra){
-            extra = extra || {};
-            lang.mixin(extra, {
-                bubbles: true,
-                cancelable: true
-            });
+			extra = extra || {};
+			lang.mixin(extra, {
+				bubbles: true,
+				cancelable: true
+			});
+			// hack for dojo 1.8 which assumes that target has an ownerDocument propery
+			if (el === window)
+				el.ownerDocument = el.document;
 
 			on.emit(el,event,extra);
+
+			if (el === window)
+				delete el.ownerDocument;
 		},
 
 		/**
