@@ -1,16 +1,19 @@
 /**
  * History.js Dojo Adapter
- * @author Lakin Wecker <lakin@structuredabstraction.com>
- * @copyright 2012-2012 Lakin Wecker <lakin@structuredabstraction.com>
+ *
+ * Essentially the same as the native adapter but uses dojo/ready for the dom load callback.
+ *
+ * @author Benjamin Arthur Lupton <contact@balupton.com>
+ * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
  */
 
-require(["dojo/on", "dojo/ready", "dojo/_base/lang"], function(on,ready, lang) {
+// Closure
+(function(window,undefined){
 	"use strict";
 
 	// Localise Globals
-	var
-		History = window.History = window.History||{};
+	var History = window.History = window.History||{};
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -20,67 +23,98 @@ require(["dojo/on", "dojo/ready", "dojo/_base/lang"], function(on,ready, lang) {
 	// Add the Adapter
 	History.Adapter = {
 		/**
-		 * History.Adapter.bind(el,event,callback)
-		 * @param {Element|string} el
-		 * @param {string} event - custom and standard events
-		 * @param {function} callback
-		 * @return {void}
+		 * History.Adapter.handlers[uid][eventName] = Array
 		 */
-		bind: function(el,event,callback){
-			on(el,event,callback);
+		handlers: {},
+
+		/**
+		 * History.Adapter._uid
+		 * The current element unique identifier
+		 */
+		_uid: 1,
+
+		/**
+		 * History.Adapter.uid(element)
+		 * @param {Element} element
+		 * @return {String} uid
+		 */
+		 uid: function(element){
+			return element._uid || (element._uid = History.Adapter._uid++);
+		 },
+
+		/**
+		 * History.Adapter.bind(el,event,callback)
+		 * @param {Element} element
+		 * @param {String} eventName - custom and standard events
+		 * @param {Function} callback
+		 * @return
+		 */
+		bind: function(element,eventName,callback){
+			// Prepare
+			var uid = History.Adapter.uid(element);
+
+			// Apply Listener
+			History.Adapter.handlers[uid] = History.Adapter.handlers[uid] || {};
+			History.Adapter.handlers[uid][eventName] = History.Adapter.handlers[uid][eventName] || [];
+			History.Adapter.handlers[uid][eventName].push(callback);
+
+			// Bind Global Listener
+			element['on'+eventName] = (function(element,eventName){
+				return function(event){
+					History.Adapter.trigger(element,eventName,event);
+				};
+			})(element,eventName);
 		},
 
 		/**
 		 * History.Adapter.trigger(el,event)
-		 * @param {Element|string} el
-		 * @param {string} event - custom and standard events
-		 * @param {Object=} extra - a object of extra event data (optional)
-		 * @return {void}
+		 * @param {Element} element
+		 * @param {String} eventName - custom and standard events
+		 * @param {Object} event - a object of event data
+		 * @return
 		 */
-		trigger: function(el,event,extra){
-			extra = extra || {};
-			lang.mixin(extra, {
-				bubbles: true,
-				cancelable: true
-			});
-			// hack for dojo 1.8 which assumes that target has an ownerDocument propery
-			if (el === window)
-				el.ownerDocument = el.document;
+		trigger: function(element,eventName,event){
+			// Prepare
+			event = event || {};
+			var uid = History.Adapter.uid(element),
+				i,n;
 
-			on.emit(el,event,extra);
+			// Apply Listener
+			History.Adapter.handlers[uid] = History.Adapter.handlers[uid] || {};
+			History.Adapter.handlers[uid][eventName] = History.Adapter.handlers[uid][eventName] || [];
 
-			if (el === window)
-				delete el.ownerDocument;
+			// Fire Listeners
+			for ( i=0,n=History.Adapter.handlers[uid][eventName].length; i<n; ++i ) {
+				History.Adapter.handlers[uid][eventName][i].apply(this,[event]);
+			}
 		},
 
 		/**
 		 * History.Adapter.extractEventData(key,event,extra)
-		 * @param {string} key - key for the event data to extract
-		 * @param {string} event - custom and standard events
-		 * @param {Object=} extra - a object of extra event data (optional)
+		 * @param {String} key - key for the event data to extract
+		 * @param {String} event - custom and standard events
 		 * @return {mixed}
 		 */
-		extractEventData: function(key,event,extra){
-			// dojo Native then dojo Custom
-			var result = (event && event[key]) || (extra && extra[key]) || undefined;
-
-			// Return
+		extractEventData: function(key,event){
+			var result = (event && event[key]) || undefined;
 			return result;
 		},
 
 		/**
 		 * History.Adapter.onDomLoad(callback)
-		 * @param {function} callback
-		 * @return {void}
+		 * @param {Function} callback
+		 * @return
 		 */
 		onDomLoad: function(callback) {
-			ready(callback);
+			require(["dojo/ready"], function(ready) {
+				ready(callback);
+			});
 		}
 	};
 
-	// Try and Initialise History
+	// Try to Initialise History
 	if ( typeof History.init !== 'undefined' ) {
 		History.init();
 	}
 
-});
+})(window);
