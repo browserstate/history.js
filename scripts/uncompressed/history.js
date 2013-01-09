@@ -535,7 +535,7 @@
 		 * History.getLocationHref(document)
 		 * Returns a normalized version of document.location.href
 		 * accounting for browser inconsistencies, etc.
-		 * 
+		 *
 		 * This URL will be URI-encoded and will include the hash
 		 *
 		 * @param {object} document
@@ -652,7 +652,7 @@
 			// Fetch ID
 			var id = History.extractId(newState.url),
 				str;
-			
+
 			if ( !id ) {
 				// Find ID via State String
 				str = History.getStateString(newState);
@@ -826,7 +826,7 @@
 		History.getStateId = function(passedState){
 			// Prepare
 			var State, id;
-			
+
 			// Fetch
 			State = History.normalizeState(passedState);
 
@@ -846,7 +846,7 @@
 		History.getHashByState = function(passedState){
 			// Prepare
 			var State, hash;
-			
+
 			// Fetch
 			State = History.normalizeState(passedState);
 
@@ -1905,20 +1905,30 @@
 				// "QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to
 				// add something to storage that exceeded the quota." infinitely
 				// every second.
+				var currentStoreString = JSON.stringify(currentStore);
 				try {
 					// Store
-					sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+					sessionStorage.setItem('History.store', currentStoreString);
 				}
-				catch (e) {}
+				catch (e) {
+					// Workaround for a bug seen on iPads. Sometimes the quota exceeded error comes up and simply
+					// removing/resetting the storage can work.
+					if (/QUOTA_EXCEEDED_ERR/.test(e.message)) {
+						sessionStorage.removeItem('History.store');
+						sessionStorage.setItem('History.store', currentStoreString);
+					} else {
+						throw e;
+					}
+				}
 			};
 
 			// For Internet Explorer
 			History.intervalList.push(setInterval(History.onUnload,History.options.storeInterval));
-			
+
 			// For Other Browsers
 			History.Adapter.bind(window,'beforeunload',History.onUnload);
 			History.Adapter.bind(window,'unload',History.onUnload);
-			
+
 			// Both are enabled for consistency
 		}
 
