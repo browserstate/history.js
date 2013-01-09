@@ -1860,7 +1860,7 @@
 			// When the page is closed
 			History.onUnload = function(){
 				// Prepare
-				var	currentStore, item;
+				var	currentStore, item, currentStoreString;
 
 				// Fetch
 				try {
@@ -1905,7 +1905,7 @@
 				// "QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to
 				// add something to storage that exceeded the quota." infinitely
 				// every second.
-				var currentStoreString = JSON.stringify(currentStore);
+				currentStoreString = JSON.stringify(currentStore);
 				try {
 					// Store
 					sessionStorage.setItem('History.store', currentStoreString);
