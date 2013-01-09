@@ -26,6 +26,13 @@
 		History = window.History = window.History||{}, // Public History Object
 		history = window.history; // Old History Object
 
+	try {
+		sessionStorage.setItem('TEST', '1');
+		sessionStorage.removeItem('TEST');
+	} catch(e) {
+		sessionStorage = false;
+	}
+
 	// MooTools Compatibility
 	JSON.stringify = JSON.stringify||JSON.encode;
 	JSON.parse = JSON.parse||JSON.decode;
@@ -98,6 +105,12 @@
 		 * How long should the interval be before we perform a double check
 		 */
 		History.options.doubleCheckInterval = History.options.doubleCheckInterval || 500;
+
+		/**
+		 * History.options.disableSuid
+		 * Force History not to append suid
+		 */
+		History.options.disableSuid = History.options.disableSuid || false;
 
 		/**
 		 * History.options.storeInterval
@@ -323,7 +336,9 @@
 		 */
 		History.isEmptyObject = function(obj) {
 			for ( var name in obj ) {
-				return false;
+				if ( obj.hasOwnProperty(name) ) {
+					return false;
+				}
 			}
 			return true;
 		};
@@ -416,7 +431,7 @@
 			// Fetch
 			var
 				State = History.getState(false,false),
-				stateUrl = (State||{}).url||document.location.href,
+				stateUrl = (State||{}).url||History.getLocationHref(),
 				pageUrl;
 
 			// Create
@@ -435,7 +450,7 @@
 		 */
 		History.getBasePageUrl = function(){
 			// Create
-			var basePageUrl = document.location.href.replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+			var basePageUrl = History.getLocationHref().replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
 				return (/[^\/]$/).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
@@ -520,6 +535,39 @@
 
 			// Return
 			return shortUrl;
+		};
+
+		/**
+		 * History.getLocationHref(document)
+		 * Returns a normalized version of document.location.href
+		 * accounting for browser inconsistencies, etc.
+		 * 
+		 * This URL will be URI-encoded and will include the hash
+		 *
+		 * @param {object} document
+		 * @return {string} url
+		 */
+		History.getLocationHref = function(doc) {
+			doc = doc || document;
+
+			// most of the time, this will be true
+			if (doc.URL === doc.location.href)
+				return doc.location.href;
+
+			// some versions of webkit URI-decode document.location.href
+			// but they leave document.URL in an encoded state
+			if (doc.location.href === decodeURIComponent(doc.URL))
+				return doc.URL;
+
+			// FF 3.6 only updates document.URL when a page is reloaded
+			// document.location.href is updated correctly
+			if (doc.location.hash && decodeURIComponent(doc.location.href.replace(/^[^#]+/, "")) === doc.location.hash)
+				return doc.location.href;
+
+			if (doc.URL.indexOf('#') == -1 && doc.location.href.indexOf('#') != -1)
+				return doc.location.href;
+			
+			return doc.URL || doc.location.href;
 		};
 
 
@@ -673,7 +721,7 @@
 			newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(History.unescapeString(oldState.url||document.location.href));
+			newState.url = History.getFullUrl(oldState.url||History.getLocationHref());
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -690,7 +738,7 @@
 			dataNotEmpty = !History.isEmptyObject(newState.data);
 
 			// Apply
-			if ( newState.title || dataNotEmpty ) {
+			if ( (newState.title || dataNotEmpty) && History.options.disableSuid !== true ) {
 				// Add ID to Hash
 				newState.hash = History.getShortUrl(newState.url).replace(/\??\&_suid.*/,'');
 				if ( !/\?/.test(newState.hash) ) {
@@ -826,10 +874,21 @@
 		 */
 		History.extractId = function ( url_or_hash ) {
 			// Prepare
-			var id,parts,url;
+			var id,parts,url, tmp;
 
 			// Extract
-			parts = /(.*)\&_suid=([0-9]+)$/.exec(url_or_hash);
+			
+			// If the URL has a #, use the id from before the #
+			if (url_or_hash.indexOf('#') != -1)
+			{
+				tmp = url_or_hash.split("#")[0];
+			}
+			else
+			{
+				tmp = url_or_hash;
+			}
+			
+			parts = /(.*)\&_suid=([0-9]+)$/.exec(tmp);
 			url = parts ? (parts[1]||url_or_hash) : url_or_hash;
 			id = parts ? String(parts[2]||'') : '';
 
@@ -1038,33 +1097,11 @@
 		 * Gets the current document hash
 		 * @return {string}
 		 */
-		History.getHash = function(){
-			var hash = History.unescapeHash(document.location.hash);
+		History.getHash = function(doc){
+			var url = History.getLocationHref(doc),
+				hash;
+			hash = History.getHashByUrl(url);
 			return hash;
-		};
-
-		/**
-		 * History.unescapeString()
-		 * Unescape a string
-		 * @param {String} str
-		 * @return {string}
-		 */
-		History.unescapeString = function(str){
-			// Prepare
-			var result = str,
-				tmp;
-
-			// Unescape hash
-			while ( true ) {
-				tmp = window.unescape(result);
-				if ( tmp === result ) {
-					break;
-				}
-				result = tmp;
-			}
-
-			// Return result
-			return result;
 		};
 
 		/**
@@ -1078,7 +1115,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			result = History.unescapeString(result);
+			result = decodeURI(result);
 
 			// Return result
 			return result;
@@ -1171,7 +1208,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			result = window.escape(result);
+			result = window.encodeURI(result);
 
 			// IE6 Escape Bug
 			if ( !History.bugs.hashEscape ) {
@@ -1446,7 +1483,7 @@
 
 			// Get the Last State which has the new URL
 			var
-				urlState = History.extractState(document.location.href),
+				urlState = History.extractState(History.getLocationHref()),
 				newState;
 
 			// Check for a difference
@@ -1614,10 +1651,10 @@
 				History.doubleCheckComplete();
 
 				// Check for a Hash, and handle apporiatly
-				currentHash	= History.getHash();
+				currentHash = History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
-					currentState = History.extractState(currentHash||document.location.href,true);
+					currentState = History.extractState(currentHash||History.getLocationHref(),true);
 					if ( currentState ) {
 						// We were able to parse it, it must be a State!
 						// Let's forward to replaceState
@@ -1650,13 +1687,13 @@
 				}
 				else {
 					// Initial State
-					newState = History.extractState(document.location.href);
+					newState = History.extractState(History.getLocationHref());
 				}
 
 				// The State did not exist in our store
 				if ( !newState ) {
 					// Regenerate the State
-					newState = History.createStateObject(null,null,document.location.href);
+					newState = History.createStateObject(null,null,History.getLocationHref());
 				}
 
 				// Clean
@@ -1830,13 +1867,12 @@
 		/**
 		 * Clear Intervals on exit to prevent memory leaks
 		 */
-		History.Adapter.bind(window,"beforeunload",History.clearAllIntervals);
 		History.Adapter.bind(window,"unload",History.clearAllIntervals);
 
 		/**
 		 * Create the initial State
 		 */
-		History.saveState(History.storeState(History.extractState(document.location.href,true)));
+		History.saveState(History.storeState(History.extractState(History.getLocationHref(),true)));
 
 		/**
 		 * Bind for Saving Store
@@ -1885,7 +1921,17 @@
 				History.normalizeStore();
 
 				// Store
-				sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+				try {
+					sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+				} catch (ex) {
+					//temporary fix, history may hiccup but won't completely break
+					if (/QUOTA_EXCEEDED_ERR/.test(ex.message)) {
+						sessionStorage.removeItem('History.store');
+					    sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+					} else {
+						throw ex;
+					}
+                }
 			};
 
 			// For Internet Explorer
@@ -1937,7 +1983,7 @@
 
 	}; // History.initCore
 
-	// Try and Initialise History
+	// Try to Initialise History
 	History.init();
 
 })(window);

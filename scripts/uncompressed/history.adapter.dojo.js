@@ -1,5 +1,8 @@
 /**
- * History.js Native Adapter
+ * History.js Dojo Adapter
+ *
+ * Essentially the same as the native adapter but uses dojo/ready for the dom load callback.
+ *
  * @author Benjamin Arthur Lupton <contact@balupton.com>
  * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
@@ -103,13 +106,9 @@
 		 * @return
 		 */
 		onDomLoad: function(callback) {
-			var timeout = window.setTimeout(function(){
-				callback();
-			},2000);
-			window.onload = function(){
-				clearTimeout(timeout);
-				callback();
-			};
+			require(["dojo/ready"], function(ready) {
+				ready(callback);
+			});
 		}
 	};
 
