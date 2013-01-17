@@ -79,6 +79,19 @@
 		};
 
 		/**
+		 * History.isHashEqual(newHash, oldHash)
+		 * Checks to see if two hashes are functionally equal
+		 * @param {string} newHash
+		 * @param {string} oldHash
+		 * @return {boolean} true
+		 */
+		History.isHashEqual = function(newHash, oldHash){
+			newHash = encodeURIComponent(newHash).replace(/%25/g, "%");
+			oldHash = encodeURIComponent(oldHash).replace(/%25/g, "%");
+			return newHash === oldHash;
+		};
+
+		/**
 		 * History.saveHash(newHash)
 		 * Push a Hash
 		 * @param {string} newHash
@@ -301,8 +314,9 @@
 						checkerRunning = true;
 
 						// Fetch
-						var documentHash = History.getHash()||'',
-							iframeHash = History.getHash(iframe.contentWindow.document)||'';
+						var
+							documentHash = History.getHash(),
+							iframeHash = History.getHash(iframe.contentWindow.document.location);
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -471,7 +485,7 @@
 
 				// Push the new HTML5 State
 				//History.debug('History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,currentState.url,false);
+				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false);
 
 				// End onHashChange closure
 				return true;
@@ -489,6 +503,11 @@
 			 */
 			History.pushState = function(data,title,url,queue){
 				//History.debug('History.pushState: called', arguments);
+
+				// We assume that the URL passed in is URI-encoded, but this makes
+				// sure that it's fully URI encoded; any '%'s that are encoded are
+				// converted back into '%'s
+				url = encodeURI(url).replace(/%25/g, "%");
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
@@ -536,7 +555,7 @@
 				}
 
 				// Update HTML4 Hash
-				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(History.getLocationHref()) ) {
+				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
 					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
 					return false;
@@ -566,9 +585,14 @@
 			History.replaceState = function(data,title,url,queue){
 				//History.debug('History.replaceState: called', arguments);
 
+				// We assume that the URL passed in is URI-encoded, but this makes
+				// sure that it's fully URI encoded; any '%'s that are encoded are
+				// converted back into '%'s
+				url = encodeURI(url).replace(/%25/g, "%");
+
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
+					throw new Error('History.js does not support states with fragment-identifiers (hashes/anchors).');
 				}
 
 				// Handle Queueing

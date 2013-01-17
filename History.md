@@ -1,5 +1,8 @@
 ## History
 
+- v1.7.2 - January 18 2013
+	- Fixed issue #158 (thanks to sbearcsiro)
+
 - v1.7.1 - October 4 2011
 	- Added a new native adapter which is framework agnostic (can be used with, or without any framework)
 	- Provided bundled files

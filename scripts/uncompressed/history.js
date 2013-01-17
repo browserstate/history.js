@@ -473,7 +473,7 @@
 		 */
 		History.getBasePageUrl = function(){
 			// Create
-			var basePageUrl = History.getLocationHref().replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
+			var basePageUrl = (History.getLocationHref()).replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
 				return (/[^\/]$/).test(part) ? '' : part;
 			}).replace(/\/+$/,'')+'/';
 
@@ -564,7 +564,7 @@
 		 * History.getLocationHref(document)
 		 * Returns a normalized version of document.location.href
 		 * accounting for browser inconsistencies, etc.
-		 * 
+		 *
 		 * This URL will be URI-encoded and will include the hash
 		 *
 		 * @param {object} document
@@ -684,7 +684,7 @@
 			// Fetch ID
 			var id = History.extractId(newState.url),
 				str;
-			
+
 			if ( !id ) {
 				// Find ID via State String
 				str = History.getStateString(newState);
@@ -744,7 +744,7 @@
 			newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(oldState.url||History.getLocationHref());
+			newState.url = History.getFullUrl(oldState.url?decodeURIComponent(oldState.url):(History.getLocationHref()));
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -799,7 +799,7 @@
 			var State = {
 				'data': data,
 				'title': title,
-				'url': url
+				'url': encodeURIComponent(url||"")
 			};
 
 			// Expand the State
@@ -858,7 +858,7 @@
 		History.getStateId = function(passedState){
 			// Prepare
 			var State, id;
-			
+
 			// Fetch
 			State = History.normalizeState(passedState);
 
@@ -878,7 +878,7 @@
 		History.getHashByState = function(passedState){
 			// Prepare
 			var State, hash;
-			
+
 			// Fetch
 			State = History.normalizeState(passedState);
 
@@ -1117,7 +1117,9 @@
 
 		/**
 		 * History.getHash()
+		 * @param {Location=} location
 		 * Gets the current document hash
+		 * Note: unlike location.hash, this is guaranteed to return the escaped hash in all browsers
 		 * @return {string}
 		 */
 		History.getHash = function(doc){
@@ -1138,7 +1140,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Unescape hash
-			result = decodeURI(result);
+			result = decodeURIComponent(result);
 
 			// Return result
 			return result;
@@ -1165,7 +1167,7 @@
 		 */
 		History.setHash = function(hash,queue){
 			// Prepare
-			var adjustedHash, State, pageUrl;
+			var State, pageUrl;
 
 			// Handle Queueing
 			if ( queue !== false && History.busy() ) {
@@ -1183,9 +1185,6 @@
 			// Log
 			//History.debug('History.setHash: called',hash);
 
-			// Prepare
-			adjustedHash = History.escapeHash(hash);
-
 			// Make Busy + Continue
 			History.busy(true);
 
@@ -1198,7 +1197,7 @@
 				// PushState
 				History.pushState(State.data,State.title,State.url,false);
 			}
-			else if ( document.location.hash !== adjustedHash ) {
+			else if ( History.getHash() !== hash ) {
 				// Hash is a proper hash, so apply it
 
 				// Handle browser bugs
@@ -1209,11 +1208,11 @@
 					pageUrl = History.getPageUrl();
 
 					// Safari hash apply
-					History.pushState(null,null,pageUrl+'#'+adjustedHash,false);
+					History.pushState(null,null,pageUrl+'#'+hash,false);
 				}
 				else {
 					// Normal hash apply
-					document.location.hash = adjustedHash;
+					document.location.hash = hash;
 				}
 			}
 
@@ -1231,7 +1230,7 @@
 			var result = History.normalizeHash(hash);
 
 			// Escape hash
-			result = window.encodeURI(result);
+			result = window.encodeURIComponent(result);
 
 			// IE6 Escape Bug
 			if ( !History.bugs.hashEscape ) {
@@ -1904,7 +1903,7 @@
 			// When the page is closed
 			History.onUnload = function(){
 				// Prepare
-				var	currentStore, item;
+				var	currentStore, item, currentStoreString;
 
 				// Fetch
 				try {
@@ -1943,27 +1942,36 @@
 				History.store = currentStore;
 				History.normalizeStore();
 
-				// Store
+				// In Safari, going into Private Browsing mode causes the
+				// Session Storage object to still exist but if you try and use
+				// or set any property/function of it it throws the exception
+				// "QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to
+				// add something to storage that exceeded the quota." infinitely
+				// every second.
+				currentStoreString = JSON.stringify(currentStore);
 				try {
-					sessionStorage.setItem('History.store',JSON.stringify(currentStore));
-				} catch (ex) {
-					//temporary fix, history may hiccup but won't completely break
-					if (/QUOTA_EXCEEDED_ERR/.test(ex.message)) {
+					// Store
+					sessionStorage.setItem('History.store', currentStoreString);
+				}
+				catch (e) {
+					// Workaround for a bug seen on iPads. Sometimes the quota exceeded error comes up and simply
+					// removing/resetting the storage can work.
+					if (/QUOTA_EXCEEDED_ERR/.test(e.message)) {
 						sessionStorage.removeItem('History.store');
-					    sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+						sessionStorage.setItem('History.store', currentStoreString);
 					} else {
-						throw ex;
+						throw e;
 					}
-                }
+				}
 			};
 
 			// For Internet Explorer
 			History.intervalList.push(setInterval(History.onUnload,History.options.storeInterval));
-			
+
 			// For Other Browsers
 			History.Adapter.bind(window,'beforeunload',History.onUnload);
 			History.Adapter.bind(window,'unload',History.onUnload);
-			
+
 			// Both are enabled for consistency
 		}
 
