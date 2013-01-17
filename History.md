@@ -1,7 +1,31 @@
 ## History
 
 - v1.7.2 - January 18 2013
-	- Fixed issue #158 (thanks to sbearcsiro)
+	- Merged from forks
+		- added option to force no suid (hrunting, sbearcsiro)
+		- provide a consistent URI-encoded document.location.href (hrunting, sbearcsiro)
+		- Change History.getHash to return consistent hash, ala History.getLocationHref (sbearcsiro)
+		- Fix an issue where HTML4 replaceState wasn't firing when SUIDs were disabled and the url didn't change (sbearcsiro)
+		- Make extractId ignore the fragment if one is present (normally the hash is passed without an fragment) (sbearcsiro)
+		- Remove all encoding / decoding of URLs except when creating or extracting a fragment, based on the assumption that all inputs to replaceState / pushState are appropriately encoded (sbearcsiro)
+		- Change escapeHash/unescapeHash methods to use encodeURI/decodeURI instead of window.escape/unescape (sbearcsiro)
+		- Fixed issue #158 (sbearcsiro)
+		- isEmptyObject should use hasOwnProperty: prevents from always returning true if the Object.prototype is extended (Alexander Johansson)
+		- Add potential fix for IE8 not returning full hashed url from getLocationHref when hash contains encoded characters (sbearcsiro)
+		- Match current W3C popState event semantics for HTML4 (STRML)
+		- Added History.options.html4Mode for easier debugging (gigafied)
+		- Added History.options.delayInit (Boolean). (gigafied)
+		- Added error testing and quota relief for sessionStorage.setItem (jamie-pate)
+		- Fix IE 6 HTTPS warning (Daniel15)
+		- Fixed bug in html4 pushState function which left History in a busy state (joelarson4)
+		- Disable session storage if it's present but not working, thanks to paulschreiber (sbearcsiro)
+		- Add Lakin Wecker's dojo adapter (sbearcsiro)
+		- Add dojo 1.8 tests (sbearcsiro)
+		- Change dojo adapter to not use dojo events, it seems to break other parts of dojo (sbearcsiro)
+		- Removes stray spaces so that the build script can run. (billmag)
+		- fixed an issue in Safari's Private Browsing mode where setItem throws an exception (billmag)
+		- Adds better error handling for the quota exceeded problem seen with the iPad. (billmag)
+		- Consolidated var in sessionStorage to the top of the function. Re-build compressed and bundled. (billmag)
 
 - v1.7.1 - October 4 2011
 	- Added a new native adapter which is framework agnostic (can be used with, or without any framework)

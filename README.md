@@ -1,17 +1,13 @@
-Welcome to History.js (v1.7.1 - October 4 2011)
+Welcome to my History.js fork (I call it v1.7.2 - January 18 2013)
 ==================
 
-[![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/balupton/history.js&title=History.js&language=&tags=github&category=software)
-
-
-This project is the successor of [jQuery History](http://balupton.com/projects/jquery-history), it aims to:
+This project is a fork of [jQuery History](http://balupton.com/projects/jquery-history), it aims the same but will be developed and supported actively:
 
 - Follow the [HTML5 History API](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
 - Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/)
-
 
 ## Usage
 
@@ -133,34 +129,6 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 > Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`. [Why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 
-
-## Get Updates
-
-- For Commit RSS/Atom Updates:
-	- You can subscribe via the [GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
-- For GitHub News Feed Updates:
-	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
-
-
-## Get Support
-
-- History.js is maintained by people like you. If you find a bug, report it to the [GitHub Issue Tracker](https://github.com/balupton/history.js/issues). If you've fixed a bug submit a [Pull Request](https://github.com/balupton/history.js/pulls) and add your fork to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network).
-
-- If you would like paid support and trainings, or have job offers, then refer to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network). If you are qualified with History.js, then be sure to add your details to that page too.
-
-- If your company uses History.js on your projects, and would like to see it grow and prosper (better documentation, bugfixes, upgrades, maintenance, etc.) and would love to become a corporate sponsor then do email sponsor@bevry.me
-
-- If you would like free support for History.js, then [post your question](http://stackoverflow.com/questions/ask) on [Stackoverflow](http://stackoverflow.com/about) and be sure to use the `history.js` tag when asking your question.
-
-- If you've created a website that uses History.js, or know of one. Then be sure to add it to the [Showcase Wiki Page](https://github.com/balupton/history.js/wiki/Showcase).
-
-- If you'd love to +1 or like this project, then be sure to tweet about it and click the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js).
-
-- For anything else, refer to the [History.js GitHub Wiki Site](https://github.com/balupton/history.js/wiki).
-
-Thanks! every bit of help really does make a difference!
-
-
 ## Browsers: Tested and Working In
 
 ### HTML5 Browsers
@@ -236,7 +204,7 @@ Thanks! every bit of help really does make a difference!
 
 ## History
 
-You can discover the history inside the [History.md](https://github.com/balupton/history.js/blob/master/History.md#files) file
+You can discover the history inside the [History.md](https://github.com/andreasbernhard/history.js/blob/master/History.md#files) file
 
 
 ## License
