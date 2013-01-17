@@ -2014,16 +2014,9 @@
 
 	}; // History.initCore
 
-<<<<<<< .mine
 	// Try to Initialise History
-	History.init();
-
-
-=======
 	if (!History.options || !History.options.delayInit) {
-		// Try and Initialise History
 		History.init();
 	}
->>>>>>> .theirs
 
 })(window);

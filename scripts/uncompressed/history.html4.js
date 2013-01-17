@@ -289,7 +289,10 @@
 					iframe = document.createElement('iframe');
 
 					// Adjust iFarme
+					// IE 6 requires iframe to have a src on HTTPS pages, otherwise it will throw a
+					// "This page contains both secure and nonsecure items" warning.
 					iframe.setAttribute('id', iframeId);
+					iframe.setAttribute('src', 'javascript:false');
 					iframe.style.display = 'none';
 
 					// Append iFrame
@@ -535,7 +538,8 @@
 					newStateHash = History.getHashByState(newState),
 					oldState = History.getState(false),
 					oldStateHash = History.getHashByState(oldState),
-					html4Hash = History.getHash();
+					html4Hash = History.getHash(),
+					wasExpected = History.expectedStateId == newState.id;
 
 				// Store the newState
 				History.storeState(newState);
@@ -558,6 +562,7 @@
 				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
 					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
 					History.setHash(newStateHash,false);
+					History.busy(false);
 					return false;
 				}
 
@@ -566,7 +571,8 @@
 
 				// Fire HTML5 Event
 				//History.debug('History.pushState: trigger popstate');
-				History.Adapter.trigger(window,'statechange');
+				if(!wasExpected)
+					History.Adapter.trigger(window,'statechange');
 				History.busy(false);
 
 				// End pushState closure
