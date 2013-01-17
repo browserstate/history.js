@@ -1,4 +1,4 @@
-Welcome to my History.js fork (I call it v1.7.2 - January 18 2013)
+Welcome to my History.js fork (v1.7.2 - January 18 2013)
 ==================
 
 This project is a fork of [jQuery History](http://balupton.com/projects/jquery-history), it aims the same but will be developed and supported actively:
