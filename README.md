@@ -1,15 +1,21 @@
 Welcome to the History.js fork (v1.8a, January 19 2013)
 ==================
 
+This project is a fork of the original History.js, it aims the same but will be developed and supported actively.
+
 ## News
 - 19/01/2013: Alpha of v1.8 is released. Started to categorize old balupton's issues.
 - 18/01/2013: v1.7.2 released, for detailled changes see history
 
+### History
+
 See History(https://github.com/andreasbernhard/history.js/blob/master/History.md#files) to for a detailled list of features, changes, solved issues and bugs
+
+### Involve
 
 Please create an issue if something doesn't work or if there is a browser specific bug. I'll try to fix it as soon as possible. Please send me your Pull requests if you have a nice solution! I'm also going to review old issues in balupton's repository and try to solve them too.
 
-This project is a fork of the original History.js, it aims the same but will be developed and supported actively:
+## Aims
 
 - Follow the [HTML5 History API](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
