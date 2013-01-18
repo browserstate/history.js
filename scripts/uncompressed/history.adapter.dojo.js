@@ -38,9 +38,9 @@
 		 * @param {Element} element
 		 * @return {String} uid
 		 */
-		 uid: function(element){
+		uid: function(element){
 			return element._uid || (element._uid = History.Adapter._uid++);
-		 },
+		},
 
 		/**
 		 * History.Adapter.bind(el,event,callback)
