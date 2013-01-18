@@ -8,6 +8,9 @@ web build:
 packager build:
  - packager build Core/Core Core/Array Core/String Core/Number Core/Function Core/Object Core/Event Core/Browser Core/Class Core/Class.Extras Core/Slick.Parser Core/Slick.Finder Core/Element Core/Element.Style Core/Element.Event Core/Element.Delegation Core/Element.Dimensions Core/Fx Core/Fx.CSS Core/Fx.Tween Core/Fx.Morph Core/Fx.Transitions Core/Request Core/Request.HTML Core/Request.JSON Core/Cookie Core/JSON Core/DOMReady Core/Swiff
 
+...
+*/
+
 /*
 ---
 
@@ -17,7 +20,7 @@ description: The heart of MooTools.
 
 license: MIT-style license.
 
-copyright: Copyright (c) 2006-2010 [Valerio Proietti](http://mad4milk.net/).
+copyright: Copyright (c) 2006-2012 [Valerio Proietti](http://mad4milk.net/).
 
 authors: The MooTools production team (http://mootools.net/developers/)
 
@@ -33,15 +36,15 @@ provides: [Core, MooTools, Type, typeOf, instanceOf, Native]
 (function(){
 
 this.MooTools = {
-	version: '1.4.0',
-	build: 'a15e35b4dbd12e8d86d9b50aa67a27e8e0071ea3'
+	version: '1.4.5',
+	build: '74e34796f5f76640cdb98853004650aea1499d69'
 };
 
 // typeOf, instanceOf
 
 var typeOf = this.typeOf = function(item){
 	if (item == null) return 'null';
-	if (item.$family) return item.$family();
+	if (item.$family != null) return item.$family();
 
 	if (item.nodeName){
 		if (item.nodeType == 1) return 'element';
@@ -61,6 +64,9 @@ var instanceOf = this.instanceOf = function(item, object){
 		if (constructor === object) return true;
 		constructor = constructor.parent;
 	}
+	/*<ltIE8>*/
+	if (!item.hasOwnProperty) return false;
+	/*</ltIE8>*/
 	return item instanceof object;
 };
 
@@ -93,8 +99,9 @@ Function.prototype.overloadGetter = function(usePlural){
 	var self = this;
 	return function(a){
 		var args, result;
-		if (usePlural || typeof a != 'string') args = a;
+		if (typeof a != 'string') args = a;
 		else if (arguments.length > 1) args = arguments;
+		else if (usePlural) args = [a];
 		if (args){
 			result = {};
 			for (var i = 0; i < args.length; i++) result[args[i]] = self.call(this, args[i]);
@@ -251,14 +258,18 @@ var force = function(name, object, methods){
 			proto = prototype[key];
 
 		if (generic) generic.protect();
-
-		if (isType && proto){
-			delete prototype[key];
-			prototype[key] = proto.protect();
-		}
+		if (isType && proto) object.implement(key, proto.protect());
 	}
 
-	if (isType) object.implement(prototype);
+	if (isType){
+		var methodsEnumerable = prototype.propertyIsEnumerable(methods[0]);
+		object.forEachMethod = function(fn){
+			if (!methodsEnumerable) for (var i = 0, l = methods.length; i < l; i++){
+				fn.call(prototype, prototype[methods[i]], methods[i]);
+			}
+			for (var key in prototype) fn.call(prototype, prototype[key], key)
+		};
+	}
 
 	return force;
 };
@@ -429,8 +440,9 @@ Array.implement({
 
 	filter: function(fn, bind){
 		var results = [];
-		for (var i = 0, l = this.length >>> 0; i < l; i++){
-			if ((i in this) && fn.call(bind, this[i], i, this)) results.push(this[i]);
+		for (var value, i = 0, l = this.length >>> 0; i < l; i++) if (i in this){
+			value = this[i];
+			if (fn.call(bind, value, i, this)) results.push(value);
 		}
 		return results;
 	},
@@ -936,17 +948,6 @@ provides: [Browser, Window, Document]
 var document = this.document;
 var window = document.window = this;
 
-var UID = 1;
-
-this.$uid = (window.ActiveXObject) ? function(item){
-	return (item.uid || (item.uid = [UID++]))[0];
-} : function(item){
-	return item.uid || (item.uid = UID++);
-};
-
-$uid(window);
-$uid(document);
-
 var ua = navigator.userAgent.toLowerCase(),
 	platform = navigator.platform.toLowerCase(),
 	UA = ua.match(/(opera|ie|firefox|chrome|version)[\s\/:]([\w\d\.]+)?.*?(safari|version[\s\/:]([\w\d\.]+)|$)/) || [null, 'unknown', 0],
@@ -1164,7 +1165,7 @@ var DOMEvent = this.DOMEvent = new Type('DOMEvent', function(event, win){
 			else if (code > 95 && code < 106) this.key = code - 96;
 		}
 		if (this.key == null) this.key = String.fromCharCode(code).toLowerCase();
-	} else if (type == 'click' || type == 'dblclick' || type == 'contextmenu' || type.indexOf('mouse') == 0){
+	} else if (type == 'click' || type == 'dblclick' || type == 'contextmenu' || type == 'DOMMouseScroll' || type.indexOf('mouse') == 0){
 		var doc = win.document;
 		doc = (!doc.compatMode || doc.compatMode == 'CSS1Compat') ? doc.html : doc.body;
 		this.page = {
@@ -1918,8 +1919,14 @@ local.setDocument = function(document){
 
 	// contains
 	// FIXME: Add specs: local.contains should be different for xml and html documents?
-	features.contains = (root && this.isNativeCode(root.contains)) ? function(context, node){
+	var nativeRootContains = root && this.isNativeCode(root.contains),
+		nativeDocumentContains = document && this.isNativeCode(document.contains);
+
+	features.contains = (nativeRootContains && nativeDocumentContains) ? function(context, node){
 		return context.contains(node);
+	} : (nativeRootContains && !nativeDocumentContains) ? function(context, node){
+		// IE8 does not have .contains on document.
+		return context === node || ((context === document) ? document.documentElement : context).contains(node);
 	} : (root && root.compareDocumentPosition) ? function(context, node){
 		return context === node || !!(context.compareDocumentPosition(node) & 16);
 	} : function(context, node){
@@ -2314,7 +2321,7 @@ local.matchSelector = function(node, tag, id, classes, attributes, pseudos){
 
 	var i, part, cls;
 	if (classes) for (i = classes.length; i--;){
-		cls = node.getAttribute('class') || node.className;
+		cls = this.getAttribute(node, 'class');
 		if (!(cls && classes[i].regexp.test(cls))) return false;
 	}
 	if (attributes) for (i = attributes.length; i--;){
@@ -2500,7 +2507,7 @@ var pseudos = {
 	'nth-last-of-type': local.createNTHPseudo('lastChild', 'previousSibling', 'posNTHTypeLast', true),
 
 	'index': function(node, index){
-		return this['pseudo:nth-child'](node, '' + index + 1);
+		return this['pseudo:nth-child'](node, '' + (index + 1));
 	},
 
 	'even': function(node){
@@ -2572,10 +2579,6 @@ for (var p in pseudos) local['pseudo:' + p] = pseudos[p];
 
 var attributeGetters = local.attributeGetters = {
 
-	'class': function(){
-		return this.getAttribute('class') || this.className;
-	},
-
 	'for': function(){
 		return ('htmlFor' in this) ? this.htmlFor : this.getAttribute('for');
 	},
@@ -2610,7 +2613,7 @@ attributeGetters.MAXLENGTH = attributeGetters.maxLength = attributeGetters.maxle
 
 var Slick = local.Slick = (this.Slick || {});
 
-Slick.version = '1.1.6';
+Slick.version = '1.1.7';
 
 // Slick finder
 
@@ -2739,7 +2742,16 @@ var Element = function(tag, props){
 	return document.newElement(tag, props);
 };
 
-if (Browser.Element) Element.prototype = Browser.Element.prototype;
+
+if (Browser.Element){
+	Element.prototype = Browser.Element.prototype;
+	// IE8 and IE9 require the wrapping.
+	Element.prototype._fireEvent = (function(fireEvent){
+		return function(type, event){
+			return fireEvent.call(this, type, event);
+		};
+	})(Element.prototype.fireEvent);
+}
 
 new Type('Element', Element).mirror(function(name){
 	if (Array.prototype[name]) return;
@@ -2760,7 +2772,10 @@ new Type('Element', Element).mirror(function(name){
 if (!Browser.Element){
 	Element.parent = Object;
 
-	Element.Prototype = {'$family': Function.from('element').hide()};
+	Element.Prototype = {
+		'$constructor': Element,
+		'$family': Function.from('element').hide()
+	};
 
 	Element.mirror(function(name, method){
 		Element.Prototype[name] = method;
@@ -2875,16 +2890,17 @@ if (object[1] == 1) Elements.implement('splice', function(){
 	return result;
 }.protect());
 
-Elements.implement(Array.prototype);
+Array.forEachMethod(function(method, name){
+	Elements.implement(name, method);
+});
 
 Array.mirror(Elements);
 
 /*<ltIE8>*/
 var createElementAcceptsHTML;
 try {
-	var x = document.createElement('<input name=x>');
-	createElementAcceptsHTML = (x.name == 'x');
-} catch(e){}
+    createElementAcceptsHTML = (document.createElement('<input name=x>').name == 'x');
+} catch (e){}
 
 var escapeQuotes = function(html){
 	return ('' + html).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
@@ -2912,6 +2928,11 @@ Document.implement({
 
 })();
 
+(function(){
+
+Slick.uidOf(window);
+Slick.uidOf(document);
+
 Document.implement({
 
 	newTextNode: function(text){
@@ -2936,8 +2957,13 @@ Document.implement({
 			},
 
 			element: function(el, nocash){
-				$uid(el);
+				Slick.uidOf(el);
 				if (!nocash && !el.$family && !(/^(?:object|embed)$/i).test(el.tagName)){
+					var fireEvent = el.fireEvent;
+					// wrapping needed in IE7, or else crash
+					el._fireEvent = function(type, event){
+						return fireEvent(type, event);
+					};
 					Object.append(el, Element.Prototype);
 				}
 				return el;
@@ -2955,7 +2981,7 @@ Document.implement({
 		};
 
 		return function(el, nocash, doc){
-			if (el && el.$family && el.uid) return el;
+			if (el && el.$family && el.uniqueNumber) return el;
 			var type = typeOf(el);
 			return (types[type]) ? types[type](el, nocash, doc || document) : null;
 		};
@@ -3075,8 +3101,6 @@ if (window.$$ == null) Window.implement('$$', function(selector){
 	return new Elements(arguments);
 });
 
-(function(){
-
 // Inserters
 
 var inserters = {
@@ -3114,18 +3138,13 @@ var propertyGetters = {}, propertySetters = {};
 var properties = {};
 Array.forEach([
 	'type', 'value', 'defaultValue', 'accessKey', 'cellPadding', 'cellSpacing', 'colSpan',
-	'frameBorder', 'readOnly', 'rowSpan', 'tabIndex', 'useMap'
+	'frameBorder', 'rowSpan', 'tabIndex', 'useMap'
 ], function(property){
 	properties[property.toLowerCase()] = property;
 });
 
-Object.append(properties, {
-	'html': 'innerHTML',
-	'text': (function(){
-		var temp = document.createElement('div');
-		return (temp.innerText == null) ? 'textContent' : 'innerText';
-	})()
-});
+properties.html = 'innerHTML';
+properties.text = (document.createElement('div').textContent == null) ? 'innerText': 'textContent';
 
 Object.forEach(properties, function(real, key){
 	propertySetters[key] = function(node, value){
@@ -3162,7 +3181,7 @@ Array.forEach(bools, function(bool){
 Object.append(propertySetters, {
 
 	'class': function(node, value){
-		('className' in node) ? node.className = value : node.setAttribute('class', value);
+		('className' in node) ? node.className = (value || '') : node.setAttribute('class', value);
 	},
 
 	'for': function(node, value){
@@ -3171,18 +3190,73 @@ Object.append(propertySetters, {
 
 	'style': function(node, value){
 		(node.style) ? node.style.cssText = value : node.setAttribute('style', value);
+	},
+
+	'value': function(node, value){
+		node.value = (value != null) ? value : '';
 	}
 
 });
 
+propertyGetters['class'] = function(node){
+	return ('className' in node) ? node.className || null : node.getAttribute('class');
+};
+
+/* <webkit> */
+var el = document.createElement('button');
+// IE sets type as readonly and throws
+try { el.type = 'button'; } catch(e){}
+if (el.type != 'button') propertySetters.type = function(node, value){
+	node.setAttribute('type', value);
+};
+el = null;
+/* </webkit> */
+
+/*<IE>*/
+var input = document.createElement('input');
+input.value = 't';
+input.type = 'submit';
+if (input.value != 't') propertySetters.type = function(node, type){
+	var value = node.value;
+	node.type = type;
+	node.value = value;
+};
+input = null;
+/*</IE>*/
+
 /* getProperty, setProperty */
+
+/* <ltIE9> */
+var pollutesGetAttribute = (function(div){
+	div.random = 'attribute';
+	return (div.getAttribute('random') == 'attribute');
+})(document.createElement('div'));
+
+/* <ltIE9> */
 
 Element.implement({
 
 	setProperty: function(name, value){
 		var setter = propertySetters[name.toLowerCase()];
-		if (setter) setter(this, value);
-		else this.setAttribute(name, value);
+		if (setter){
+			setter(this, value);
+		} else {
+			/* <ltIE9> */
+			if (pollutesGetAttribute) var attributeWhiteList = this.retrieve('$attributeWhiteList', {});
+			/* </ltIE9> */
+
+			if (value == null){
+				this.removeAttribute(name);
+				/* <ltIE9> */
+				if (pollutesGetAttribute) delete attributeWhiteList[name];
+				/* </ltIE9> */
+			} else {
+				this.setAttribute(name, '' + value);
+				/* <ltIE9> */
+				if (pollutesGetAttribute) attributeWhiteList[name] = true;
+				/* </ltIE9> */
+			}
+		}
 		return this;
 	},
 
@@ -3194,6 +3268,18 @@ Element.implement({
 	getProperty: function(name){
 		var getter = propertyGetters[name.toLowerCase()];
 		if (getter) return getter(this);
+		/* <ltIE9> */
+		if (pollutesGetAttribute){
+			var attr = this.getAttributeNode(name), attributeWhiteList = this.retrieve('$attributeWhiteList', {});
+			if (!attr) return null;
+			if (attr.expando && !attributeWhiteList[name]){
+				var outer = this.outerHTML;
+				// segment by the opening tag and find mention of attribute name
+				if (outer.substr(0, outer.search(/\/?['"]?>(?![^<]*<['"])/)).indexOf(name) < 0) return null;
+				attributeWhiteList[name] = true;
+			}
+		}
+		/* </ltIE9> */
 		var result = Slick.getAttribute(this, name);
 		return (!result && !Slick.hasAttribute(this, name)) ? null : result;
 	},
@@ -3204,10 +3290,7 @@ Element.implement({
 	},
 
 	removeProperty: function(name){
-		name = name.toLowerCase();
-		if (booleans[name]) this.setProperty(name, false);
-		this.removeAttribute(name);
-		return this;
+		return this.setProperty(name, null);
 	},
 
 	removeProperties: function(){
@@ -3323,7 +3406,7 @@ var get = function(uid){
 };
 
 var clean = function(item){
-	var uid = item.uid;
+	var uid = item.uniqueNumber;
 	if (item.removeEvents) item.removeEvents();
 	if (item.clearAttributes) item.clearAttributes();
 	if (uid != null){
@@ -3369,7 +3452,7 @@ Element.implement({
 			if (node.clearAttributes){
 				node.clearAttributes();
 				node.mergeAttributes(element);
-				node.removeAttribute('uid');
+				node.removeAttribute('uniqueNumber');
 				if (node.options){
 					var no = node.options, eo = element.options;
 					for (var j = no.length; j--;) no[j].selected = eo[j].selected;
@@ -3401,7 +3484,7 @@ Element.implement({
 				old();
 			};
 		} else {
-			collected[$uid(this)] = this;
+			collected[Slick.uidOf(this)] = this;
 		}
 		if (this.addEventListener) this.addEventListener(type, fn, !!arguments[2]);
 		else this.attachEvent('on' + type, fn);
@@ -3415,19 +3498,19 @@ Element.implement({
 	},
 
 	retrieve: function(property, dflt){
-		var storage = get($uid(this)), prop = storage[property];
+		var storage = get(Slick.uidOf(this)), prop = storage[property];
 		if (dflt != null && prop == null) prop = storage[property] = dflt;
 		return prop != null ? prop : null;
 	},
 
 	store: function(property, value){
-		var storage = get($uid(this));
+		var storage = get(Slick.uidOf(this));
 		storage[property] = value;
 		return this;
 	},
 
 	eliminate: function(property){
-		var storage = get($uid(this));
+		var storage = get(Slick.uidOf(this));
 		delete storage[property];
 		return this;
 	}
@@ -3469,60 +3552,77 @@ Element.Properties.tag = {
 
 };
 
-/*<!webkit>*/
-Element.Properties.html = (function(){
+Element.Properties.html = {
 
-	var tableTest = Function.attempt(function(){
-		var table = document.createElement('table');
-		table.innerHTML = '<tr><td></td></tr>';
-	});
+	set: function(html){
+		if (html == null) html = '';
+		else if (typeOf(html) == 'array') html = html.join('');
+		this.innerHTML = html;
+	},
 
-	var wrapper = document.createElement('div');
-
-	var translations = {
-		table: [1, '<table>', '</table>'],
-		select: [1, '<select>', '</select>'],
-		tbody: [2, '<table><tbody>', '</tbody></table>'],
-		tr: [3, '<table><tbody><tr>', '</tr></tbody></table>']
-	};
-	translations.thead = translations.tfoot = translations.tbody;
-
-	/*<ltIE9>*/
-	// technique by jdbarlett - http://jdbartlett.com/innershiv/
-	wrapper.innerHTML = '<nav></nav>';
-	var HTML5Test = wrapper.childNodes.length == 1;
-	if (!HTML5Test){
-		var tags = 'abbr article aside audio canvas datalist details figcaption figure footer header hgroup mark meter nav output progress section summary time video'.split(' '),
-			fragment = document.createDocumentFragment(), l = tags.length;
-		while (l--) fragment.createElement(tags[l]);
-		fragment.appendChild(wrapper);
+	erase: function(){
+		this.innerHTML = '';
 	}
-	/*</ltIE9>*/
 
-	var html = {
-		set: function(html){
-			if (typeOf(html) == 'array') html = html.join('');
+};
 
-			var wrap = (!tableTest && translations[this.get('tag')]);
-			/*<ltIE9>*/
-			if (!wrap && !HTML5Test) wrap = [0, '', ''];
-			/*</ltIE9>*/
-			if (wrap){
-				var first = wrapper;
-				first.innerHTML = wrap[1] + html + wrap[2];
-				for (var i = wrap[0]; i--;) first = first.firstChild;
-				this.empty().adopt(first.childNodes);
-			} else {
-				this.innerHTML = html;
-			}
-		}
-	};
+/*<ltIE9>*/
+// technique by jdbarlett - http://jdbartlett.com/innershiv/
+var div = document.createElement('div');
+div.innerHTML = '<nav></nav>';
+var supportsHTML5Elements = (div.childNodes.length == 1);
+if (!supportsHTML5Elements){
+	var tags = 'abbr article aside audio canvas datalist details figcaption figure footer header hgroup mark meter nav output progress section summary time video'.split(' '),
+		fragment = document.createDocumentFragment(), l = tags.length;
+	while (l--) fragment.createElement(tags[l]);
+}
+div = null;
+/*</ltIE9>*/
 
-	html.erase = html.set;
+/*<IE>*/
+var supportsTableInnerHTML = Function.attempt(function(){
+	var table = document.createElement('table');
+	table.innerHTML = '<tr><td></td></tr>';
+	return true;
+});
 
-	return html;
-})();
-/*</!webkit>*/
+/*<ltFF4>*/
+var tr = document.createElement('tr'), html = '<td></td>';
+tr.innerHTML = html;
+var supportsTRInnerHTML = (tr.innerHTML == html);
+tr = null;
+/*</ltFF4>*/
+
+if (!supportsTableInnerHTML || !supportsTRInnerHTML || !supportsHTML5Elements){
+
+	Element.Properties.html.set = (function(set){
+
+		var translations = {
+			table: [1, '<table>', '</table>'],
+			select: [1, '<select>', '</select>'],
+			tbody: [2, '<table><tbody>', '</tbody></table>'],
+			tr: [3, '<table><tbody><tr>', '</tr></tbody></table>']
+		};
+
+		translations.thead = translations.tfoot = translations.tbody;
+
+		return function(html){
+			var wrap = translations[this.get('tag')];
+			if (!wrap && !supportsHTML5Elements) wrap = [0, '', ''];
+			if (!wrap) return set.call(this, html);
+
+			var level = wrap[0], wrapper = document.createElement('div'), target = wrapper;
+			if (!supportsHTML5Elements) fragment.appendChild(wrapper);
+			wrapper.innerHTML = [wrap[1], html, wrap[2]].flatten().join('');
+			while (level--) target = target.firstChild;
+			this.empty().adopt(target.childNodes);
+			if (!supportsHTML5Elements) fragment.removeChild(wrapper);
+			wrapper = null;
+		};
+
+	})(Element.Properties.html.set);
+}
+/*</IE>*/
 
 /*<ltIE9>*/
 var testForm = document.createElement('form');
@@ -3554,7 +3654,22 @@ if (testForm.firstChild.value != 's') Element.Properties.value = {
 	}
 
 };
+testForm = null;
 /*</ltIE9>*/
+
+/*<IE>*/
+if (document.createElement('div').getAttributeNode('id')) Element.Properties.id = {
+	set: function(id){
+		this.id = this.getAttributeNode('id').value = id;
+	},
+	get: function(){
+		return this.id || null;
+	},
+	erase: function(){
+		this.id = this.getAttributeNode('id').value = '';
+	}
+};
+/*</IE>*/
 
 })();
 
@@ -3579,6 +3694,15 @@ provides: Element.Style
 
 var html = document.html;
 
+//<ltIE9>
+// Check for oldIE, which does not remove styles when they're set to null
+var el = document.createElement('div');
+el.style.color = 'red';
+el.style.color = null;
+var doesNotRemoveStyles = el.style.color == 'red';
+el = null;
+//</ltIE9>
+
 Element.Properties.styles = {set: function(styles){
 	this.setStyles(styles);
 }};
@@ -3589,17 +3713,19 @@ var hasOpacity = (html.style.opacity != null),
 
 var setVisibility = function(element, opacity){
 	element.store('$opacity', opacity);
-	element.style.visibility = opacity > 0 ? 'visible' : 'hidden';
+	element.style.visibility = opacity > 0 || opacity == null ? 'visible' : 'hidden';
 };
 
 var setOpacity = (hasOpacity ? function(element, opacity){
 	element.style.opacity = opacity;
 } : (hasFilter ? function(element, opacity){
-	if (!element.currentStyle || !element.currentStyle.hasLayout) element.style.zoom = 1;
-	opacity = (opacity * 100).limit(0, 100).round();
-	opacity = (opacity == 100) ? '' : 'alpha(opacity=' + opacity + ')';
-	var filter = element.style.filter || element.getComputedStyle('filter') || '';
-	element.style.filter = reAlpha.test(filter) ? filter.replace(reAlpha, opacity) : filter + opacity;
+	var style = element.style;
+	if (!element.currentStyle || !element.currentStyle.hasLayout) style.zoom = 1;
+	if (opacity == null || opacity == 1) opacity = '';
+	else opacity = 'alpha(opacity=' + (opacity * 100).limit(0, 100).round() + ')';
+	var filter = style.filter || element.getComputedStyle('filter') || '';
+	style.filter = reAlpha.test(filter) ? filter.replace(reAlpha, opacity) : filter + opacity;
+	if (!style.filter) style.removeAttribute('filter');
 } : setVisibility));
 
 var getOpacity = (hasOpacity ? function(element){
@@ -3629,7 +3755,8 @@ Element.implement({
 
 	setStyle: function(property, value){
 		if (property == 'opacity'){
-			setOpacity(this, parseFloat(value));
+			if (value != null) value = parseFloat(value);
+			setOpacity(this, value);
 			return this;
 		}
 		property = (property == 'float' ? floatName : property).camelCase();
@@ -3643,6 +3770,11 @@ Element.implement({
 			value = Math.round(value);
 		}
 		this.style[property] = value;
+		//<ltIE9>
+		if ((value == '' || value == null) && doesNotRemoveStyles && this.style.removeAttribute){
+			this.style.removeAttribute(property);
+		}
+		//</ltIE9>
 		return this;
 	},
 
@@ -3664,7 +3796,7 @@ Element.implement({
 			var color = result.match(/rgba?\([\d\s,]+\)/);
 			if (color) result = result.replace(color[0], color[0].rgbToHex());
 		}
-		if (Browser.opera || (Browser.ie && isNaN(parseFloat(result)))){
+		if (Browser.ie && isNaN(parseFloat(result))){
 			if ((/^(height|width)$/).test(property)){
 				var values = (property == 'width') ? ['left', 'right'] : ['top', 'bottom'], size = 0;
 				values.each(function(value){
@@ -3733,7 +3865,7 @@ Element.ShortStyles = {margin: {}, padding: {}, border: {}, borderWidth: {}, bor
 
 name: Element.Event
 
-description: Contains Element methods for dealing with events. This file also includes mouseenter and mouseleave custom Element Events.
+description: Contains Element methods for dealing with events. This file also includes mouseenter and mouseleave custom Element Events, if necessary.
 
 license: MIT-style license.
 
@@ -3866,35 +3998,35 @@ Element.NativeEvents = {
 	orientationchange: 2, // mobile
 	touchstart: 2, touchmove: 2, touchend: 2, touchcancel: 2, // touch
 	gesturestart: 2, gesturechange: 2, gestureend: 2, // gesture
-	focus: 2, blur: 2, change: 2, reset: 2, select: 2, submit: 2, paste: 2, oninput: 2, //form elements
+	focus: 2, blur: 2, change: 2, reset: 2, select: 2, submit: 2, paste: 2, input: 2, //form elements
 	load: 2, unload: 1, beforeunload: 2, resize: 1, move: 1, DOMContentLoaded: 1, readystatechange: 1, //window
 	error: 1, abort: 1, scroll: 1 //misc
 };
 
-var check = function(event){
-	var related = event.relatedTarget;
-	if (related == null) return true;
-	if (!related) return false;
-	return (related != this && related.prefix != 'xul' && typeOf(this) != 'document' && !this.contains(related));
-};
+Element.Events = {mousewheel: {
+	base: (Browser.firefox) ? 'DOMMouseScroll' : 'mousewheel'
+}};
 
-Element.Events = {
+if ('onmouseenter' in document.documentElement){
+	Element.NativeEvents.mouseenter = Element.NativeEvents.mouseleave = 2;
+} else {
+	var check = function(event){
+		var related = event.relatedTarget;
+		if (related == null) return true;
+		if (!related) return false;
+		return (related != this && related.prefix != 'xul' && typeOf(this) != 'document' && !this.contains(related));
+	};
 
-	mouseenter: {
+	Element.Events.mouseenter = {
 		base: 'mouseover',
 		condition: check
-	},
+	};
 
-	mouseleave: {
+	Element.Events.mouseleave = {
 		base: 'mouseout',
 		condition: check
-	},
-
-	mousewheel: {
-		base: (Browser.firefox) ? 'DOMMouseScroll' : 'mousewheel'
-	}
-
-};
+	};
+}
 
 /*<ltIE9>*/
 if (!window.addEventListener){
@@ -3905,7 +4037,7 @@ if (!window.addEventListener){
 			return (this.get('tag') == 'input' && (type == 'radio' || type == 'checkbox')) ? 'propertychange' : 'change'
 		},
 		condition: function(event){
-			return !!(this.type != 'radio' || this.checked);
+			return this.type != 'radio' || (event.event.propertyName == 'checked' && this.checked);
 		}
 	}
 }
@@ -3938,8 +4070,7 @@ var eventListenerSupport = !!window.addEventListener;
 
 Element.NativeEvents.focusin = Element.NativeEvents.focusout = 2;
 
-var bubbleUp = function(self, match, fn, event){
-	var target = event.target;
+var bubbleUp = function(self, match, fn, event, target){
 	while (target && target != self){
 		if (match(target, event)) return fn.call(target, event, target);
 		target = document.id(target.parentNode);
@@ -3978,9 +4109,8 @@ var formObserver = function(type){
 			}
 		},
 
-		listen: function(self, match, fn, event, uid){
-			var target = event.target,
-				form = (target.get('tag') == 'form') ? target : event.target.getParent('form');
+		listen: function(self, match, fn, event, target, uid){
+			var form = (target.get('tag') == 'form') ? target : event.target.getParent('form');
 			if (!form) return;
 
 			var listeners = self.retrieve(_key + type + 'listeners', {}),
@@ -3991,7 +4121,7 @@ var formObserver = function(type){
 			forms.push(form);
 
 			var _fn = function(event){
-				bubbleUp(self, match, fn, event);
+				bubbleUp(self, match, fn, event, target);
 			};
 			form.addEvent(type, _fn);
 			fns.push(_fn);
@@ -4005,12 +4135,12 @@ var formObserver = function(type){
 var inputObserver = function(type){
 	return {
 		base: 'focusin',
-		listen: function(self, match, fn, event){
+		listen: function(self, match, fn, event, target){
 			var events = {blur: function(){
 				this.removeEvents(events);
 			}};
 			events[type] = function(event){
-				bubbleUp(self, match, fn, event);
+				bubbleUp(self, match, fn, event, target);
 			};
 			event.target.addEvents(events);
 		}
@@ -4038,6 +4168,7 @@ var relay = function(old, method){
 		parsed.pseudos.slice(1).each(function(pseudo){
 			newType += ':' + pseudo.key + (pseudo.value ? '(' + pseudo.value + ')' : '');
 		});
+		old.call(this, type, fn);
 		return method.call(this, newType, parsed.pseudos[0].value, fn);
 	};
 };
@@ -4066,10 +4197,12 @@ var delegation = {
 		}
 
 		var self = this, uid = String.uniqueID();
-		var delegator = _map.listen ? function(event){
-			_map.listen(self, match, fn, event, uid);
-		} : function(event){
-			bubbleUp(self, match, fn, event);
+		var delegator = _map.listen ? function(event, target){
+			if (!target && event && event.target) target = event.target;
+			if (target) _map.listen(self, match, fn, event, target, uid);
+		} : function(event, target){
+			if (!target && event && event.target) target = event.target;
+			if (target) bubbleUp(self, match, fn, event, target);
 		};
 
 		if (!stored) stored = {};
@@ -4605,12 +4738,31 @@ Fx.CSS = new Class({
 
 	prepare: function(element, property, values){
 		values = Array.from(values);
-		if (values[1] == null){
-			values[1] = values[0];
-			values[0] = element.getStyle(property);
+		var from = values[0], to = values[1];
+		if (to == null){
+			to = from;
+			from = element.getStyle(property);
+			var unit = this.options.unit;
+			// adapted from: https://github.com/ryanmorr/fx/blob/master/fx.js#L299
+			if (unit && from.slice(-unit.length) != unit && parseFloat(from) != 0){
+				element.setStyle(property, to + unit);
+				var value = element.getComputedStyle(property);
+				// IE and Opera support pixelLeft or pixelWidth
+				if (!(/px$/.test(value))){
+					value = element.style[('pixel-' + property).camelCase()];
+					if (value == null){
+						// adapted from Dean Edwards' http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
+						var left = element.style.left;
+						element.style.left = to + unit;
+						value = element.style.pixelLeft;
+						element.style.left = left;
+					}
+				}
+				from = (to || 1) / (parseFloat(value) || 1) * (parseFloat(from) || 0);
+				element.setStyle(property, from + unit);
+			}
 		}
-		var parsed = values.map(this.parse);
-		return {from: parsed[0], to: parsed[1]};
+		return {from: this.parse(from), to: this.parse(to)};
 	},
 
 	//parses a value into an array
@@ -4793,27 +4945,35 @@ Element.Properties.tween = {
 Element.implement({
 
 	tween: function(property, from, to){
-		this.get('tween').start(arguments);
+		this.get('tween').start(property, from, to);
 		return this;
 	},
 
 	fade: function(how){
-		var fade = this.get('tween'), o = 'opacity', toggle;
-		how = [how, 'toggle'].pick();
-		switch (how){
-			case 'in': fade.start(o, 1); break;
-			case 'out': fade.start(o, 0); break;
-			case 'show': fade.set(o, 1); break;
-			case 'hide': fade.set(o, 0); break;
+		var fade = this.get('tween'), method, args = ['opacity'].append(arguments), toggle;
+		if (args[1] == null) args[1] = 'toggle';
+		switch (args[1]){
+			case 'in': method = 'start'; args[1] = 1; break;
+			case 'out': method = 'start'; args[1] = 0; break;
+			case 'show': method = 'set'; args[1] = 1; break;
+			case 'hide': method = 'set'; args[1] = 0; break;
 			case 'toggle':
 				var flag = this.retrieve('fade:flag', this.getStyle('opacity') == 1);
-				fade.start(o, (flag) ? 0 : 1);
+				method = 'start';
+				args[1] = flag ? 0 : 1;
 				this.store('fade:flag', !flag);
 				toggle = true;
 			break;
-			default: fade.start(o, arguments);
+			default: method = 'start';
 		}
 		if (!toggle) this.eliminate('fade:flag');
+		fade[method].apply(fade, args);
+		var to = args[args.length - 1];
+		if (method == 'set' || to != 0) this.setStyle('visibility', to == 0 ? 'hidden' : 'visible');
+		else fade.chain(function(){
+			this.element.setStyle('visibility', 'hidden');
+			this.callChain();
+		});
 		return this;
 	},
 
@@ -5237,7 +5397,7 @@ var Request = this.Request = new Class({
 		this.fireEvent('request');
 		xhr.send(data);
 		if (!this.options.async) this.onStateChange();
-		if (this.options.timeout) this.timer = this.timeout.delay(this.options.timeout, this);
+		else if (this.options.timeout) this.timer = this.timeout.delay(this.options.timeout, this);
 		return this;
 	},
 
@@ -5301,6 +5461,7 @@ Element.implement({
 });
 
 })();
+
 
 /*
 ---
