@@ -457,7 +457,7 @@
 				}
 
 				// Create State
-				currentState = History.extractState(History.getFullUrl(currentHash||History.getLocationHref(),false),true);
+				currentState = History.extractState(History.getFullUrl(currentHash||History.getLocationHref()),true);
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(currentState) ) {
