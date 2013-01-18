@@ -1,18 +1,18 @@
-Welcome to my History.js fork (v1.7.2 - January 18 2013)
+Welcome to a new History.js fork (v1.7.2, January 18 2013)
 ==================
 
 ## News
-18/01/2013 - New in v1.7.2: See [History.md](https://github.com/andreasbernhard/history.js/blob/master/History.md#files)
+18/01/2013: v1.7.2 released, for detailled changes see [History](https://github.com/andreasbernhard/history.js/blob/master/History.md#files)
 
-Please create issues or send a mail if something doesn't work in History.js. I'll try to fix it as soon as possible. I'm also going to review old issues in balupton's repository.
+Please create an issue if something doesn't work or if there is a browser specific bug. I'll try to fix it as soon as possible. I'm also going to review old issues in balupton's repository and try to solve them too.
 
-This project is a fork of History.js, it aims the same but will be developed and supported actively:
+This project is a fork of the original History.js, it aims the same but will be developed and supported actively:
 
 - Follow the [HTML5 History API](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
-- Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/)
+- Provide support for as many javascript frameworks as possible via adapters; especially [Dojo](http://dojotoolkit.org/), [ExtJS](http://www.sencha.com/), [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/).
 
 ## Usage
 
@@ -39,8 +39,6 @@ This project is a fork of History.js, it aims the same but will be developed and
 
 })(window);
 ```
-
-To ajaxify your entire website with the HTML5 History API, History.js and jQuery [this snippet of code](https://gist.github.com/854622) is all you need. It's that easy.
 
 ### How would the above operations look in a HTML5 Browser?
 
@@ -193,8 +191,8 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 
 ## Known Issues
-	- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing we can do about this
-	- Mercury iOS fails to apply url changes (hashes and HTML5 History API states) - there is nothing we can do about this
+- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing we can do about this
+- Mercury iOS fails to apply url changes (hashes and HTML5 History API states) - there is nothing we can do about this
 
 
 ## Notes on Compatibility
@@ -226,11 +224,12 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 ## History
 
-You can discover the history inside the [History.md](https://github.com/andreasbernhard/history.js/blob/master/History.md#files) file
+You can discover the history inside the [History.md](https://github.com/andreasbernhard/history.js/blob/master/History.md#files) file.
 
 
 ## License
 
 Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
+
 <br/>Copyright &copy;  2011-2012 [Benjamin Arthur Lupton](http://balupton.com)
 <br/>Copyright &copy;  2013 Andreas Bernhard
