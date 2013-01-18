@@ -1,7 +1,10 @@
 Welcome to my History.js fork (v1.7.2 - January 18 2013)
 ==================
 
-New in v1.7.2: See [History.md](https://github.com/andreasbernhard/history.js/blob/master/History.md#files)
+## News
+18/01/2013 - New in v1.7.2: See [History.md](https://github.com/andreasbernhard/history.js/blob/master/History.md#files)
+
+Please create issues or send a mail if something doesn't work in History.js. I'll try to fix it as soon as possible. I'm also going to review old issues in balupton's repository.
 
 This project is a fork of History.js, it aims the same but will be developed and supported actively:
 
@@ -104,6 +107,12 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/dojo.history.js"></script>
 		```
 	
+	- For [ExtJs](http://www.sencha.com/) v1.8+
+
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/extjs.history.js"></script>
+		```
+	
 	- For [jQuery](http://jquery.com/) v1.3+
 
 		``` html
@@ -191,6 +200,11 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 - `window.onanchorchange` <br/> Fired when the anchor of the page changes (does not include state hashes)
 
 
+## Known Issues
+	- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing we can do about this
+	- Mercury iOS fails to apply url changes (hashes and HTML5 History API states) - there is nothing we can do about this
+
+
 ## Notes on Compatibility
 
 - History.js **solves** the following browser bugs:
@@ -216,10 +230,6 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 - Changing the hash of the page causes `onpopstate` to fire (this is expected/standard functionality). To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
 	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
-- Known Issues
-	- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing we can do about this
-	- Mercury iOS fails to apply url changes (hashes and HTML5 History API states) - there is nothing we can do about this
-
 
 
 ## History
@@ -231,4 +241,4 @@ You can discover the history inside the [History.md](https://github.com/andreasb
 
 Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
 <br/>Copyright &copy;  2011-2012 [Benjamin Arthur Lupton](http://balupton.com)
-<br/>Copyright &copy;  2013 [Andreas Bernhard]
+<br/>Copyright &copy;  2013 Andreas Bernhard
