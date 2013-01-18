@@ -43,7 +43,7 @@
 	}
 
 	// Initialise History
-	History.init = function(){
+	History.init = function(options){
 		// Check Load Status of Adapter
 		if ( typeof History.Adapter === 'undefined' ) {
 			return false;
@@ -68,7 +68,7 @@
 	// Initialise Core
 
 	// Initialise Core
-	History.initCore = function(){
+	History.initCore = function(options){
 		// Initialise
 		if ( typeof History.initCore.initialized !== 'undefined' ) {
 			// Already Loaded
@@ -798,7 +798,7 @@
 			// Hashify
 			var State = {
 				'data': data,
-				'title': title,
+				'title': typeof title === "string" ? title : document.title,
 				'url': encodeURIComponent(url||"")
 			};
 
@@ -1110,7 +1110,25 @@
 			// Return State
 			return State;
 		};
-
+		
+		/**
+		* History.getCurrentIndex()
+		* Gets the current index
+		* @return (integer)
+		*/
+		History.getCurrentIndex() = function(){
+			// Prepare
+			var index = null;
+			
+			// No states saved
+			if(History.savedStates.length < 1) {
+				index = 0;
+			}
+			else {
+				index = History.savedStates.length;
+			}
+			return index;
+		};
 
 		// ====================================================================
 		// Hash Helpers
