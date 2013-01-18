@@ -1,6 +1,8 @@
 ## History
 
 - v1.7.2 - January 18 2013
+	- Updated project README
+	- Integrated ExtJS Adapter (thanks to seanadkinson!)
 	- Merged from forks
 		- added option to force no suid (hrunting, sbearcsiro)
 		- provide a consistent URI-encoded document.location.href (hrunting, sbearcsiro)
