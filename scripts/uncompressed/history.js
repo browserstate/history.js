@@ -137,16 +137,16 @@
 		History.options.initialTitle = History.options.initialTitle || document.title;
 
 		/**
-		 * History.options.initialTitle
+		 * History.options.html4Mode
 		 * If true, will force HTMl4 mode (hashtags)
 		 */
-		 History.options.html4Mode = History.options.html4Mode || false;
+		History.options.html4Mode = History.options.html4Mode || false;
 
 		/**
 		 * History.options.delayInit
 		 * Want to override default options and call init manually.
 		 */
-		 History.options.delayInit = History.options.delayInit || false;
+		History.options.delayInit = History.options.delayInit || false;
 
 
 		// ====================================================================
