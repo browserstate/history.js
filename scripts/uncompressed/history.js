@@ -1112,11 +1112,11 @@
 		};
 		
 		/**
-		* History.getCurrentIndex()
-		* Gets the current index
-		* @return (integer)
+		 * History.getCurrentIndex()
+		 * Gets the current index
+		 * @return (integer)
 		*/
-		History.getCurrentIndex() = function(){
+		History.getCurrentIndex = function(){
 			// Prepare
 			var index = null;
 			
