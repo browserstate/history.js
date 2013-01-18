@@ -21,7 +21,7 @@ Please create an issue if something doesn't work or if there is a browser specif
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
 - Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
-- Provide support for as many javascript frameworks as possible via adapters; especially [Dojo](http://dojotoolkit.org/), [ExtJS](http://www.sencha.com/), [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/).
+- Provide support for as many javascript frameworks as possible via adapters; especially [Dojo](http://dojotoolkit.org/), [ExtJS](http://www.sencha.com/), [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Right.js](http://rightjs.org/) and [Zepto](http://zeptojs.com/).
 
 ## Usage
 
