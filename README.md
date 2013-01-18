@@ -1,7 +1,9 @@
 Welcome to my History.js fork (v1.7.2 - January 18 2013)
 ==================
 
-This project is a fork of [jQuery History](http://balupton.com/projects/jquery-history), it aims the same but will be developed and supported actively:
+New in v1.7.2: See [History.md](https://github.com/andreasbernhard/history.js/blob/master/History.md#files)
+
+This project is a fork of History.js, it aims the same but will be developed and supported actively:
 
 - Follow the [HTML5 History API](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
@@ -90,13 +92,18 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 - Sure is, give it a download and navigate to the demo directory in your browser :-)
 - If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports.
 
-
 ## Download & Installation
 
-- Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/history.js/tarball/master) or [zip](https://github.com/balupton/history.js/zipball/master)
+- Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/andreasbernhard/history.js/tarball/master) or [zip](https://github.com/andreasbernhard/history.js/zipball/master)
 
 - Include History.js
 
+	- For [Dojo](http://dojotoolkit.org/) v1.8+
+
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/dojo.history.js"></script>
+		```
+	
 	- For [jQuery](http://jquery.com/) v1.3+
 
 		``` html
@@ -127,7 +134,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/native.history.js"></script>
 		```
 
-> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`. [Why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`.
 
 ## Browsers: Tested and Working In
 
@@ -135,13 +142,13 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 - Firefox 4+
 - Chrome 8+
-- Opera 11.5
+- Opera 11.5+
 - Safari 5.0+
 - Safari iOS 4.3+
 
 ### HTML4 Browsers
 
-- IE 6, 7, 8, 9
+- IE 6, 7, 8, 9, (10)
 - Firefox 3
 - Opera 10, 11.0
 - Safari 4
@@ -164,6 +171,19 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 - `History.go(X)` <br/> If X is negative go back through history X times, if X is positive go forwards through history X times
 - `History.log(...)` <br/> Logs messages to the console, the log element, and fallbacks to alert if neither of those two exist
 - `History.debug(...)` <br/> Same as `History.log` but only runs if `History.debug.enable === true`
+
+### Options
+
+- `History.options.hashChangeInterval` <br/> How long should the interval be before hashchange checks
+- `History.options.safariPollInterval` <br/> How long should the interval be before safari poll checks
+- `History.options.doubleCheckInterval` <br/> How long should the interval be before we perform a double check
+- `History.options.disableSuid` <br/> Force History not to append suid
+- `History.options.storeInterval` <br/> How long should we wait between store calls
+- `History.options.busyDelay` <br/> How long should we wait between busy events
+- `History.options.debug` <br/> If true will enable debug messages to be logged
+- `History.options.initialTitle` <br/> What is the title of the initial state
+- `History.options.html4Mode` <br/> If true, will force HTMl4 mode (hashtags)
+- `History.options.delayInit` <br/> Want to override default options and call init manually.
 
 ### Events
 
@@ -211,3 +231,4 @@ You can discover the history inside the [History.md](https://github.com/andreasb
 
 Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
 <br/>Copyright &copy;  2011-2012 [Benjamin Arthur Lupton](http://balupton.com)
+<br/>Copyright &copy;  2013 [Andreas Bernhard]
