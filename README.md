@@ -1,10 +1,13 @@
-Welcome to a new History.js fork (v1.7.2, January 18 2013)
+Welcome to the History.js fork (v1.8a, January 19 2013)
 ==================
 
 ## News
-18/01/2013: v1.7.2 released, for detailled changes see [History](https://github.com/andreasbernhard/history.js/blob/master/History.md#files)
+19/01/2013: Alpha of v1.8 is released. Started to categorize old balupton's issues.
+18/01/2013: v1.7.2 released, for detailled changes see
 
-Please create an issue if something doesn't work or if there is a browser specific bug. I'll try to fix it as soon as possible. I'm also going to review old issues in balupton's repository and try to solve them too.
+See History(https://github.com/andreasbernhard/history.js/blob/master/History.md#files) to for a detailled list of features, changes, solved issues and bugs
+
+Please create an issue if something doesn't work or if there is a browser specific bug. I'll try to fix it as soon as possible. Please send me your Pull requests if you have a nice solution! I'm also going to review old issues in balupton's repository and try to solve them too.
 
 This project is a fork of the original History.js, it aims the same but will be developed and supported actively:
 
@@ -158,18 +161,29 @@ This project is a fork of the original History.js, it aims the same but will be 
 
 ### Functions
 
+#### States
 - `History.pushState(data,title,url)` <br/> Pushes a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
 - `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
 - `History.getState()` <br/> Gets the current state of the browser, returns an object with `data`, `title` and `url`
+- `History.getStateByIndex` <br/> Gets a state by the index
+- `History.getCurrentIndex` <br/> Gets the current index
 - `History.getHash()` <br/> Gets the current hash of the browser
+
+#### Adapter
 - `History.Adapter.bind(element,event,callback)` <br/> A framework independent event binder, you may either use this or your framework's native event binder.
 - `History.Adapter.trigger(element,event)` <br/> A framework independent event trigger, you may either use this or your framework's native event trigger.
 - `History.Adapter.onDomLoad(callback)` <br/> A framework independent onDomLoad binder, you may either use this or your framework's native onDomLoad binder.
+
+#### Navigation
 - `History.back()` <br/> Go back once through the history (same as hitting the browser's back button)
 - `History.forward()` <br/> Go forward once through the history (same as hitting the browser's forward button)
 - `History.go(X)` <br/> If X is negative go back through history X times, if X is positive go forwards through history X times
+
+#### Debug
 - `History.log(...)` <br/> Logs messages to the console, the log element, and fallbacks to alert if neither of those two exist
 - `History.debug(...)` <br/> Same as `History.log` but only runs if `History.debug.enable === true`
+
+
 
 ### Options
 

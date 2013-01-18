@@ -1,5 +1,16 @@
 ## History
 
+- v1.8a - January 19 2013
+	- Pass options to `init()` as json is now supported
+	- Introduced `getCurrentIndex()`, so you can get previous state by `History.getStateByIndex(getCurrentIndex()-1)`
+	- Fixed HTML4 endless loop when url starts with a slash (e.g. /welcome/hello) #239, #232, #185
+	- Bundled and compressed all scripts
+	- Responsed (and therefore solved) or old issues from balupton repository: #250, #242, #238, #234, #224, #213, #206, #195, #183, #181, #180, #179, #175, #168
+	- Fixed (or merged and therefore fixed) old issues from balupton repository: #248, #239, #236, #235, #229, #221, #220, #218, #215, #214, #212, #203, #191, #189, #172, #171, #166  
+	- Still unresolved issues: #249, #246, #245, #244, #243, #241, #233, #232, #231, #226, #225, #222, #219, #217, #216, #209, #208, #204, #202, #199, #198, #194, #193, #192, #190, #188, #186, #184, #182, #178, #176, #173, #167, #165, #164, and all issues smaller equal #160 (not even visited!)
+	- Feedback for UTF8 / url encode issues necessary, related problems (thanks to riyad)
+		- #64, #107, #108, #162, #177, #187, #205, #207, #210, #228
+
 - v1.7.2 - January 18 2013
 	- Updated project README
 	- Integrated ExtJS Adapter (thanks to seanadkinson!)
