@@ -39,8 +39,7 @@
             Ext.EventManager.addListener(element, eventName, callback, scope);
             
             //bind an observable to the element that will let us "trigger" events on it
-            var id = Ext.id(element, 'history-');
-            var observable = this.observables[id];
+            var id = Ext.id(element, 'history-'), observable = this.observables[id];
             if (!observable) {
                 observable = Ext.create('Ext.util.Observable');
                 this.observables[id] = observable;
@@ -56,8 +55,7 @@
          * @return {void}
          */
         trigger: function(element,eventName,extra){
-            var id = Ext.id(element, 'history-');
-            var observable = this.observables[id];
+            var id = Ext.id(element, 'history-'), observable = this.observables[id];
             if (observable) {
                 observable.fireEvent(eventName, extra);
             }
