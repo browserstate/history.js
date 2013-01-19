@@ -514,7 +514,7 @@
 
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
+					throw new Error('History.js does not support states with fragment-identifiers (hashes/anchors).');
 				}
 
 				// Handle Queueing
@@ -558,21 +558,18 @@
 					return false;
 				}
 
-				// Update HTML4 Hash
-				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
-					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
-					History.setHash(newStateHash,false);
-					History.busy(false);
-					return false;
-				}
-
 				// Update HTML5 State
 				History.saveState(newState);
 
 				// Fire HTML5 Event
-				//History.debug('History.pushState: trigger popstate');
 				if(!wasExpected)
 					History.Adapter.trigger(window,'statechange');
+
+				// Update HTML4 Hash
+				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
+					History.setHash(newStateHash,false);
+				}
+				
 				History.busy(false);
 
 				// End pushState closure
