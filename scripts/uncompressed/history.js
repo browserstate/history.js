@@ -1883,9 +1883,11 @@
 				// Update
 				History.store = currentStore;
 				History.normalizeStore();
-
-				// Store
-				sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+        try{
+				  // Store
+				  sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+        }
+        catch(e){}
 			};
 
 			// For Internet Explorer
