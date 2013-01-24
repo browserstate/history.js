@@ -1125,7 +1125,7 @@
 				index = 0;
 			}
 			else {
-				index = History.savedStates.length;
+				index = History.savedStates.length-1;
 			}
 			return index;
 		};
