@@ -798,8 +798,8 @@
 			// Hashify
 			var State = {
 				'data': data,
-				'title': typeof title === "string" ? title : document.title,
-				'url': encodeURIComponent(url||"")
+				'title': title,
+				'url': url
 			};
 
 			// Expand the State
