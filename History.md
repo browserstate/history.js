@@ -1,19 +1,29 @@
 ## History
 
+- v1.8a3 - February 5 2013
+	- Added tests for Dojo and ExtJS
+	- Changed setting of title and url
+	- Testing status
+		- Zepto Adapter fails completely in Internet Explorer <= 9 (it seems to be a Zepto bug?)
+		- All HTML5 Native Adapter fail in all browsers on Test 10
+		- All other HTML5 tests work fine
+		- All other HTML4 tests fail in Test 4
+	- Still unresolved issues: #249, #246, #245, #243, #241, #233, #232, #231, #226, #225, #222, #219, #217, #216, #209, #208, #204, #202, #199, #198, #194, #193, #192, #190, #188, #186, #184, #182, #178, #176, #173, #167, #165, #164 and all issues smaller equal #160
+
+
 - v1.8a2 - January 21 2013
 	- Fixed hashchange / statechange triggers: e.g. if a user in a HTML5 browser clicks a link, statechange is fired, in a HTML4 browser only hashchange, but state has also changed
 	- UTF8 / url encoding / decoding tested and so resolved: #64, #107, #108, #162, #177, #187, #205, #207, #210, #228, #251
 	- Fixed (or merged or responded and therefore fixed) old issues from balupton repository: #244
-	- Still unresolved issues: #249, #246, #245, #243, #241, #233, #232, #231, #226, #225, #222, #219, #217, #216, #209, #208, #204, #202, #199, #198, #194, #193, #192, #190, #188, #186, #184, #182, #178, #176, #173, #167, #165, #164, and all issues smaller equal #160 (not even visited!)
-
+	
 - v1.8a1 - January 19 2013
 	- Pass options to `init()` as json is now supported
+	- Added unicode demo
 	- Introduced `getCurrentIndex()`, so you can get previous state by `History.getStateByIndex(getCurrentIndex()-1)`
 	- Fixed HTML4 endless loop when url starts with a slash (e.g. /welcome/hello) #239, #232, #185
 	- Bundled and compressed all scripts
 	- Responsed (and therefore solved) or old issues from balupton repository: #250, #242, #238, #234, #224, #213, #206, #195, #183, #181, #180, #179, #175, #168
 	- Fixed (or merged and therefore fixed) old issues from balupton repository: #248, #239, #236, #235, #229, #221, #220, #218, #215, #214, #212, #203, #191, #189, #172, #171, #166  
-	- Still unresolved issues: #249, #246, #245, #244, #243, #241, #233, #232, #231, #226, #225, #222, #219, #217, #216, #209, #208, #204, #202, #199, #198, #194, #193, #192, #190, #188, #186, #184, #182, #178, #176, #173, #167, #165, #164, and all issues smaller equal #160 (not even visited!)
 	- Feedback for UTF8 / url encode issues necessary, related problems (thanks to riyad)
 		- #64, #107, #108, #162, #177, #187, #205, #207, #210, #228
 
