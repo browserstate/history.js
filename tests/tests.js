@@ -4,7 +4,7 @@ var
 	History = window.History,
 	document = window.document,
 	test = window.test,
-	same = window.same;
+    deepEqual = window.deepEqual;
 
 // Check
 if ( !History.enabled ) {
@@ -110,7 +110,7 @@ var checkState = function(){
 
 	test(testName,function(){
 		History.log('Completed: '+testName +' / '+ stateName);
-		same(actualState,expectedState,stateName);
+        deepEqual(actualState,expectedState,stateName);
 	});
 
 	// Image Load to Stress Test Safari and Opera
