@@ -11,7 +11,8 @@
 
     // Localise Globals
     var
-        History = window.History = window.History||{};
+        History = window.History = window.History||{},
+        Ext = window.Ext;
 
     window.JSON = {
         stringify: Ext.JSON.encode,
