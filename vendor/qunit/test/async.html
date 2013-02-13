@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>QUnit Test Suite</title>
+	<link rel="stylesheet" href="../qunit/qunit.css">
+</head>
+<body>
+	<div id="qunit"></div>
+	<div id="qunit-fixture">test markup</div>
+	<script src="../qunit/qunit.js"></script>
+	<script>
+	QUnit.config.autostart = false;
+
+	// Simulate a delay in loading the tests, as when they are loaded
+	// asynchronously using requirejs, steal, etc.
+	setTimeout(function() {
+		var script = document.createElement( "script" );
+		script.src = "async.js";
+		document.getElementsByTagName( "head" )[0].appendChild( script );
+
+	}, 1000);
+	</script>
+	<script src="swarminject.js"></script>
+</body>
+</html>

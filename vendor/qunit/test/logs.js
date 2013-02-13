@@ -1,6 +1,5 @@
 // TODO disable reordering for this suite!
 
-
 var begin = 0,
 	moduleStart = 0,
 	moduleDone = 0,
@@ -13,138 +12,173 @@ var begin = 0,
 	testDoneContext,
 	logContext;
 
-QUnit.begin = function() {
+QUnit.begin(function() {
 	begin++;
-};
-QUnit.done = function() {
-};
-QUnit.moduleStart = function(context) {
+});
+QUnit.done(function() {
+});
+QUnit.moduleStart(function(context) {
 	moduleStart++;
 	moduleContext = context;
-};
-QUnit.moduleDone = function(context) {
+});
+QUnit.moduleDone(function(context) {
 	moduleDone++;
 	moduleDoneContext = context;
-};
-QUnit.testStart = function(context) {
+});
+QUnit.testStart(function(context) {
 	testStart++;
 	testContext = context;
-};
-QUnit.testDone = function(context) {
+});
+QUnit.testDone(function(context) {
 	testDone++;
 	testDoneContext = context;
-};
-QUnit.log = function(context) {
+});
+QUnit.log(function(context) {
 	log++;
 	logContext = context;
-};
-
-var logs = ["begin", "testStart", "testDone", "log", "moduleStart", "moduleDone", "done"];
-for (var i = 0; i < logs.length; i++) {
-	(function() {
-		var log = logs[i],
-			logger = QUnit[log];
-		QUnit[log] = function() {
-			console.log(log, arguments);
-			logger.apply(this, arguments);
-		};
-	})();
-}
+});
 
 module("logs1");
 
-test("test1", 13, function() {
-	equal(begin, 1);
-	equal(moduleStart, 1);
-	equal(testStart, 1);
-	equal(testDone, 0);
-	equal(moduleDone, 0);
-
-	deepEqual(logContext, {
+test("test1", 15, function() {
+	equal( begin, 1, "QUnit.begin calls" );
+	equal( moduleStart, 1, "QUnit.moduleStart calls" );
+	equal( testStart, 1, "QUnit.testStart calls" );
+	equal( testDone, 0, "QUnit.testDone calls" );
+	equal( moduleDone, 0, "QUnit.moduleDone calls" );
+	deepEqual( logContext, {
+		name: "test1",
+		module: "logs1",
 		result: true,
-		message: undefined,
+		message: "QUnit.moduleDone calls",
 		actual: 0,
 		expected: 0
-	});
-	equal("foo", "foo", "msg");
+	}, "log context after equal(actual, expected, message)" );
+
+	equal( "foo", "foo" );
 	deepEqual(logContext, {
+		name: "test1",
+		module: "logs1",
 		result: true,
-		message: "msg",
+		message: undefined,
 		actual: "foo",
 		expected: "foo"
-	});
-	strictEqual(testDoneContext, undefined);
-	deepEqual(testContext, {
+	}, "log context after equal(actual, expected)" );
+
+	ok( true, "ok(true, message)" );
+	deepEqual( logContext, {
+		module: "logs1",
+		name: "test1",
+		result: true,
+		message: "ok(true, message)"
+	}, "log context after ok(true, message)" );
+
+	strictEqual( testDoneContext, undefined, "testDone context" );
+	deepEqual( testContext, {
+		module: "logs1",
 		name: "test1"
-	});
-	strictEqual(moduleDoneContext, undefined);
-	deepEqual(moduleContext, {
+	}, "test context" );
+	strictEqual( moduleDoneContext, undefined, "moduleDone context" );
+	deepEqual( moduleContext, {
 		name: "logs1"
-	});
+	}, "module context" );
 
-	equal(log, 12);
+	equal( log, 14, "QUnit.log calls" );
 });
-test("test2", 10, function() {
-	equal(begin, 1);
-	equal(moduleStart, 1);
-	equal(testStart, 2);
-	equal(testDone, 1);
-	equal(moduleDone, 0);
+test("test2", 11, function() {
+	equal( begin, 1, "QUnit.begin calls" );
+	equal( moduleStart, 1, "QUnit.moduleStart calls" );
+	equal( testStart, 2, "QUnit.testStart calls" );
+	equal( testDone, 1, "QUnit.testDone calls" );
+	equal( moduleDone, 0, "QUnit.moduleDone calls" );
 
-	deepEqual(testDoneContext, {
+	ok( typeof testDoneContext.duration === "number" , "testDone context: duration" );
+	delete testDoneContext.duration;
+	deepEqual( testDoneContext, {
+		module: "logs1",
 		name: "test1",
 		failed: 0,
-		passed: 13,
-		total: 13
-	});
-	deepEqual(testContext, {
+		passed: 15,
+		total: 15
+	}, "testDone context" );
+	deepEqual( testContext, {
+		module: "logs1",
 		name: "test2"
-	});
-	strictEqual(moduleDoneContext, undefined);
-	deepEqual(moduleContext, {
+	}, "test context" );
+	strictEqual( moduleDoneContext, undefined, "moduleDone context" );
+	deepEqual( moduleContext, {
 		name: "logs1"
-	});
+	}, "module context" );
 
-	equal(log, 22);
+	equal( log, 25, "QUnit.log calls" );
 });
 
 module("logs2");
 
-test("test1", 9, function() {
-	equal(begin, 1);
-	equal(moduleStart, 2);
-	equal(testStart, 3);
-	equal(testDone, 2);
-	equal(moduleDone, 1);
+test( "test1", 9, function() {
+	equal( begin, 1, "QUnit.begin calls" );
+	equal( moduleStart, 2, "QUnit.moduleStart calls" );
+	equal( testStart, 3, "QUnit.testStart calls" );
+	equal( testDone, 2, "QUnit.testDone calls" );
+	equal( moduleDone, 1, "QUnit.moduleDone calls" );
 
-	deepEqual(testContext, {
+	deepEqual( testContext, {
+		module: "logs2",
 		name: "test1"
-	});
-	deepEqual(moduleDoneContext, {
+	}, "test context" );
+	deepEqual( moduleDoneContext, {
 		name: "logs1",
 		failed: 0,
-		passed: 23,
-		total: 23
-	});
-	deepEqual(moduleContext, {
+		passed: 26,
+		total: 26
+	}, "moduleDone context" );
+	deepEqual( moduleContext, {
 		name: "logs2"
-	});
+	}, "module context" );
 
-	equal(log, 31);
+	equal( log, 34, "QUnit.log calls" );
 });
-test("test2", 8, function() {
-	equal(begin, 1);
-	equal(moduleStart, 2);
-	equal(testStart, 4);
-	equal(testDone, 3);
-	equal(moduleDone, 1);
+test( "test2", 8, function() {
+	equal( begin, 1, "QUnit.begin calls" );
+	equal( moduleStart, 2, "QUnit.moduleStart calls" );
+	equal( testStart, 4, "QUnit.testStart calls" );
+	equal( testDone, 3, "QUnit.testDone calls" );
+	equal( moduleDone, 1, "QUnit.moduleDone calls" );
 
-	deepEqual(testContext, {
+	deepEqual( testContext, {
+		module: "logs2",
 		name: "test2"
-	});
-	deepEqual(moduleContext, {
+	}, "test context" );
+	deepEqual( moduleContext, {
 		name: "logs2"
+	}, "module context" );
+
+	equal( log, 42, "QUnit.log calls" );
+});
+
+var testAutorun = true;
+
+QUnit.done(function() {
+
+	if (!testAutorun) {
+		return;
+	}
+
+	testAutorun = false;
+
+	module("autorun");
+
+	test("reset", 0, function() {});
+
+	moduleStart = moduleDone = 0;
+
+	test("first", function() {
+		equal(moduleStart, 1, "test started");
+		equal(moduleDone, 0, "test in progress");
 	});
 
-	equal(log, 39);
+	test("second", function() {
+		equal(moduleStart, 2, "test started");
+		equal(moduleDone, 1, "test in progress");
+	});
 });
