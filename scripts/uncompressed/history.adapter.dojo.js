@@ -13,7 +13,8 @@
 	"use strict";
 
 	// Localise Globals
-	var History = window.History = window.History||{};
+	var History = window.History = window.History||{},
+        dojo = window.dojo;
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -106,8 +107,8 @@
 		 * @return
 		 */
 		onDomLoad: function(callback) {
-			require(["dojo/ready"], function(ready) {
-				ready(callback);
+			dojo.require(["dojo/ready"], function(ready) {
+				dojo.ready(callback);
 			});
 		}
 	};
