@@ -14,7 +14,7 @@
 
 	// Localise Globals
 	var History = window.History = window.History||{},
-        dojo = window.dojo;
+        require = window.require;
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -107,8 +107,8 @@
 		 * @return
 		 */
 		onDomLoad: function(callback) {
-			dojo.require(["dojo/ready"], function(ready) {
-				dojo.ready(callback);
+			require(["dojo/ready"], function(ready) {
+				ready(callback);
 			});
 		}
 	};
