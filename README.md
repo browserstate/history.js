@@ -1,9 +1,10 @@
-Welcome to the History.js fork (v1.8a3, February 5 2013)
+Welcome to the History.js fork (v1.8a4, February 14 2013)
 ==================
 
 This project is a fork of the original History.js, it aims the same but will be developed and supported actively.
 
 ## News
+- 14/02/2013: Alpha 4 of v1.8 is released. Fixes.
 - 05/02/2013: Alpha 3 of v1.8 is released. Tests updated.
 - 21/01/2013: Alpha 2 of v1.8 is released. Correct statechange behaviour.
 - 19/01/2013: Alpha 1 of v1.8 is released. Started to categorize old balupton's issues.

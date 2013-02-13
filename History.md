@@ -1,5 +1,10 @@
 ## History
 
+- v1.8a4 - February 13 2013
+    - Fixed coffee script warnings (ExtJS & Dojo adapter, IE 6 iFrame)
+    - Updated qUnit to release 1.11.0, jQuery to release 1.9.1
+    - Still unresolved issues: #249, #246, #245, #243, #241, #233, #232, #231, #226, #225, #222, #219, #217, #216, #209, #208, #204, #202, #199, #198, #194, #193, #192, #190, #188, #186, #184, #182, #178, #176, #173, #167, #165, #164 and all issues smaller equal #160
+
 - v1.8a3 - February 5 2013
 	- Added tests for Dojo and ExtJS
 	- Changed setting of title and url
@@ -7,7 +12,6 @@
 		- All HTML5 Native Adapter fail in all browsers on Test 10
 		- All other HTML5 tests work fine
 		- All other HTML4 tests fail in Test 4 (in IE)
-	- Still unresolved issues: #249, #246, #245, #243, #241, #233, #232, #231, #226, #225, #222, #219, #217, #216, #209, #208, #204, #202, #199, #198, #194, #193, #192, #190, #188, #186, #184, #182, #178, #176, #173, #167, #165, #164 and all issues smaller equal #160
 
 - v1.8a2 - January 21 2013
 	- Fixed hashchange / statechange triggers: e.g. if a user in a HTML5 browser clicks a link, statechange is fired, in a HTML4 browser only hashchange, but state has also changed
