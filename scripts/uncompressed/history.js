@@ -123,7 +123,6 @@
 		 */
 		History.options.initialTitle = History.options.initialTitle || document.title;
 
-
 		// ====================================================================
 		// Interval record
 
@@ -613,7 +612,7 @@
 			// Fetch ID
 			var id = History.extractId(newState.url),
 				str;
-			
+
 			if ( !id ) {
 				// Find ID via State String
 				str = History.getStateString(newState);
@@ -672,7 +671,7 @@
 			// Create
 			newState = {};
 			newState.normalized = true;
-			newState.title = oldState.title||'';
+			newState.title = oldState.title||History.options.initialTitle;
 			newState.url = History.getFullUrl(History.unescapeString(oldState.url||document.location.href));
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
@@ -787,7 +786,7 @@
 		History.getStateId = function(passedState){
 			// Prepare
 			var State, id;
-			
+
 			// Fetch
 			State = History.normalizeState(passedState);
 
@@ -807,7 +806,7 @@
 		History.getHashByState = function(passedState){
 			// Prepare
 			var State, hash;
-			
+
 			// Fetch
 			State = History.normalizeState(passedState);
 
@@ -857,7 +856,7 @@
 		 * @param {String} url_or_hash
 		 * @return {State|null}
 		 */
-		History.extractState = function(url_or_hash,create){
+		History.extractState = function(url_or_hash,create,title){
 			// Prepare
 			var State = null, id, url;
 			create = create||false;
@@ -881,7 +880,7 @@
 
 				// Create State
 				if ( !State && create && !History.isTraditionalAnchor(url_or_hash) ) {
-					State = History.createStateObject(null,null,url);
+					State = History.createStateObject(null,title||null,url);
 				}
 			}
 
@@ -1836,7 +1835,7 @@
 		/**
 		 * Create the initial State
 		 */
-		History.saveState(History.storeState(History.extractState(document.location.href,true)));
+		History.saveState(History.storeState(History.extractState(document.location.href,true,document.title)));
 
 		/**
 		 * Bind for Saving Store
@@ -1890,11 +1889,11 @@
 
 			// For Internet Explorer
 			History.intervalList.push(setInterval(History.onUnload,History.options.storeInterval));
-			
+
 			// For Other Browsers
 			History.Adapter.bind(window,'beforeunload',History.onUnload);
 			History.Adapter.bind(window,'unload',History.onUnload);
-			
+
 			// Both are enabled for consistency
 		}
 
