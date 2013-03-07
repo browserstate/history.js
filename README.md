@@ -15,7 +15,12 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 
 ## Usage
 
-### Working with History.js:
+### Instant
+
+To ajaxify your entire website with the HTML5 History API, History.js and jQuery the [Ajaxify Script](https://github.com/browserstate/ajaxify) is all you need. It's that easy.
+
+
+### Working with History.js directly
 
 ``` javascript
 (function(window,undefined){
@@ -47,7 +52,6 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 })(window);
 ```
 
-To ajaxify your entire website with the HTML5 History API, History.js and jQuery [this snippet of code](https://gist.github.com/854622) is all you need. It's that easy.
 
 ### How would the above operations look in a HTML5 Browser?
 
