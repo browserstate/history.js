@@ -40,7 +40,6 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 	// Bind to StateChange Event
 	History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
 		var State = History.getState(); // Note: We are using History.getState() instead of event.state
-		History.log(State.data, State.title, State.url);
 	});
 
 	// Change our States
