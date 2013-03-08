@@ -1,4 +1,4 @@
-Welcome to the History.js fork (v1.8a4, February 14 2013)
+Welcome to History.js (v1.8a4, March 08 2013)
 ==================
 
 [![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/browserstate/history.js&title=History.js&language=&tags=github&category=software)
@@ -8,11 +8,10 @@ Welcome to the History.js fork (v1.8a4, February 14 2013)
 - 05/02/2013: Alpha 3 of v1.8 is released. Tests updated.
 - 21/01/2013: Alpha 2 of v1.8 is released. Correct statechange behaviour.
 - 19/01/2013: Alpha 1 of v1.8 is released. Started to categorize old balupton's issues.
-- 18/01/2013: v1.7.2 released, for detailled changes see history
 
 ### History
 
-See History(https://github.com/andreasbernhard/history.js/blob/master/History.md#files) to for a detailled list of features, changes, solved issues and bugs
+See History(https://github.com/browserstate/history.js/blob/master/History.md#files) to for a detailled list of features, changes, solved issues and bugs
 
 ### Involve
 
