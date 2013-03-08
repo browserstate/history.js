@@ -673,7 +673,7 @@
 			newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(History.unescapeString(oldState.url||document.location.href));
+			newState.url = History.getFullUrl(oldState.url||document.location.href);
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
@@ -1883,9 +1883,11 @@
 				// Update
 				History.store = currentStore;
 				History.normalizeStore();
-
-				// Store
-				sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+        try{
+				  // Store
+				  sessionStorage.setItem('History.store',JSON.stringify(currentStore));
+        }
+        catch(e){}
 			};
 
 			// For Internet Explorer
