@@ -1,7 +1,7 @@
 Welcome to the History.js fork (v1.8a4, February 14 2013)
 ==================
 
-This project is a fork of the original History.js, it aims the same but will be developed and supported actively.
+[![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/browserstate/history.js&title=History.js&language=&tags=github&category=software)
 
 ## News
 - 14/02/2013: Alpha 4 of v1.8 is released. Fixes.
@@ -22,13 +22,18 @@ Please create an issue if something doesn't work or if there is a browser specif
 
 - Follow the [HTML5 History API](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
-- Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+- Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
 - Provide support for as many javascript frameworks as possible via adapters; especially [Dojo](http://dojotoolkit.org/), [ExtJS](http://www.sencha.com/), [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Right.js](http://rightjs.org/) and [Zepto](http://zeptojs.com/).
 
 ## Usage
 
-### Working with History.js:
+### Instant
+
+To ajaxify your entire website with the HTML5 History API, History.js and jQuery the [Ajaxify Script](https://github.com/browserstate/ajaxify) is all you need. It's that easy.
+
+
+### Working with History.js directly
 
 ``` javascript
 (function(window,undefined){
@@ -64,7 +69,7 @@ Please create an issue if something doesn't work or if there is a browser specif
 1. www.mysite.com
 1. www.mysite.com/?state=3
 
-> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling).
+> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling).
 
 ### How would they look in a HTML4 Browser?
 
@@ -82,7 +87,7 @@ Please create an issue if something doesn't work or if there is a browser specif
 >
 > Note 2: These urls will be automatically url-encoded in IE6 to prevent certain browser-specific bugs.
 >
-> Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+> Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling)
 
 ### What's the deal with the SUIDs used in the HTML4 States?
 
@@ -99,7 +104,7 @@ Please create an issue if something doesn't work or if there is a browser specif
 
 ## Download & Installation
 
-- Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/andreasbernhard/history.js/tarball/master) or [zip](https://github.com/andreasbernhard/history.js/zipball/master)
+- Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/browserstate/history.js/tarball/master) or [zip](https://github.com/browserstate/history.js/zipball/master)
 
 - Include History.js
 
@@ -145,7 +150,35 @@ Please create an issue if something doesn't work or if there is a browser specif
 		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/native.history.js"></script>
 		```
 
-> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`.
+> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`. [Why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling)
+
+
+## Get Updates
+
+- For Commit RSS/Atom Updates:
+	- You can subscribe via the [GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
+- For GitHub News Feed Updates:
+	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/browserstate/history.js)
+
+
+## Get Support
+
+- History.js is maintained by people like you. If you find a bug, report it to the [GitHub Issue Tracker](https://github.com/browserstate/history.js/issues). If you've fixed a bug submit a [Pull Request](https://github.com/browserstate/history.js/pulls) and add your fork to the [Network Wiki Page](https://github.com/browserstate/history.js/wiki/Network).
+
+- If you would like paid support and trainings, or have job offers, then refer to the [Network Wiki Page](https://github.com/browserstate/history.js/wiki/Network). If you are qualified with History.js, then be sure to add your details to that page too.
+
+- If your company uses History.js on your projects, and would like to see it grow and prosper (better documentation, bugfixes, upgrades, maintenance, etc.) and would love to become a corporate sponsor then do email sponsor@bevry.me
+
+- If you would like free support for History.js, then [post your question](http://stackoverflow.com/questions/ask) on [Stackoverflow](http://stackoverflow.com/about) and be sure to use the `history.js` tag when asking your question.
+
+- If you've created a website that uses History.js, or know of one. Then be sure to add it to the [Showcase Wiki Page](https://github.com/browserstate/history.js/wiki/Showcase).
+
+- If you'd love to +1 or like this project, then be sure to tweet about it and click the "watch" button up the top of its [Project Page](https://github.com/browserstate/history.js).
+
+- For anything else, refer to the [History.js GitHub Wiki Site](https://github.com/browserstate/history.js/wiki).
+
+Thanks! every bit of help really does make a difference!
+
 
 ## Browsers: Tested and Working In
 
@@ -247,12 +280,10 @@ Please create an issue if something doesn't work or if there is a browser specif
 
 ## History
 
-You can discover the history inside the [History.md](https://github.com/andreasbernhard/history.js/blob/master/History.md#files) file.
+You can discover the history inside the [History.md](https://github.com/browserstate/history.js/blob/master/History.md#files) file
 
 
 ## License
 
 Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
-
-<br/>Copyright &copy;  2011-2012 [Benjamin Arthur Lupton](http://balupton.com)
-<br/>Copyright &copy;  2013 Andreas Bernhard
+<br/>Copyright &copy;  2011+ [Benjamin Arthur Lupton](http://balupton.com)
