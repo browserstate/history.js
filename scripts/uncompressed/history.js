@@ -386,7 +386,7 @@
 				baseHref = baseElement.href.replace(/[^\/]+$/,'');
 			}
 
-			// Adjust trailing slash
+			// Adjusts trailing slash
 			baseHref = baseHref.replace(/\/+$/,'');
 			if ( baseHref ) baseHref += '/';
 
@@ -895,7 +895,9 @@
 		 */
 		History.getIdByUrl = function(url){
 			// Fetch
-			var id = History.urlToId[url] || History.store.urlToId[url] || undefined;
+			var unescaped = History.unescapeString(url);
+			var id = History.urlToId[url] || History.store.urlToId[url] ||
+                                 History.urlToId[unescaped] || History.store.urlToId[unescaped] || undefined;
 
 			// Return
 			return id;
@@ -948,7 +950,9 @@
 		 */
 		History.storeState = function(newState){
 			// Store the State
-			History.urlToId[newState.url] = newState.id;
+			History.urlToId[newState.cleanUrl] = newState.id;
+			History.idToState[newState.id] = newState;
+			History.stateToId[History.getStateString(newState)] = newState.id;
 
 			// Push the State
 			History.storedStates.push(History.cloneObject(newState));
@@ -1442,8 +1446,12 @@
 		 * @return {History}
 		 */
 		History.safariStatePoll = function(){
-			// Poll the URL
+			// check if we just pushed state, if so.. bail
+			if (History.waitForPropagation) {
+				return;
+			}
 
+			// Poll the URL
 			// Get the Last State which has the new URL
 			var
 				urlState = History.extractState(document.location.href),
@@ -1470,6 +1478,23 @@
 
 			// Chain
 			return History;
+		};
+
+		History.blockSafariPollUntilPropagation = function(newState){
+			// clear existing interval in preparation for the new one
+			if (History.waitForPropagationInterval) {
+				clearInterval(History.waitForPropagationInterval);
+			}
+			History.waitForPropagation = true;
+			History.waitForPropagationInterval = setInterval(function() {
+				var urlState = History.extractState(document.location.href);
+				if (!urlState || (urlState.id == newState.id)) {
+					//History.debug('url state propagated, un-blocking Safari poll');
+					History.waitForPropagation = false;
+					clearInterval(History.waitForPropagationInterval);
+				}
+			}, 250);
+			History.intervalList.push(History.waitForPropagationInterval);
 		};
 
 
@@ -1613,7 +1638,7 @@
 				// Reset the double check
 				History.doubleCheckComplete();
 
-				// Check for a Hash, and handle apporiatly
+				// Check for a Hash, and handle appropriately
 				currentHash	= History.getHash();
 				if ( currentHash ) {
 					// Expand Hash
@@ -1731,6 +1756,11 @@
 					// Store the newState
 					History.storeState(newState);
 					History.expectedStateId = newState.id;
+
+					if (History.bugs.safariPoll) {
+						//History.debug('Blocking safariPoll until url state propagation');
+						History.blockSafariPollUntilPropagation(newState);
+					}
 
 					// Push the newState
 					history.pushState(newState.id,newState.title,newState.url);
@@ -1908,6 +1938,7 @@
 			 * Setup Safari Fix
 			 */
 			if ( History.bugs.safariPoll ) {
+				History.waitForPropagation = false;
 				History.intervalList.push(setInterval(History.safariStatePoll, History.options.safariPollInterval));
 			}
 
