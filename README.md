@@ -1,4 +1,4 @@
-Welcome to History.js (v1.8a4, March 08 2013)
+Welcome to History.js (v1.8a4, February 14 2013)
 ==================
 
 [![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/browserstate/history.js&title=History.js&language=&tags=github&category=software)
