@@ -123,6 +123,18 @@
 		 */
 		History.options.initialTitle = History.options.initialTitle || document.title;
 
+		/**
+		 * History.options.initialTitle
+		 * If true, will force HTMl4 mode (hashtags)
+		 */
+		 History.options.html4Mode = History.options.html4Mode || false;
+
+		/**
+		 * History.options.delayInit
+		 * Want to override default options and call init manually.
+		 */
+		 History.options.delayInit = History.options.delayInit || false;
+
 
 		// ====================================================================
 		// Interval record
@@ -266,20 +278,31 @@
 		 * History.emulated
 		 * Which features require emulating?
 		 */
-		History.emulated = {
-			pushState: !Boolean(
-				window.history && window.history.pushState && window.history.replaceState
-				&& !(
-					(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
-					|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
+
+		if (History.options.html4Mode) {
+			History.emulated = {
+				pushState : true,
+				hashChange: true
+			};
+		}
+
+		else {
+
+			History.emulated = {
+				pushState: !Boolean(
+					window.history && window.history.pushState && window.history.replaceState
+					&& !(
+						(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+						|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
+					)
+				),
+				hashChange: Boolean(
+					!(('onhashchange' in window) || ('onhashchange' in document))
+					||
+					(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8)
 				)
-			),
-			hashChange: Boolean(
-				!(('onhashchange' in window) || ('onhashchange' in document))
-				||
-				(History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 8)
-			)
-		};
+			};
+		}
 
 		/**
 		 * History.enabled
@@ -1937,7 +1960,9 @@
 
 	}; // History.initCore
 
-	// Try and Initialise History
-	History.init();
+	if (!History.options || !History.options.delayInit) {
+		// Try and Initialise History
+		History.init();
+	}
 
 })(window);
