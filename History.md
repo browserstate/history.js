@@ -1,5 +1,8 @@
 ## History
 
+- v1.8b1 - May 31 2013
+    - Fixed "encoded string automatically unencoded on html5 browsers" #282, #236, #272
+
 - v1.8a4 - February 13 2013
     - Fixed coffee script warnings (ExtJS & Dojo adapter, IE 6 iFrame)
     - Updated qUnit to release 1.11.0, jQuery to release 1.9.1
