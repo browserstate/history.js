@@ -12,7 +12,7 @@ Welcome to History.js <br/> v1.8b1, May 31 2013
 
 ### History
 
-See the [`History.md`](https://github.com/browserstate/history.js/blob/master/History.md#files) to for a detailled list of features, changes, solved issues and bugs
+See the [`History.md`](https://github.com/browserstate/history.js/blob/master/History.md#files) file for a detailled list of features, changes, solved issues and bugs
 
 ### Involve
 
