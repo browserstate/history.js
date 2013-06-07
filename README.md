@@ -1,4 +1,4 @@
-Welcome to History.js (v1.8b1, May 31 2013)
+Welcome to History.js <br/> v1.8b1, May 31 2013
 ==================
 
 [![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/browserstate/history.js&title=History.js&language=&tags=github&category=software)
@@ -12,7 +12,7 @@ Welcome to History.js (v1.8b1, May 31 2013)
 
 ### History
 
-See History(https://github.com/browserstate/history.js/blob/master/History.md#files) to for a detailled list of features, changes, solved issues and bugs
+See the [`History.md`](https://github.com/browserstate/history.js/blob/master/History.md#files) to for a detailled list of features, changes, solved issues and bugs
 
 ### Involve
 
