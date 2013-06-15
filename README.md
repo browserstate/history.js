@@ -32,6 +32,9 @@ Please create an issue if something doesn't work or if there is a browser specif
 
 To ajaxify your entire website with the HTML5 History API, History.js and jQuery the [Ajaxify Script](https://github.com/browserstate/ajaxify) is all you need. It's that easy.
 
+### Ruby On Rails
+
+If you are using Rails, then the easiest way for you to try History.js would be to use [Wiselinks](https://github.com/igor-alexandrov/wiselinks) gem. Wiselinks integrates  into Rails application and allows you to start using History.js with three lines of code.
 
 ### Working with History.js directly
 
