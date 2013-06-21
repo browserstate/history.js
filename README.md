@@ -1,9 +1,10 @@
-Welcome to History.js (v1.8b1, May 31 2013)
+Welcome to History.js (v1.8b2, June 22 2013)
 ==================
 
 [![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/browserstate/history.js&title=History.js&language=&tags=github&category=software)
 
 ## News
+- 22/06/2013: Beta 2 of v1.8 is released. Fixes and uncompressed bundled files.
 - 31/05/2013: Beta 1 of v1.8 is released. Fixes.
 - 14/02/2013: Alpha 4 of v1.8 is released. Fixes.
 - 05/02/2013: Alpha 3 of v1.8 is released. Tests updated.
@@ -12,7 +13,7 @@ Welcome to History.js (v1.8b1, May 31 2013)
 
 ### History
 
-See History(https://github.com/browserstate/history.js/blob/master/History.md#files) to for a detailled list of features, changes, solved issues and bugs
+See History(https://github.com/browserstate/history.js/blob/master/History.md#files) to for a detailed list of features, changes, solved issues and bugs
 
 ### Involve
 
