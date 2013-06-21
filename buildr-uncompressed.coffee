@@ -16,7 +16,6 @@ configs =
 
 		# Paths
 		srcPath: __dirname+'/scripts/uncompressed'
-		outPath: __dirname+'/scripts/compressed'
 
 		# Checking
 		checkScripts: true
