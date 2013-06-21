@@ -1,5 +1,10 @@
 ## History
 
+- v1.8b2 - June 22 2013
+    - Introduced uncompressed bundled files #287
+    - Copied component.json to bower.json #291 and used right tag #286
+    - Fixed wrong argument passed to History.getHash() #305, #297, #292 (@Izkata)
+
 - v1.8b1 - May 31 2013
     - Fixed "encoded string automatically unencoded on html5 browsers" #282, #236, #272
 
