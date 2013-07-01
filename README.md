@@ -3,6 +3,7 @@ Welcome to History.js <br/> v1.8b2, June 22 2013
 
 [![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/browserstate/history.js&title=History.js&language=&tags=github&category=software)
 
+
 ## News
 - 22/06/2013: Beta 2 of v1.8 is released. Fixes and uncompressed bundled files.
 - 31/05/2013: Beta 1 of v1.8 is released. Fixes.
@@ -11,13 +12,14 @@ Welcome to History.js <br/> v1.8b2, June 22 2013
 - 21/01/2013: Alpha 2 of v1.8 is released. Correct statechange behaviour.
 - 19/01/2013: Alpha 1 of v1.8 is released. Started to categorize old balupton's issues.
 
-### History
 
-See the [`History.md`](https://github.com/browserstate/history.js/blob/master/History.md#files) file for a detailed list of features, changes, solved issues and bugs
+### History
+[See the `History.md` file for a detailed list of features, changes, solved issues and bugs](https://github.com/browserstate/history.js/blob/master/History.md#files)
+
 
 ### Involve
-
 Please create an issue if something doesn't work or if there is a browser specific bug. I'll try to fix it as soon as possible. Please send me your Pull requests if you have a nice solution! I'm also going to review old issues in balupton's repository and try to solve them too.
+
 
 ## Aims
 
@@ -27,15 +29,20 @@ Please create an issue if something doesn't work or if there is a browser specif
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
 - Provide support for as many javascript frameworks as possible via adapters; especially [Dojo](http://dojotoolkit.org/), [ExtJS](http://www.sencha.com/), [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Right.js](http://rightjs.org/) and [Zepto](http://zeptojs.com/).
 
-## Usage
 
-### Instant
+## Quick Install
 
-To ajaxify your entire website with the HTML5 History API, History.js and jQuery the [Ajaxify Script](https://github.com/browserstate/ajaxify) is all you need. It's that easy.
+### Via Ajaxify Script
+To ajaxify your entire website with the HTML5 History API, History.js and jQuery the [Ajaxify script](https://github.com/browserstate/ajaxify) is all you need. It's that easy.
 
-### Ruby On Rails
+### Via Ajaxify Extension
+If you don't have access to your server, or just want to try out the Ajaxify script first, you can install the [History.js It! Google Chrome Extension](https://github.com/browserstate/historyjsit.crx) to try out History.js via Ajaxify on select websites without actually installing History.js/Ajaxify on your server.
 
+### Via Ruby On Rails Gem
 If you are using Rails, then the easiest way for you to try History.js would be to use [Wiselinks](https://github.com/igor-alexandrov/wiselinks) gem. Wiselinks integrates  into Rails application and allows you to start using History.js with three lines of code.
+
+
+## Direct Install
 
 ### Working with History.js directly
 
@@ -60,6 +67,7 @@ If you are using Rails, then the easiest way for you to try History.js would be 
 })(window);
 ```
 
+
 ### How would the above operations look in a HTML5 Browser?
 
 1. www.mysite.com
@@ -73,6 +81,7 @@ If you are using Rails, then the easiest way for you to try History.js would be 
 1. www.mysite.com/?state=3
 
 > Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling).
+
 
 ### How would they look in a HTML4 Browser?
 
@@ -92,6 +101,7 @@ If you are using Rails, then the easiest way for you to try History.js would be 
 >
 > Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling)
 
+
 ### What's the deal with the SUIDs used in the HTML4 States?
 
 - SUIDs (State Unique Identifiers) are used when we utilise a `title` and/or `data` in our state. Adding a SUID allows us to associate particular states with data and titles while keeping the urls as simple as possible (don't worry it's all tested, working and a lot smarter than I'm making it out to be).
@@ -100,10 +110,12 @@ If you are using Rails, then the easiest way for you to try History.js would be 
 - It works with domains, subdomains, subdirectories, whatever - doesn't matter where you put it. It's smart.
 - Safari 5 will also have a SUID appended to the URL, it is entirely transparent but just a visible side-effect. It is required to fix a bug with Safari 5.
 
+
 ### Is there a working demo?
 
 - Sure is, give it a download and navigate to the demo directory in your browser :-)
 - If you are after something a bit more adventurous than a end-user demo, open up the tests directory in your browser and editor - it'll rock your world and show all the vast use cases that History.js supports.
+
 
 ## Download & Installation
 
@@ -183,6 +195,7 @@ If you are using Rails, then the easiest way for you to try History.js would be 
 Thanks! every bit of help really does make a difference!
 
 
+
 ## Browsers: Tested and Working In
 
 ### HTML5 Browsers
@@ -193,6 +206,7 @@ Thanks! every bit of help really does make a difference!
 - Safari 5.0+
 - Safari iOS 4.3+
 
+
 ### HTML4 Browsers
 
 - IE 6, 7, 8, 9, (10)
@@ -202,11 +216,13 @@ Thanks! every bit of help really does make a difference!
 - Safari iOS 4.2, 4.1, 4.0, 3.2
 
 
+
 ## Exposed API
 
 ### Functions
 
 #### States
+
 - `History.pushState(data,title,url)` <br/> Pushes a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
 - `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
 - `History.getState()` <br/> Gets the current state of the browser, returns an object with `data`, `title` and `url`
@@ -215,16 +231,19 @@ Thanks! every bit of help really does make a difference!
 - `History.getHash()` <br/> Gets the current hash of the browser
 
 #### Adapter
+
 - `History.Adapter.bind(element,event,callback)` <br/> A framework independent event binder, you may either use this or your framework's native event binder.
 - `History.Adapter.trigger(element,event)` <br/> A framework independent event trigger, you may either use this or your framework's native event trigger.
 - `History.Adapter.onDomLoad(callback)` <br/> A framework independent onDomLoad binder, you may either use this or your framework's native onDomLoad binder.
 
 #### Navigation
+
 - `History.back()` <br/> Go back once through the history (same as hitting the browser's back button)
 - `History.forward()` <br/> Go forward once through the history (same as hitting the browser's forward button)
 - `History.go(X)` <br/> If X is negative go back through history X times, if X is positive go forwards through history X times
 
 #### Debug
+
 - `History.log(...)` <br/> Logs messages to the console, the log element, and fallbacks to alert if neither of those two exist
 - `History.debug(...)` <br/> Same as `History.log` but only runs if `History.debug.enable === true`
 
@@ -242,6 +261,7 @@ Thanks! every bit of help really does make a difference!
 - `History.options.initialTitle` <br/> What is the title of the initial state
 - `History.options.html4Mode` <br/> If true, will force HTMl4 mode (hashtags)
 - `History.options.delayInit` <br/> Want to override default options and call init manually.
+
 
 ### Events
 
@@ -283,10 +303,10 @@ Thanks! every bit of help really does make a difference!
 
 ## History
 
-You can discover the history inside the [History.md](https://github.com/browserstate/history.js/blob/master/History.md#files) file
+[You can discover the history inside the `History.md` file](https://github.com/browserstate/history.js/blob/master/History.md#files)
 
 
 ## License
 
 Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
-<br/>Copyright &copy;  2011+ [Benjamin Arthur Lupton](http://balupton.com)
+<br/>Copyright &copy;  2011+ [Benjamin Arthur Lupton](http://balupton.com) <b@lupton.cc>
