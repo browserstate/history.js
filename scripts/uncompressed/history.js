@@ -744,7 +744,7 @@
 			newState = {};
 			newState.normalized = true;
 			newState.title = oldState.title||'';
-			newState.url = History.getFullUrl(oldState.url?oldState.url:(History.getLocationHref()));
+			newState.url = History.getFullUrl(oldState.url != null ? oldState.url : History.getLocationHref());
 			newState.hash = History.getShortUrl(newState.url);
 			newState.data = History.cloneObject(oldState.data);
 
