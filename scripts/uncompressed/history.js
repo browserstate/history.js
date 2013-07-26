@@ -927,7 +927,7 @@
 		 */
 		History.isTraditionalAnchor = function(url_or_hash){
 			// Check
-			var isTraditional = !(/[\/\?\.]/.test(url_or_hash));
+			var isTraditional = !(/[\/\?]/.test(url_or_hash));
 
 			// Return
 			return isTraditional;
