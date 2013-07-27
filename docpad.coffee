@@ -59,6 +59,14 @@ docpadConfig =
 			# Merge the document keywords with the site keywords
 			@site.keywords.concat(@document.keywords or []).join(', ')
 
+	events:
+		serverExtend: ({server}) ->
+			server.all 'stress-image.jpg', (req,res) ->
+				res.setHeader('Content-Type', 'image/jpeg')
+				setTimeout(
+					-> res.send(200)
+					10*1000
+				)
 
 # Export our DocPad Configuration
 module.exports = docpadConfig

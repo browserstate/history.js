@@ -114,7 +114,7 @@ var checkState = function(){
 	});
 
 	// Image Load to Stress Test Safari and Opera
-	(new Image()).src = "image.php";
+	(new Image()).src = "/stress-image.jpg";
 };
 
 // Check the Initial State
