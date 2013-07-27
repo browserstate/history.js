@@ -1,8 +1,8 @@
 /**
  * History.js HTML4 Support
  * Depends on the HTML5 Support
- * @author Benjamin Arthur Lupton <contact@balupton.com>
- * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+ * @author Benjamin Arthur Lupton <b@lupton.cc>
+ * @copyright 2010+ Benjamin Arthur Lupton <b@lupton.cc>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
  */
 
@@ -351,7 +351,7 @@
 
 							// Equalise
 							lastIframeHash = iframeHash;
-							
+
 							// If there is no iframe hash that means we're at the original
 							// iframe state.
 							// And if there was a hash on the original request, the original
@@ -569,7 +569,7 @@
 				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
 					History.setHash(newStateHash,false);
 				}
-				
+
 				History.busy(false);
 
 				// End pushState closure
@@ -631,13 +631,13 @@
 					// Store the newState
 					History.storeState(newState);
 					History.expectedStateId = newState.id;
-	
+
 					// Recycle the State
 					History.recycleState(newState);
-	
+
 					// Force update of the title
 					History.setTitle(newState);
-					
+
 					// Update HTML5 State
 					History.saveState(newState);
 

@@ -1,7 +1,10 @@
 /**
- * History.js Native Adapter
- * @author Benjamin Arthur Lupton <contact@balupton.com>
- * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+ * History.js Dojo Adapter
+ *
+ * Essentially the same as the native adapter but uses dojo/ready for the dom load callback.
+ *
+ * @author Benjamin Arthur Lupton <b@lupton.cc>
+ * @copyright 2010+ Benjamin Arthur Lupton <b@lupton.cc>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
  */
 
@@ -10,7 +13,8 @@
 	"use strict";
 
 	// Localise Globals
-	var History = window.History = window.History||{};
+	var History = window.History = window.History||{},
+        require = window.require;
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -103,13 +107,9 @@
 		 * @return
 		 */
 		onDomLoad: function(callback) {
-			var timeout = window.setTimeout(function(){
-				callback();
-			},2000);
-			window.onload = function(){
-				clearTimeout(timeout);
-				callback();
-			};
+			require(["dojo/ready"], function(ready) {
+				ready(callback);
+			});
 		}
 	};
 

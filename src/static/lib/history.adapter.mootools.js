@@ -1,7 +1,7 @@
 /**
  * History.js MooTools Adapter
- * @author Benjamin Arthur Lupton <contact@balupton.com>
- * @copyright 2010-2011 Benjamin Arthur Lupton <contact@balupton.com>
+ * @author Benjamin Arthur Lupton <b@lupton.cc>
+ * @copyright 2010+ Benjamin Arthur Lupton <b@lupton.cc>
  * @license New BSD License <http://creativecommons.org/licenses/BSD/>
  */
 
