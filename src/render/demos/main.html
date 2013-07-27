@@ -1,5 +1,6 @@
 ---
 title: History.js
+url: '/'
 layout: default
 scripts:
 	- /vendor/json2.js
@@ -20,8 +21,7 @@ scripts:
 <p>Click through the buttons in order and you'll get the results demonstrated in the <a href="../README.md">README.md</a> file.</p>
 
 <!-- Buttons -->
-<ul id="buttons">
-</ul>
+<ul id="buttons"></ul>
 
 <!-- Our Script -->
 <script>
@@ -60,8 +60,7 @@ scripts:
 				'History.back(); // logs {}, "The page you started at", "?"',
 				'History.go(2); // logs {state:3}, "State 3", "?state=3"'
 			],
-			buttonsHTML = ''
-			;
+			buttonsHTML = '';
 
 		// Add Buttons
 		for ( var i=0,n=scripts.length; i<n; ++i ) {

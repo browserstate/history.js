@@ -51,10 +51,10 @@
 	<textarea id="log" style="width:100%;height:400px"></textarea>
 
 	<!-- History.js -->
-	<script src="../scripts/uncompressed/json2.js"></script>
-	<script src="../scripts/uncompressed/history.adapter.<%- @document.framework.toLowerCase() %>.js"></script>
-	<% if @document.html4 is true: %><script src="../scripts/uncompressed/history.html4.js"></script><% end %>
-	<script src="../scripts/uncompressed/history.js"></script>
+	<script src="/vendor/json2.js"></script>
+	<script src="/lib/history.adapter.<%- @document.framework.toLowerCase() %>.js"></script>
+	<% if @document.html4 is true: %><script src="/lib/history.html4.js"></script><% end %>
+	<script src="/lib/history.js"></script>
 
 	<!-- Run Tests -->
 	<script src="tests.js"></script>

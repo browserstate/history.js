@@ -1,0 +1,12 @@
+---
+title: History.js Demos
+layout: default
+---
+
+<h1>History.js Demos</h1>
+
+<section>
+	<ul><% for demo in @getFilesAtPath('demos/').toJSON(): %>
+		<li><a href="<%= demo.url %>"><%= demo.title %></a></li>
+	<% end %></ul>
+</section>

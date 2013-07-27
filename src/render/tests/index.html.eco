@@ -8,15 +8,15 @@ layout: default
 <p>Zepto does not support IE, this is intended</p>
 
 <section>
-	<h2>HTML4+5</h2>
-	<ul><% for item in @getFilesAtPath('tests/html4+html5').toJSON(): %>
-		<li><a href="<%= item.url %>"><%= item.title %></a></li>
+	<h2>HTML4+HTML5</h2>
+	<ul><% for test in @getFilesAtPath('tests/html4+html5').toJSON(): %>
+		<li><a href="<%= test.url %>"><%= test.framework %></a></li>
 	<% end %></ul>
 </section>
 
 <section>
 	<h2>HTML 5</h2>
-	<ul><% for item in @getFilesAtPath('tests/html5').toJSON(): %>
-		<li><a href="<%= item.url %>"><%= item.title %></a></li>
+	<ul><% for test in @getFilesAtPath('tests/html4+html5').toJSON(): %>
+		<li><a href="<%= test.url %>"><%= test.framework %></a></li>
 	<% end %></ul>
 </section>

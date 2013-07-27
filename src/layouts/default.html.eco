@@ -15,13 +15,13 @@
 	<%- @getBlock('meta').toHTML() %>
 
 	<!-- DocPad Styles + Our Own -->
-	<%- @getBlock('styles').add(@site.styles).toHTML() %>
+	<%- @getBlock('styles').add(@document.styles or []).toHTML() %>
 </head>
 <body>
 	<!-- Page Content -->
 	<%- @content %>
 
 	<!-- DocPad Scripts + Our Own -->
-	<%- @getBlock('scripts').add(@site.scripts).toHTML() %>
+	<%- @getBlock('scripts').add(@document.scripts or []).toHTML() %>
 </body>
 </html>
