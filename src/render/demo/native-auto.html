@@ -1,43 +1,40 @@
-<html>
-<head>
-</head>
-<body>
-	<script type="text/javascript">
-		(function(){
+---
+title: HTML5 History API Demo - Auto
+layout: default
+---
 
-			window.onpopstate = function(event) {
-				console.log("onpopstate: location: " + document.location.href + ", data: " + JSON.stringify(event.state));
-			};
-			window.onhashchange = function(event) {
-				console.log("onhashchange: location: " + document.location.href);
-			};
+<script>
+	(function(){
+		window.onpopstate = function(event) {
+			console.log("onpopstate: location: " + document.location.href + ", data: " + JSON.stringify(event.state));
+		};
+		window.onhashchange = function(event) {
+			console.log("onhashchange: location: " + document.location.href);
+		};
 
-			setTimeout(function(){
-				history.pushState({page: 1}, "title 1", "?page=1");
-			},1e3);
-			setTimeout(function(){
-				history.pushState({page: 2}, "title 2", "?page=2");
-			},2e3);
-			setTimeout(function(){
-				history.replaceState({page: 3}, "title 3", "?page=3");
-			},3e3);
-			setTimeout(function(){
-				document.location.hash = 'asd';
-			},4e3);
-			setTimeout(function(){
-				history.back(); // alerts "location: http://example.com/example.html?page=3#asd, state: {"page":3}"
-			},5e3);
-			setTimeout(function(){
-				history.back(); // alerts "location: http://example.com/example.html?page=1, state: {"page":1}"
-			},6e3);
-			setTimeout(function(){
-				history.back(); // alerts "location: http://example.com/example.html, state: null
-			},7e3);
-			setTimeout(function(){
-				history.go(2);  // alerts "location: http://example.com/example.html?page=3, state: {"page":3}
-			},8e3);
-
-		})();
-	</script>
-</body>
-</html>
+		setTimeout(function(){
+			history.pushState({page: 1}, "title 1", "?page=1");
+		},1e3);
+		setTimeout(function(){
+			history.pushState({page: 2}, "title 2", "?page=2");
+		},2e3);
+		setTimeout(function(){
+			history.replaceState({page: 3}, "title 3", "?page=3");
+		},3e3);
+		setTimeout(function(){
+			document.location.hash = 'asd';
+		},4e3);
+		setTimeout(function(){
+			history.back(); // alerts "location: http://example.com/example.html?page=3#asd, state: {"page":3}"
+		},5e3);
+		setTimeout(function(){
+			history.back(); // alerts "location: http://example.com/example.html?page=1, state: {"page":1}"
+		},6e3);
+		setTimeout(function(){
+			history.back(); // alerts "location: http://example.com/example.html, state: null
+		},7e3);
+		setTimeout(function(){
+			history.go(2);  // alerts "location: http://example.com/example.html?page=3, state: {"page":3}
+		},8e3);
+	})();
+</script>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html debug="true">
+<head>
+	<!-- Disable Cache -->
+	<meta http-equiv="Expires" content="Mon, 06 Jan 1990 00:00:01 GMT" />
+	<meta http-equiv="PRAGMA" content="NO-CACHE" />
+	<meta http-equiv="CACHE-CONTROL" content="NO-CACHE" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+	<!-- Standard Meta -->
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="viewport" content="width=device-width" />
+
+	<!-- Site Properities -->
+	<title>History.js HTML4+HTML5 <%- @document.framework %> Test Suite</title>
+	<meta name="description" content="<%= @getPreparedDescription() %>" />
+	<meta name="keywords" content="<%= @getPreparedKeywords() %>" />
+
+	<!-- DocPad Meta -->
+	<%- @getBlock('meta').toHTML() %>
+
+	<!-- Check -->
+	<script>
+		var href = window.document.location.href,
+			test_url = href.replace(/(history\.js\/tests\/[^\/\?\#]+).*/,'$1');
+		if ( test_url !== href ) {
+			window.document.location.href = test_url;
+		}
+	</script>
+
+	<!-- QUnit -->
+	<link rel="stylesheet" href="/vendor/qunit/qunit/qunit.css" type="text/css" media="screen">
+	<script src="/vendor/qunit/qunit/qunit.js"></script>
+
+	<!-- DocPad Styles + Our Own -->
+	<%- @getBlock('styles').add(@site.styles).toHTML() %>
+</head>
+<body>
+	<!-- Framework -->
+	<script src="/vendor/<%- @document.framework.toLowerCase() %>.js"></script>
+
+	<!-- Elements -->
+	<h1 id="qunit-header">History.js <%- if @document.html4 is true then 'HTML4+HTML5' else 'HTML5' %> <%- @document.framework %> Test Suite</h1>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+	<div id="qunit-fixture">test markup</div>
+	<button onclick="history.back()">back</button><button onclick="history.forward()">forward</button>
+	<textarea id="log" style="width:100%;height:400px"></textarea>
+
+	<!-- History.js -->
+	<script src="../scripts/uncompressed/json2.js"></script>
+	<script src="../scripts/uncompressed/history.adapter.<%- @document.framework.toLowerCase() %>.js"></script>
+	<% if @document.html4 is true: %><script src="../scripts/uncompressed/history.html4.js"></script><% end %>
+	<script src="../scripts/uncompressed/history.js"></script>
+
+	<!-- Run Tests -->
+	<script src="tests.js"></script>
+
+	<!-- Page Content -->
+	<%- @content %>
+
+	<!-- DocPad Scripts + Our Own -->
+	<%- @getBlock('scripts').add(@site.scripts).toHTML() %>
+</body>
+</html>
