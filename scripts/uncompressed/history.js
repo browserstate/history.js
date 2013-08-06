@@ -23,8 +23,15 @@
 		clearInterval = window.clearInterval,
 		JSON = window.JSON,
 		alert = window.alert,
-		History = window.History = window.History||{}, // Public History Object
+		History, // Public History Object
 		history = window.history; // Old History Object
+		
+		
+	if (typeof module !== "undefined" && module.exports) {
+		module.exports = History = {}
+	} else {
+		History = window.History = window.History||{}, 	
+	}
 
 	try {
 		sessionStorage.setItem('TEST', '1');
