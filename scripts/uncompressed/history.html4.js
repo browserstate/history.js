@@ -79,6 +79,19 @@
 		};
 
 		/**
+		 * History.isHashEqual(newHash, oldHash)
+		 * Checks to see if two hashes are functionally equal
+		 * @param {string} newHash
+		 * @param {string} oldHash
+		 * @return {boolean} true
+		 */
+		History.isHashEqual = function(newHash, oldHash){
+			newHash = encodeURIComponent(newHash).replace(/%25/g, "%");
+			oldHash = encodeURIComponent(oldHash).replace(/%25/g, "%");
+			return newHash === oldHash;
+		};
+
+		/**
 		 * History.saveHash(newHash)
 		 * Push a Hash
 		 * @param {string} newHash
@@ -190,7 +203,7 @@
 		};
 
 		/**
-		 * History.discardState(State)
+		 * History.discardedState(State)
 		 * Checks to see if the state is discarded
 		 * @param {object} State
 		 * @return {bool}
@@ -263,7 +276,8 @@
 				// Define some variables that will help in our checker function
 				var lastDocumentHash = '',
 					iframeId, iframe,
-					lastIframeHash, checkerRunning;
+					lastIframeHash, checkerRunning,
+					startedWithHash = Boolean(History.getHash());
 
 				// Handle depending on the browser
 				if ( History.isInternetExplorer() ) {
@@ -275,7 +289,10 @@
 					iframe = document.createElement('iframe');
 
 					// Adjust iFarme
+					// IE 6 requires iframe to have a src on HTTPS pages, otherwise it will throw a
+					// "This page contains both secure and nonsecure items" warning.
 					iframe.setAttribute('id', iframeId);
+					iframe.setAttribute('src', '#');
 					iframe.style.display = 'none';
 
 					// Append iFrame
@@ -300,8 +317,9 @@
 						checkerRunning = true;
 
 						// Fetch
-						var documentHash = History.getHash()||'',
-							iframeHash = History.unescapeHash(iframe.contentWindow.document.location.hash)||'';
+						var
+							documentHash = History.getHash(),
+							iframeHash = History.getHash(iframe.contentWindow.document);
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -333,9 +351,19 @@
 
 							// Equalise
 							lastIframeHash = iframeHash;
-
-							// Update the Hash
-							History.setHash(iframeHash,false);
+							
+							// If there is no iframe hash that means we're at the original
+							// iframe state.
+							// And if there was a hash on the original request, the original
+							// iframe state was replaced instantly, so skip this state and take
+							// the user back to where they came from.
+							if (startedWithHash && iframeHash === '') {
+								History.back();
+							}
+							else {
+								// Update the Hash
+								History.setHash(iframeHash,false);
+							}
 						}
 
 						// Reset Running
@@ -352,7 +380,7 @@
 					// Define the checker function
 					History.checkerFunction = function(){
 						// Prepare
-						var documentHash = History.getHash();
+						var documentHash = History.getHash()||'';
 
 						// The Document Hash has changed (application caused)
 						if ( documentHash !== lastDocumentHash ) {
@@ -398,7 +426,7 @@
 				//History.debug('History.onHashChange', arguments);
 
 				// Prepare
-				var currentUrl = ((event && event.newURL) || document.location.href),
+				var currentUrl = ((event && event.newURL) || History.getLocationHref()),
 					currentHash = History.getHashByUrl(currentUrl),
 					currentState = null,
 					currentStateHash = null,
@@ -429,7 +457,7 @@
 				}
 
 				// Create State
-				currentState = History.extractState(History.getFullUrl(currentHash||document.location.href,false),true);
+				currentState = History.extractState(History.getFullUrl(currentHash||History.getLocationHref()),true);
 
 				// Check if we are the same state
 				if ( History.isLastSavedState(currentState) ) {
@@ -460,7 +488,7 @@
 
 				// Push the new HTML5 State
 				//History.debug('History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,currentState.url,false);
+				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false);
 
 				// End onHashChange closure
 				return true;
@@ -479,9 +507,14 @@
 			History.pushState = function(data,title,url,queue){
 				//History.debug('History.pushState: called', arguments);
 
+				// We assume that the URL passed in is URI-encoded, but this makes
+				// sure that it's fully URI encoded; any '%'s that are encoded are
+				// converted back into '%'s
+				url = encodeURI(url).replace(/%25/g, "%");
+
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
+					throw new Error('History.js does not support states with fragment-identifiers (hashes/anchors).');
 				}
 
 				// Handle Queueing
@@ -505,7 +538,8 @@
 					newStateHash = History.getHashByState(newState),
 					oldState = History.getState(false),
 					oldStateHash = History.getHashByState(oldState),
-					html4Hash = History.getHash();
+					html4Hash = History.getHash(),
+					wasExpected = History.expectedStateId == newState.id;
 
 				// Store the newState
 				History.storeState(newState);
@@ -524,19 +558,18 @@
 					return false;
 				}
 
-				// Update HTML4 Hash
-				if ( newStateHash !== html4Hash && newStateHash !== History.getShortUrl(document.location.href) ) {
-					//History.debug('History.pushState: update hash', newStateHash, html4Hash);
-					History.setHash(newStateHash,false);
-					return false;
-				}
-
 				// Update HTML5 State
 				History.saveState(newState);
 
 				// Fire HTML5 Event
-				//History.debug('History.pushState: trigger popstate');
-				History.Adapter.trigger(window,'statechange');
+				if(!wasExpected)
+					History.Adapter.trigger(window,'statechange');
+
+				// Update HTML4 Hash
+				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
+					History.setHash(newStateHash,false);
+				}
+				
 				History.busy(false);
 
 				// End pushState closure
@@ -555,9 +588,14 @@
 			History.replaceState = function(data,title,url,queue){
 				//History.debug('History.replaceState: called', arguments);
 
+				// We assume that the URL passed in is URI-encoded, but this makes
+				// sure that it's fully URI encoded; any '%'s that are encoded are
+				// converted back into '%'s
+				url = encodeURI(url).replace(/%25/g, "%");
+
 				// Check the State
 				if ( History.getHashByUrl(url) ) {
-					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
+					throw new Error('History.js does not support states with fragment-identifiers (hashes/anchors).');
 				}
 
 				// Handle Queueing
@@ -578,14 +616,40 @@
 
 				// Fetch the State Objects
 				var newState        = History.createStateObject(data,title,url),
+					newStateHash = History.getHashByState(newState),
 					oldState        = History.getState(false),
+					oldStateHash = History.getHashByState(oldState),
 					previousState   = History.getStateByIndex(-2);
 
 				// Discard Old State
 				History.discardState(oldState,newState,previousState);
 
-				// Alias to PushState
-				History.pushState(newState.data,newState.title,newState.url,false);
+				// If the url hasn't changed, just store and save the state
+				// and fire a statechange event to be consistent with the
+				// html 5 api
+				if ( newStateHash === oldStateHash ) {
+					// Store the newState
+					History.storeState(newState);
+					History.expectedStateId = newState.id;
+	
+					// Recycle the State
+					History.recycleState(newState);
+	
+					// Force update of the title
+					History.setTitle(newState);
+					
+					// Update HTML5 State
+					History.saveState(newState);
+
+					// Fire HTML5 Event
+					//History.debug('History.pushState: trigger popstate');
+					History.Adapter.trigger(window,'statechange');
+					History.busy(false);
+				}
+				else {
+					// Alias to PushState
+					History.pushState(newState.data,newState.title,newState.url,false);
+				}
 
 				// End replaceState closure
 				return true;
@@ -613,7 +677,7 @@
 
 	}; // History.initHtml4
 
-	// Try and Initialise History
+	// Try to Initialise History
 	if ( typeof History.init !== 'undefined' ) {
 		History.init();
 	}

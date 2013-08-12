@@ -1,25 +1,47 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>History.js Test Suite</title>
-	<style type="text/css">
-		body,html,iframe {
-			padding:0;
-			margin:0;
-			outline:none;
-			border:none;
-		}
-		.browser {
-			padding-top:1em;
-		}
-		.adapter {
-			padding-top:1em;
-		}
-	</style>
-</head>
-<body>
-	<h1>History.js Test Suite</h1>
-	<p>HTML5 Browsers must pass the HTML4+HTML5 tests</p>
-	<p>HTML4 Browsers must pass the HTML4 tests and should fail the HTML5 tests</p>
-	<div class="browser"><div class="adapter"><a href="html4+html5.jquery.html">History.js Html4+html5 Jquery Test Suite</a></div><div class="adapter"><a href="html4+html5.mootools.html">History.js Html4+html5 Mootools Test Suite</a></div><div class="adapter"><a href="html4+html5.native.html">History.js Html4+html5 Native Test Suite</a></div><div class="adapter"><a href="html4+html5.right.html">History.js Html4+html5 Right Test Suite</a></div><div class="adapter"><a href="html4+html5.zepto.html">History.js Html4+html5 Zepto Test Suite</a></div></div><div class="browser"><div class="adapter"><a href="html5.jquery.html">History.js Html5 Jquery Test Suite</a></div><div class="adapter"><a href="html5.mootools.html">History.js Html5 Mootools Test Suite</a></div><div class="adapter"><a href="html5.native.html">History.js Html5 Native Test Suite</a></div><div class="adapter"><a href="html5.right.html">History.js Html5 Right Test Suite</a></div><div class="adapter"><a href="html5.zepto.html">History.js Html5 Zepto Test Suite</a></div></div></body>
+	<head>
+		<title>History.js Test Suite</title>
+		<style type="text/css">
+			body,html,iframe {
+				padding:0;
+				margin:0;
+				outline:none;
+				border:none;
+			}
+			.browser {
+				padding-bottom:1em;
+				float: left;
+				margin-right: 5em;
+			}
+			.adapter {
+				padding-bottom:1em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>History.js Test Suite</h1>
+		<p>HTML5 Browsers must pass the HTML4+HTML5 tests, HTML4 Browsers must pass the HTML4 tests and should fail the HTML5 tests.</p>
+		
+		<div class="browser">
+			<h2>HTML 4+5</h2>
+			<div class="adapter"><a href="html4+HTML5.dojo.html">Dojo Test Suite</a></div>
+			<div class="adapter"><a href="html4+HTML5.extjs.html">ExtJS Test Suite</a></div>
+			<div class="adapter"><a href="HTML4+HTML5.jquery.html">jQuery Test Suite</a></div>
+			<div class="adapter"><a href="HTML4+HTML5.mootools.html">Mootools Test Suite</a></div>
+			<div class="adapter"><a href="HTML4+HTML5.native.html">Native Test Suite</a></div>
+			<div class="adapter"><a href="HTML4+HTML5.right.html">Right Test Suite</a></div>
+			<div class="adapter"><a href="HTML4+HTML5.zepto.html">Zepto Test Suite</a> (Zepto doesn't support IE)</div>
+		</div>
+		<div class="browser">
+			<h2>HTML 5</h2>
+			<div class="adapter"><a href="HTML5.dojo.html">Dojo Test Suite</a></div>
+			<div class="adapter"><a href="HTML5.extjs.html">ExtJS Test Suite</a></div>
+			<div class="adapter"><a href="HTML5.jquery.html">jQuery Test Suite</a></div>
+			<div class="adapter"><a href="HTML5.mootools.html">Mootools Test Suite</a></div>
+			<div class="adapter"><a href="HTML5.native.html">Native Test Suite</a></div>
+			<div class="adapter"><a href="HTML5.right.html">Right Test Suite</a></div>
+			<div class="adapter"><a href="HTML5.zepto.html">Zepto Test Suite</a> (Zepto doesn't support IE)</div>
+		</div>
+	</body>
 </html>

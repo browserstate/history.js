@@ -1,0 +1,28 @@
+{
+	"predef": [
+		"jQuery",
+		"exports"
+	],
+
+	"bitwise": true,
+	"camelcase": false,
+	"curly": true,
+	"eqeqeq": true,
+	"immed": true,
+	"latedef": false,
+	"newcap": true,
+	"noarg": false,
+	"noempty": true,
+	"nonew": true,
+	"undef": true,
+	"unused": true,
+
+	"proto": true,
+	"smarttabs": true,
+	"sub": true,
+	"trailing": true,
+
+	"browser": true,
+
+	"onevar": true
+}

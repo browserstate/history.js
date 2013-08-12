@@ -1,8 +1,8 @@
 /**
- * RightJS v2.2.3 - http://rightjs.org
+ * RightJS v2.3.1 - http://rightjs.org
  * Released under the terms of MIT license
  *
- * Copyright (C) 2008-2011 Nikolay Nemshilov
+ * Copyright (C) 2008-2012 Nikolay Nemshilov
  */
 /**
  * The basic layout for RightJS builds
@@ -20,7 +20,7 @@ var RightJS = function(value) {
   return value; // <- a dummy method to emulate the safe-mode
 };
 
-RightJS.version = "2.2.3";
+RightJS.version = "2.3.1";
 RightJS.modules =["core", "dom", "form", "events", "xhr", "fx", "cookie"];
 
 
@@ -157,7 +157,7 @@ isString = RightJS.isString = function(value) {
  * @return boolean check result
  */
 isNumber = RightJS.isNumber = function(value) {
-  return typeof(value) === 'number';
+  return typeof(value) === 'number' && !isNaN(value);
 },
 
 /**
@@ -471,8 +471,8 @@ $ext(Object, {
    * @return Object merged object
    */
   merge: function() {
-    var object = {}, i=0, args=arguments, key;
-    for (l = args.length; i < l; i++) {
+    var object = {}, i=0, args=arguments, l=args.length, key;
+    for (; i < l; i++) {
       if (isHash(args[i])) {
         for (key in args[i]) {
           object[key] = isHash(args[i][key]) && !(args[i][key] instanceof Class) ?
@@ -490,17 +490,55 @@ $ext(Object, {
    * @return String query
    */
   toQueryString: function(object) {
-    var tokens = [], key, value, encode = encodeURIComponent;
-    for (key in object) {
-      value = ensure_array(object[key]);
-      for (var i=0, l = value.length; i < l; i++) {
-        tokens.push(encode(key) +'='+ encode(value[i]));
-      }
+    var entries = to_query_string_map(object), i=0, result = [];
+
+    for (; i < entries.length; i++) {
+      result.push(encodeURIComponent(entries[i][0]) + "=" + encodeURIComponent(''+entries[i][1]));
     }
-    return tokens.join('&');
+
+    return result.join('&');
   }
 }, true);
 
+// private
+
+/**
+ * pre-converts nested objects into a flat key-value structure
+ *
+ * @param {Object} data-hash
+ * @param {String} key-prefix
+ * @return {Array} key-value pairs
+ */
+function to_query_string_map(hash, prefix) {
+  var result = [], key, value, i;
+
+  for (key in hash) {
+    value = hash[key];
+    if (prefix) {
+      key = prefix + "["+ key + "]";
+    }
+
+    if (typeof(value) === 'object') {
+      if (isArray(value)) {
+        if (!key.endsWith('[]')) {
+          key += "[]";
+        }
+        for (i=0; i < value.length; i++) {
+          result.push([key, value[i]]);
+        }
+      } else if (value) { // assuming it's an object
+        value = to_query_string_map(value, key);
+        for (i=0; i < value.length; i++) {
+          result.push(value[i]);
+        }
+      }
+    } else {
+      result.push([key, value]);
+    }
+  }
+
+  return result;
+}
 
 /**
  * here are the starndard Math object extends
@@ -1123,6 +1161,15 @@ String.include({
   },
 
   /**
+   * Makes a dashed version of the string
+   *
+   * @return String dashed version
+   */
+  dasherize: function() {
+    return this.underscored().replace(/_/g, '-');
+  },
+
+  /**
    * checks if the string contains the given substring
    *
    * @param String string
@@ -1311,7 +1358,7 @@ Function.include({
  *   Some methods inspired by
  *     - Ruby      (http://www.ruby-lang.org) Copyright (C) Yukihiro Matsumoto
  *
- * Copyright (C) 2008-2010 Nikolay V. Nemshilov
+ * Copyright (C) 2008-2011 Nikolay V. Nemshilov
  */
 Number.include({
   /**
@@ -1340,6 +1387,33 @@ Number.include({
       callback.call(scope, i);
     }
     return this;
+  },
+
+  /**
+   * Maps a list of numbers from current to given
+   * or map a result of calls of the callback on those numbers
+   *
+   * @param {Number} end number
+   * @param {Function} optional callback
+   * @param {Object} optional callback scope
+   * @return {Array} the result list
+   */
+  to: function(number, callback, scope) {
+    var start = this + 0, end = number, result = [], i=start;
+
+    callback = callback || function(i) { return i; };
+
+    if (end > start) {
+      for (; i <= end; i++) {
+        result.push(callback.call(scope, i));
+      }
+    } else {
+      for (; i >= end; i--) {
+        result.push(callback.call(scope, i));
+      }
+    }
+
+    return result;
   },
 
   abs: function() {
@@ -1389,6 +1463,80 @@ RegExp.escape = function(string) {
   return (''+string).replace(/([.*+?\^=!:${}()|\[\]\/\\])/g, '\\$1');
 };
 
+
+if (!window.JSON) {
+  window.JSON = (function() {
+    var
+    // see the original JSON decoder implementation for descriptions http://www.json.org/json2.js
+    cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+    specials = {'\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f', '\r': '\\r', '"' : '\\"', '\\': '\\\\'},
+    quotables = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
+
+
+    // quotes the string
+    function quote(string) {
+      return string.replace(quotables, function(chr) {
+        return specials[chr] || '\\u' + ('0000' + chr.charCodeAt(0).toString(16)).slice(-4);
+      });
+    }
+
+    // adds the leading zero symbol
+    function zerofy(num) {
+      return (num < 10 ? '0' : '')+num;
+    }
+
+    return {
+      stringify: function(value) {
+        switch(typeof(value)) {
+          case 'boolean': return String(value);
+          case 'number':  return String(value+0);
+          case 'string':  return '"'+ quote(value) + '"';
+          case 'object':
+            if (value === null) {
+              return 'null';
+            } else if (isArray(value)) {
+              return '['+$A(value).map(JSON.stringify).join(',')+']';
+
+            } else if (to_s.call(value) === '[object Date]') {
+              return '"' + value.getUTCFullYear() + '-' +
+                zerofy(value.getUTCMonth() + 1)   + '-' +
+                zerofy(value.getUTCDate())        + 'T' +
+                zerofy(value.getUTCHours())       + ':' +
+                zerofy(value.getUTCMinutes())     + ':' +
+                zerofy(value.getUTCSeconds())     + '.' +
+                zerofy(value.getMilliseconds())   + 'Z' +
+              '"';
+
+            } else {
+              var result = [], key;
+              for (key in value) {
+                result.push('"'+key+'":'+JSON.stringify(value[key]));
+              }
+              return '{'+result.join(',')+'}';
+            }
+        }
+      },
+
+      parse: function(string) {
+        if (isString(string) && string) {
+          // getting back the UTF-8 symbols
+          string = string.replace(cx, function (a) {
+            return '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+          });
+
+          // checking the JSON string consistency
+          if (/^[\],:{}\s]*$/.test(string.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
+            .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+            .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+              return new Function('return '+string)();
+            }
+        }
+
+        throw "JSON parse error: "+string;
+      }
+    };
+  })();
+}
 
 /**
  * The basic Class unit
@@ -2306,11 +2454,13 @@ make_element = function (tag, options) {
 //
 if (IE8_OR_LESS) {
   make_element = function(tag, options) {
-    if (tag === 'input' && options !== undefined) {
-      tag = '<input name="'+ options.name +
-        '" type='+ options.type +
-        (options.checked ? ' checked' : '') +
-      '/>';
+    if (options !== undefined && (tag === 'input' || tag === 'button')) {
+      tag = '<'+ tag +' name="'+ options.name +
+        '" type="'+ options.type +'"'+
+        (options.checked ? ' checked' : '') + ' />';
+
+      delete(options.name);
+      delete(options.type);
     }
 
     return document.createElement(tag);
@@ -2524,8 +2674,9 @@ Element.include({
    * @return String text content or Element this
    */
   text: function(text) {
-    return text === undefined ? (this._.textContent || this._.innerText) :
-      this.update(this.doc()._.createTextNode(text));
+    return text === undefined ? (
+      this._.textContent === undefined ? this._.innerText : this._.textContent
+    ) : this.update(this.doc()._.createTextNode(text));
   },
 
   /**
@@ -2929,7 +3080,9 @@ Element.include({
         if (!(key in element)) {
           element.setAttribute(key, ''+hash[key]);
         }
-        element[key] = hash[key];
+        if (key.substr(0,5) !== 'data-') {
+          element[key] = hash[key];
+        }
       }
     }
 
@@ -3050,6 +3203,60 @@ Element.include({
   radio: function(effect, options) {
     this.siblings().each('hide', effect, options);
     return this.show();
+  },
+
+  /**
+   * Sets/gets the `data-smth` data attribute and
+   * automatically converts everything in/out JSON
+   *
+   * @param String key name
+   * @param mixed data or `undefined` to erase
+   * @return mixed Element self or extracted data
+   */
+  data: function(key, value) {
+    var name, result, match, attrs, attr, i;
+
+    if (isHash(key)) {
+      for (name in key) {
+        value = this.data(name, key[name]);
+      }
+    } else if (value === undefined) {
+      key = 'data-'+ (''+key).dasherize();
+
+      for (result = {}, match = false, attrs = this._.attributes, i=0; i < attrs.length; i++) {
+        value = attrs[i].value;
+        try { value = JSON.parse(value); } catch (e) {}
+
+        if (attrs[i].name === key) {
+          result = value;
+          match  = true;
+          break;
+        } else if (attrs[i].name.indexOf(key) === 0) {
+          result[attrs[i].name.substring(key.length+1).camelize()] = value;
+          match = true;
+        }
+      }
+
+      value = match ? result : null;
+    } else {
+      key = 'data-'+ (''+key).dasherize();
+
+      if (!isHash(value)) { value = {'': value}; }
+
+      for (name in value) {
+        attr = name.blank() ? key : key+'-'+name.dasherize();
+
+        if (value[name] === null) {
+          this._.removeAttribute(attr);
+        } else {
+          this._.setAttribute(attr, isString(value[name]) ? value[name] : JSON.stringify(value[name]));
+        }
+      }
+
+      value = this;
+    }
+
+    return value;
   }
 });
 
@@ -3564,7 +3771,15 @@ var Form = RightJS.Form = Element_wrappers.FORM = new Class(Element, {
    * @return Input field
    */
   input: function(name) {
-    return wrap(this._[name]);
+    var input = this._[name];
+
+    if ('tagName' in input) {
+      input = wrap(input);
+    } else { // a list of radio-buttons (coz they have all the same name)
+      input = $A(input).map(wrap);
+    }
+
+    return input;
   },
 
   /**
@@ -3618,20 +3833,36 @@ var Form = RightJS.Form = Element_wrappers.FORM = new Class(Element, {
    * @return Object values
    */
   values: function() {
-    var values = {}, value, name, element, input;
+    var values = {};
 
-    this.inputs().each(function(element) {
-      input = element._;
-      name  = input.name;
-      if (!input.disabled && name && (
-        !['checkbox', 'radio'].include(input.type) || input.checked
-      )) {
-        value = element.getValue();
-        if (name.endsWith('[]')) {
-          value = (values[name] || []).concat([value]);
+    this.inputs().each(function (element) {
+      var input = element._,
+          hash  = values, key,
+          keys  = input.name.match(/[^\[]+/g);
+
+      if (!input.disabled && input.name && (!(input.type === 'checkbox' || input.type === 'radio') || input.checked)) {
+        // getting throught the smth[smth][smth][] in the name
+        while (keys.length > 1) {
+          key  = keys.shift();
+          if (key.endsWith(']')) {
+            key  = key.substr(0, key.length-1);
+          }
+          if (!hash[key]) {
+            hash[key] = keys[0] === ']' ? [] : {};
+          }
+          hash = hash[key];
         }
 
-        values[name] = value;
+        key  = keys.shift();
+        if (key.endsWith(']')) {
+          key = key.substr(0, key.length-1);
+        }
+
+        if (key === '') { // an array
+          hash.push(element.value());
+        } else {
+          hash[key] = element.value();
+        }
       }
     });
 
@@ -4536,10 +4767,6 @@ var Xhr = RightJS.Xhr = new Class(Observer, {
 
   // prepares user sending params
   prepareParams: function(params) {
-    if (params && params instanceof Form) {
-      this.form = params;
-      params = params.values();
-    }
     return params;
   },
 
@@ -4571,40 +4798,31 @@ var Xhr = RightJS.Xhr = new Class(Observer, {
   // called on success
   tryScripts: function(response) {
     var content_type = this.getHeader('Content-type');
+    var x_json_data  = this.getHeader('X-JSON');
+
+    if (x_json_data) {
+      this.json = this.responseJSON = this.headerJSON = JSON.parse(x_json_data);
+    }
 
     if (this.evalResponse || (this.evalJS && /(ecma|java)script/i.test(content_type))) {
       $eval(this.text);
     } else if (/json/.test(content_type) && this.evalJSON) {
-      this.json = this.responseJSON = this.sanitizedJSON();
+      this.json = this.responseJSON = JSON.parse(this.text);
     } else if (this.evalScripts) {
       this.text.evalScripts();
     }
-  },
-
-  // sanitizes the json-response texts
-  sanitizedJSON: function() {
-    if (!(/^[,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]*$/).test(
-      this.text.replace(/\\./g, '@').replace(/"[^"\\\n\r]*"/g, '')
-    )) {
-      if (this.secureJSON) {
-        throw "JSON error: "+this.text;
-      }
-      return null;
-    }
-
-    return 'JSON' in window ? JSON.parse(this.text) :
-      (new Function("return "+this.text))();
   },
 
   // initializes the request callbacks
   initCallbacks: function() {
     // connecting basic callbacks
     this.on({
-      success:  'tryScripts',
       create:   'showSpinner',
       complete: 'hideSpinner',
       cancel:   'hideSpinner'
     });
+
+    this.on('complete', 'tryScripts');
 
     // wiring the global xhr callbacks
     Xhr.EVENTS.each(function(name) {
@@ -4739,6 +4957,22 @@ function Form_remote_send(event, options) {
   event.stop();
   this.send(options);
 }
+
+/**
+ * Adds Xhr params handling if a Form element is passed to Xhr#send
+ * 
+ * @param Object params - could be Hash or Form element
+ * @return Object
+ */
+Xhr.include({
+  prepareParams: function(params) {
+    if (params && params instanceof Form) {
+      this.form = params;
+      params = params.values();
+    }
+    return params;
+  }
+});
 
 
 /**
@@ -4913,7 +5147,9 @@ Xhr.JSONP = new Class({
  *
  * Credits:
  *   The basic principles, structures and naming system are inspired by
- *     - MooTools  (http://mootools.net)      Copyright (C) Valerio Proietti
+ *     - MooTools  (http://mootools.net) Copyright (C) Valerio Proietti
+ *   The cubic bezier emulation is backported from
+ *     - Lovely.IO (http://lovely.io) Copytirhgt (C) Nikolay Nemshilov
  *
  * Copyright (C) 2008-2011 Nikolay V. Nemshilov
  */
@@ -4932,31 +5168,9 @@ var Fx = RightJS.Fx = new Class(Observer, {
     Options: {
       fps:        IE8_OR_LESS ? 40 : 60,
       duration:   'normal',
-      transition: 'Sin',
-      queue:      true
-    },
-
-    // list of basic transitions
-    Transitions: {
-      Sin: function(i)  {
-        return -(Math.cos(Math.PI * i) - 1) / 2;
-      },
-
-      Cos: function(i) {
-        return Math.asin((i-0.5) * 2)/Math.PI + 0.5;
-      },
-
-      Exp: function(i) {
-        return Math.pow(2, 8 * (i - 1));
-      },
-
-      Log: function(i) {
-        return 1 - Math.pow(2, - 8 * i);
-      },
-
-      Lin: function(i) {
-        return i;
-      }
+      transition: 'default',
+      queue:      true,
+      engine:     'css'
     }
   },
 
@@ -4979,17 +5193,11 @@ var Fx = RightJS.Fx = new Class(Observer, {
   start: function() {
     if (fx_add_to_queue(this, arguments)) { return this; }
 
-    var options    = this.options,
-        duration   = Fx.Durations[options.duration] || options.duration,
-        transition = Fx.Transitions[options.transition] || options.transition,
-        steps      = (duration / 1000 * this.options.fps).ceil(),
-        interval   = (1000 / this.options.fps).round();
-
     fx_mark_current(this);
 
     this.prepare.apply(this, arguments);
 
-    fx_start_timer(this, transition, interval, steps);
+    fx_start_timer(this);
 
     return this.fire('start', this);
   },
@@ -5123,19 +5331,22 @@ function fx_cancel_all(element) {
  * Initializes the fx rendering timer
  *
  * @param Fx fx
- * @param Function transition stops calculator
- * @param Float interval
- * @param Integer number of steps
  * @return void
  */
-function fx_start_timer(fx, transition, interval, steps) {
-  var number = 1;
+function fx_start_timer(fx) {
+  var options    = fx.options,
+      duration   = Fx.Durations[options.duration] || options.duration,
+      steps      = Math.ceil(duration / 1000 * options.fps),
+      transition = Bezier_sequence(options.transition, steps),
+      interval   = Math.round(1000 / options.fps),
+      number     = 0;
+
   fx._timer = setInterval(function() {
-    if (number > steps) {
+    if (number === steps) {
       fx.finish();
     } else {
-      fx.render(transition(number/steps));
-      number ++;
+      fx.render(transition[number]);
+      number++;
     }
   }, interval);
 }
@@ -5152,6 +5363,82 @@ function fx_stop_timer(fx) {
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// CSS3 Cubic Bezier sequentions emulator
+// Backport from Lovely.IO (http://lovely.io)
+// See also:
+// http://st-on-it.blogspot.com/2011/05/calculating-cubic-bezier-function.html
+///////////////////////////////////////////////////////////////////////////////
+
+// CSS3 cubic-bezier presets
+var Bezier_presets = {
+  'default':     '(.25,.1,.25,1)',
+  'linear':      '(0,0,1,1)',
+  'ease-in':     '(.42,0,1,1)',
+  'ease-out':    '(0,0,.58,1)',
+  'ease-in-out': '(.42,0,.58,1)',
+  'ease-out-in': '(0,.42,1,.58)'
+},
+
+// Bezier loockup tables cache
+Bezier_cache = {};
+
+// builds a loockup table of parametric values with a given size
+function Bezier_sequence(params, size) {
+  params = Bezier_presets[params] || native_fx_functions[params] || params;
+  params = params.match(/([\d\.]+)[\s,]+([\d\.]+)[\s,]+([\d\.]+)[\s,]+([\d\.]+)/);
+  params = [0, params[1]-0, params[2]-0, params[3]-0, params[4]-0]; // cleaning up
+
+  var name = params.join(',') + ',' + size, Cx, Bx, Ax, Cy, By, Ay, sequence, step, x;
+
+  function bezier_x(t) { return t * (Cx + t * (Bx + t * Ax)); }
+  function bezier_y(t) { return t * (Cy + t * (By + t * Ay)); }
+
+  // a quick search for a more or less close parametric
+  // value using several iterations by Newton's method
+
+  function bezier_x_der(t) { // bezier_x derivative
+    return Cx + t * (2*Bx + t * 3*Ax) + 1e-3;
+  }
+  function find_parametric(t) {
+    var x=t, i=0, z;
+
+    while (i < 5) {
+      z = bezier_x(x) - t;
+
+      if (Math.abs(z) < 1e-3) { break; }
+
+      x = x - z/bezier_x_der(x);
+      i++;
+    }
+
+    return x;
+  }
+
+  if (!(name in Bezier_cache)) {
+    // defining bezier functions in a polynomial form (coz it's faster)
+    Cx = 3 * params[1];
+    Bx = 3 * (params[3] - params[1]) - Cx;
+    Ax = 1 - Cx - Bx;
+
+    Cy = 3 * params[2];
+    By = 3 * (params[4] - params[2]) - Cy;
+    Ay = 1 - Cy - By;
+
+
+    // building the actual lookup table
+    Bezier_cache[name] = sequence = [];
+    x=0; step=1/size;
+
+    while (x < 1.0001) { // should include 1.0
+      sequence.push(bezier_y(find_parametric(x)));
+      x += step;
+    }
+  }
+
+  return Bezier_cache[name];
+}
 
 /**
  * There are the String unit extensions for the effects library
@@ -5396,7 +5683,7 @@ native_fx_function   = native_fx_transition + 'TimingFunction',
 native_fx_functions  = {
   Sin: 'cubic-bezier(.3,0,.6,1)',
   Cos: 'cubic-bezier(0,.3,.6,0)',
-  Log: 'cubic-bezier(0.6,.3,.8)',
+  Log: 'cubic-bezier(0,.6,.3,.8)',
   Exp: 'cubic-bezier(.6,0,.8,.3)',
   Lin: 'cubic-bezier(0,0,1,1)'
 };
@@ -5873,7 +6160,7 @@ Fx.Scroll = new Class(Fx.Attr, {
     this.$super(
       element instanceof Window ?
         element._.document[
-          'body' in element._.document ? 'body' : 'documentElement'
+          Browser.WebKit ? 'body' : 'documentElement'
         ] : element,
       options
     );
@@ -5909,12 +6196,12 @@ var Cookie = RightJS.Cookie = new Class({
       return new this(name, options).set(value);
     },
     // gets the cookie
-    get: function(name) {
-      return new this(name).get();
+    get: function(name, options) {
+      return new this(name, options).get();
     },
     // deletes the cookie
-    remove: function(name) {
-      return new this(name).remove();
+    remove: function(name, options) {
+      return new this(name, options).remove();
     },
 
     // checks if the cookies are enabled
@@ -5948,7 +6235,10 @@ var Cookie = RightJS.Cookie = new Class({
    * @return Cookie this
    */
   set: function(data) {
+    if (!isString(data)) { data = JSON.stringify(data); }
+
     var value = encodeURIComponent(data), options = this.options;
+
     if (options.domain) { value += '; domain=' + options.domain; }
     if (options.path)   { value += '; path=' + options.path; }
     if (options.duration) {
@@ -5970,7 +6260,12 @@ var Cookie = RightJS.Cookie = new Class({
     var value = this.options.document.cookie.match(
       '(?:^|;)\\s*' + RegExp.escape(this.name) + '=([^;]*)'
     );
-    return value ? decodeURIComponent(value[1]) : null;
+    if (value) {
+      value = decodeURIComponent(value[1]);
+      try { value = JSON.parse(value); }
+      catch (e) {}
+    }
+    return value || null;
   },
 
   /**

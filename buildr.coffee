@@ -35,6 +35,98 @@ configs =
 	other: [
 
 		# -----------------------------
+		# Dojo Toolkit
+
+		{
+			# Options
+			name: 'html4+html5+dojo'
+			watch: options.watch
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: options.compress # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'json2.js'
+				'history.adapter.dojo.js'
+				'history.html4.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html4+html5/dojo.history.js'
+		}
+		{
+			# Options
+			name: 'html5+dojo'
+			watch: options.watch
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: options.compress # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'history.adapter.dojo.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html5/dojo.history.js'
+		}
+		
+		# -----------------------------
+		# ExtJS
+
+		{
+			# Options
+			name: 'html4+html5+extjs'
+			watch: options.watch
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: options.compress # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'json2.js'
+				'history.adapter.extjs.js'
+				'history.html4.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html4+html5/extjs.history.js'
+		}
+		{
+			# Options
+			name: 'html5+extjs'
+			watch: options.watch
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: options.compress # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'history.adapter.extjs.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html5/extjs.history.js'
+		}
+
+		# -----------------------------
 		# JQUERY
 
 		{

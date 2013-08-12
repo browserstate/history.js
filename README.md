@@ -1,37 +1,57 @@
-Welcome to History.js (v1.7.1 - October 4 2011)
+Welcome to History.js <br/> v1.8b2, June 22 2013
 ==================
 
-[![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/balupton/history.js&title=History.js&language=&tags=github&category=software)
+[![Flattr this project](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=balupton&url=https://github.com/browserstate/history.js&title=History.js&language=&tags=github&category=software)
 
 
-This project is the successor of [jQuery History](http://balupton.com/projects/jquery-history), it aims to:
+## News
+- 22/06/2013: Beta 2 of v1.8 is released. Fixes and uncompressed bundled files.
+- 31/05/2013: Beta 1 of v1.8 is released. Fixes.
+- 14/02/2013: Alpha 4 of v1.8 is released. Fixes.
+- 05/02/2013: Alpha 3 of v1.8 is released. Tests updated.
+- 21/01/2013: Alpha 2 of v1.8 is released. Correct statechange behaviour.
+- 19/01/2013: Alpha 1 of v1.8 is released. Started to categorize old balupton's issues.
+
+
+### History
+[See the `History.md` file for a detailed list of features, changes, solved issues and bugs](https://github.com/browserstate/history.js/blob/master/History.md#files)
+
+
+### Involve
+Please create an issue if something doesn't work or if there is a browser specific bug. I'll try to fix it as soon as possible. Please send me your Pull requests if you have a nice solution! I'm also going to review old issues in balupton's repository and try to solve them too.
+
+
+## Aims
 
 - Follow the [HTML5 History API](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history) as much as possible
 - Provide a cross-compatible experience for all HTML5 Browsers (they all implement the HTML5 History API a little bit differently causing different behaviours and sometimes bugs - History.js fixes this ensuring the experience is as expected / the same / great throughout the HTML5 browsers)
-- Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+- Provide a backwards-compatible experience for all HTML4 Browsers using a hash-fallback (including continued support for the HTML5 History API's `data`, `title`, `pushState` and `replaceState`) with the option to [remove HTML4 support if it is not right for your application](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling)
 - Provide a forwards-compatible experience for HTML4 States to HTML5 States (so if a hash-fallbacked url is accessed by a HTML5 browser it is naturally transformed into its non-hashed url equivalent)
-- Provide support for as many javascript frameworks as possible via adapters; especially [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Prototype](http://www.prototypejs.org/) and [Zepto](http://zeptojs.com/)
+- Provide support for as many javascript frameworks as possible via adapters; especially [Dojo](http://dojotoolkit.org/), [ExtJS](http://www.sencha.com/), [jQuery](http://jquery.com/), [MooTools](http://mootools.net/), [Right.js](http://rightjs.org/) and [Zepto](http://zeptojs.com/).
 
 
-## Usage
+## Quick Install
 
-### Working with History.js:
+### Via Ajaxify Script
+To ajaxify your entire website with the HTML5 History API, History.js and jQuery the [Ajaxify script](https://github.com/browserstate/ajaxify) is all you need. It's that easy.
+
+### Via Ajaxify Extension
+If you don't have access to your server, or just want to try out the Ajaxify script first, you can install the [History.js It! Google Chrome Extension](https://github.com/browserstate/historyjsit.crx) to try out History.js via Ajaxify on select websites without actually installing History.js/Ajaxify on your server.
+
+### Via Ruby On Rails Gem
+If you are using Rails, then the easiest way for you to try History.js would be to use [Wiselinks](https://github.com/igor-alexandrov/wiselinks) gem. Wiselinks integrates  into Rails application and allows you to start using History.js with three lines of code.
+
+
+## Direct Install
+
+### Working with History.js directly
 
 ``` javascript
 (function(window,undefined){
 
-	// Prepare
-	var History = window.History; // Note: We are using a capital H instead of a lower h
-	if ( !History.enabled ) {
-		 // History.js is disabled for this browser.
-		 // This is because we can optionally choose to support HTML4 browsers or not.
-		return false;
-	}
-
 	// Bind to StateChange Event
 	History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
 		var State = History.getState(); // Note: We are using History.getState() instead of event.state
-		History.log(State.data, State.title, State.url);
 	});
 
 	// Change our States
@@ -47,7 +67,6 @@ This project is the successor of [jQuery History](http://balupton.com/projects/j
 })(window);
 ```
 
-To ajaxify your entire website with the HTML5 History API, History.js and jQuery [this snippet of code](https://gist.github.com/854622) is all you need. It's that easy.
 
 ### How would the above operations look in a HTML5 Browser?
 
@@ -61,7 +80,8 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 1. www.mysite.com
 1. www.mysite.com/?state=3
 
-> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling).
+> Note: These urls also work in HTML4 browsers and Search Engines. So no need for the hashbang (`#!`) fragment-identifier that google ["recommends"](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling).
+
 
 ### How would they look in a HTML4 Browser?
 
@@ -79,7 +99,8 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 >
 > Note 2: These urls will be automatically url-encoded in IE6 to prevent certain browser-specific bugs.
 >
-> Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+> Note 3: Support for HTML4 browsers (this hash fallback) is optional [- why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling)
+
 
 ### What's the deal with the SUIDs used in the HTML4 States?
 
@@ -89,6 +110,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 - It works with domains, subdomains, subdirectories, whatever - doesn't matter where you put it. It's smart.
 - Safari 5 will also have a SUID appended to the URL, it is entirely transparent but just a visible side-effect. It is required to fix a bug with Safari 5.
 
+
 ### Is there a working demo?
 
 - Sure is, give it a download and navigate to the demo directory in your browser :-)
@@ -97,10 +119,22 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 
 ## Download & Installation
 
-- Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/balupton/history.js/tarball/master) or [zip](https://github.com/balupton/history.js/zipball/master)
+- Download History.js and upload it to your webserver. Download links: [tar.gz](https://github.com/browserstate/history.js/tarball/master) or [zip](https://github.com/browserstate/history.js/zipball/master)
 
 - Include History.js
 
+	- For [Dojo](http://dojotoolkit.org/) v1.8+
+
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/dojo.history.js"></script>
+		```
+	
+	- For [ExtJs](http://www.sencha.com/) v1.8+
+
+		``` html
+		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/extjs.history.js"></script>
+		```
+	
 	- For [jQuery](http://jquery.com/) v1.3+
 
 		``` html
@@ -131,7 +165,7 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 		<script src="http://www.yourwebsite.com/history.js/scripts/bundled/html4+html5/native.history.js"></script>
 		```
 
-> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`. [Why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/balupton/history.js/wiki/Intelligent-State-Handling)
+> Note: If you want to only support HTML5 Browsers and not HTML4 Browsers (so no hash fallback support) then just change the `/html4+html5/` part in the urls to just `/html5/`. See [Why supporting HTML4 browsers could be either good or bad based on my app's use cases](https://github.com/browserstate/history.js/wiki/Intelligent-State-Handling)
 
 
 ## Get Updates
@@ -139,26 +173,27 @@ To ajaxify your entire website with the HTML5 History API, History.js and jQuery
 - For Commit RSS/Atom Updates:
 	- You can subscribe via the [GitHub Commit Atom Feed](http://feeds.feedburner.com/historyjs)
 - For GitHub News Feed Updates:
-	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/balupton/history.js)
+	- You can click the "watch" button up the top right of History.js's [GitHub Project Page](https://github.com/browserstate/history.js)
 
 
 ## Get Support
 
-- History.js is maintained by people like you. If you find a bug, report it to the [GitHub Issue Tracker](https://github.com/balupton/history.js/issues). If you've fixed a bug submit a [Pull Request](https://github.com/balupton/history.js/pulls) and add your fork to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network).
+- History.js is maintained by people like you. If you find a bug, report it to the [GitHub Issue Tracker](https://github.com/browserstate/history.js/issues). If you've fixed a bug submit a [Pull Request](https://github.com/browserstate/history.js/pulls) and add your fork to the [Network Wiki Page](https://github.com/browserstate/history.js/wiki/Network).
 
-- If you would like paid support and trainings, or have job offers, then refer to the [Network Wiki Page](https://github.com/balupton/history.js/wiki/Network). If you are qualified with History.js, then be sure to add your details to that page too.
+- If you would like paid support and trainings, or have job offers, then refer to the [Network Wiki Page](https://github.com/browserstate/history.js/wiki/Network). If you are qualified with History.js, then be sure to add your details to that page too.
 
 - If your company uses History.js on your projects, and would like to see it grow and prosper (better documentation, bugfixes, upgrades, maintenance, etc.) and would love to become a corporate sponsor then do email sponsor@bevry.me
 
 - If you would like free support for History.js, then [post your question](http://stackoverflow.com/questions/ask) on [Stackoverflow](http://stackoverflow.com/about) and be sure to use the `history.js` tag when asking your question.
 
-- If you've created a website that uses History.js, or know of one. Then be sure to add it to the [Showcase Wiki Page](https://github.com/balupton/history.js/wiki/Showcase).
+- If you've created a website that uses History.js, or know of one, be sure to add it to the [Showcase Wiki Page](https://github.com/browserstate/history.js/wiki/Showcase).
 
-- If you'd love to +1 or like this project, then be sure to tweet about it and click the "watch" button up the top of its [Project Page](https://github.com/balupton/history.js).
+- If you'd love to +1 or like this project, then be sure to tweet about it and click the "watch" button up the top of its [Project Page](https://github.com/browserstate/history.js).
 
-- For anything else, refer to the [History.js GitHub Wiki Site](https://github.com/balupton/history.js/wiki).
+- For anything else, refer to the [History.js GitHub Wiki Site](https://github.com/browserstate/history.js/wiki).
 
 Thanks! every bit of help really does make a difference!
+
 
 
 ## Browsers: Tested and Working In
@@ -167,40 +202,76 @@ Thanks! every bit of help really does make a difference!
 
 - Firefox 4+
 - Chrome 8+
-- Opera 11.5
+- Opera 11.5+
 - Safari 5.0+
 - Safari iOS 4.3+
 
+
 ### HTML4 Browsers
 
-- IE 6, 7, 8, 9
+- IE 6, 7, 8, 9, (10)
 - Firefox 3
 - Opera 10, 11.0
 - Safari 4
 - Safari iOS 4.2, 4.1, 4.0, 3.2
 
 
+
 ## Exposed API
 
 ### Functions
 
+#### States
+
 - `History.pushState(data,title,url)` <br/> Pushes a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
 - `History.replaceState(data,title,url)` <br/> Replaces the existing state with a new state to the browser; `data` can be null or an object, `title` can be null or a string, `url` must be a string
 - `History.getState()` <br/> Gets the current state of the browser, returns an object with `data`, `title` and `url`
+- `History.getStateByIndex` <br/> Gets a state by the index
+- `History.getCurrentIndex` <br/> Gets the current index
 - `History.getHash()` <br/> Gets the current hash of the browser
+
+#### Adapter
+
 - `History.Adapter.bind(element,event,callback)` <br/> A framework independent event binder, you may either use this or your framework's native event binder.
 - `History.Adapter.trigger(element,event)` <br/> A framework independent event trigger, you may either use this or your framework's native event trigger.
 - `History.Adapter.onDomLoad(callback)` <br/> A framework independent onDomLoad binder, you may either use this or your framework's native onDomLoad binder.
+
+#### Navigation
+
 - `History.back()` <br/> Go back once through the history (same as hitting the browser's back button)
 - `History.forward()` <br/> Go forward once through the history (same as hitting the browser's forward button)
 - `History.go(X)` <br/> If X is negative go back through history X times, if X is positive go forwards through history X times
+
+#### Debug
+
 - `History.log(...)` <br/> Logs messages to the console, the log element, and fallbacks to alert if neither of those two exist
 - `History.debug(...)` <br/> Same as `History.log` but only runs if `History.debug.enable === true`
+
+
+
+### Options
+
+- `History.options.hashChangeInterval` <br/> How long should the interval be before hashchange checks
+- `History.options.safariPollInterval` <br/> How long should the interval be before safari poll checks
+- `History.options.doubleCheckInterval` <br/> How long should the interval be before we perform a double check
+- `History.options.disableSuid` <br/> Force History not to append suid
+- `History.options.storeInterval` <br/> How long should we wait between store calls
+- `History.options.busyDelay` <br/> How long should we wait between busy events
+- `History.options.debug` <br/> If true will enable debug messages to be logged
+- `History.options.initialTitle` <br/> What is the title of the initial state
+- `History.options.html4Mode` <br/> If true, will force HTMl4 mode (hashtags)
+- `History.options.delayInit` <br/> Want to override default options and call init manually.
+
 
 ### Events
 
 - `window.onstatechange` <br/> Fired when the state of the page changes (does not include hash changes)
 - `window.onanchorchange` <br/> Fired when the anchor of the page changes (does not include state hashes)
+
+
+## Known Issues
+- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing we can do about this
+- Mercury iOS fails to apply url changes (hashes and HTML5 History API states) - there is nothing we can do about this
 
 
 ## Notes on Compatibility
@@ -228,18 +299,14 @@ Thanks! every bit of help really does make a difference!
 - Changing the hash of the page causes `onpopstate` to fire (this is expected/standard functionality). To ensure correct compatibility between HTML5 and HTML4 browsers the following events have been created:
 	- `window.onstatechange`: this is the same as the `onpopstate` event except it does not fire for traditional anchors
 	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
-- Known Issues
-	- Opera 11 fails to create history entries when under stressful loads (events fire perfectly, just the history events fail) - there is nothing we can do about this
-	- Mercury iOS fails to apply url changes (hashes and HTML5 History API states) - there is nothing we can do about this
-
 
 
 ## History
 
-You can discover the history inside the [History.md](https://github.com/balupton/history.js/blob/master/History.md#files) file
+[You can discover the history inside the `History.md` file](https://github.com/browserstate/history.js/blob/master/History.md#files)
 
 
 ## License
 
 Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
-<br/>Copyright &copy;  2011-2012 [Benjamin Arthur Lupton](http://balupton.com)
+<br/>Copyright &copy;  2011+ [Benjamin Arthur Lupton](http://balupton.com) <b@lupton.cc>

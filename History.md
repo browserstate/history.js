@@ -1,5 +1,70 @@
 ## History
 
+- v1.8b2 - June 22 2013
+    - Introduced uncompressed bundled files #287
+    - Copied component.json to bower.json #291 and used right tag #286
+    - Fixed wrong argument passed to History.getHash() #305, #297, #292 (@Izkata)
+
+- v1.8b1 - May 31 2013
+    - Fixed "encoded string automatically unencoded on html5 browsers" #282, #236, #272
+
+- v1.8a4 - February 13 2013
+    - Fixed coffee script warnings (ExtJS & Dojo adapter, IE 6 iFrame)
+    - Updated qUnit to release 1.11.0, jQuery to release 1.9.1
+
+- v1.8a3 - February 5 2013
+	- Added tests for Dojo and ExtJS
+	- Changed setting of title and url
+	- Testing status
+		- All HTML5 Native Adapter fail in all browsers on Test 10
+		- All other HTML5 tests work fine
+		- All other HTML4 tests fail in Test 4 (in IE)
+
+- v1.8a2 - January 21 2013
+	- Fixed hashchange / statechange triggers: e.g. if a user in a HTML5 browser clicks a link, statechange is fired, in a HTML4 browser only hashchange, but state has also changed
+	- UTF8 / url encoding / decoding tested and so resolved: #64, #107, #108, #162, #177, #187, #205, #207, #210, #228, #251
+	- Fixed #244
+
+- v1.8a1 - January 19 2013
+	- Pass options to `init()` as json is now supported
+	- Added unicode demo
+	- Introduced `getCurrentIndex()`, so you can get previous state by `History.getStateByIndex(getCurrentIndex()-1)`
+	- Fixed HTML4 endless loop when url starts with a slash (e.g. /welcome/hello) #239, #232, #185
+	- Bundled and compressed all scripts
+	- Responsed (and therefore solved) or old issues from balupton repository: #250, #242, #238, #234, #224, #213, #206, #195, #183, #181, #180, #179, #175, #168
+	- Fixed (or merged and therefore fixed) old issues from balupton repository: #248, #239, #236, #235, #229, #221, #220, #218, #215, #214, #212, #203, #191, #189, #172, #171, #166  
+	- Feedback for UTF8 / url encode issues necessary, related problems (thanks to riyad)
+		- #64, #107, #108, #162, #177, #187, #205, #207, #210, #228
+
+- v1.7.2 - January 18 2013
+	- Updated project README
+	- Integrated ExtJS Adapter (thanks to @seanadkinson!)
+	- Merged from forks
+		- added option to force no suid (@hrunting, @sbearcsiro)
+		- provide a consistent URI-encoded document.location.href (@hrunting, @sbearcsiro)
+		- Change History.getHash to return consistent hash, ala History.getLocationHref (@sbearcsiro)
+		- Fix an issue where HTML4 replaceState wasn't firing when SUIDs were disabled and the url didn't change (@sbearcsiro)
+		- Make extractId ignore the fragment if one is present (normally the hash is passed without an fragment) (@sbearcsiro)
+		- Remove all encoding / decoding of URLs except when creating or extracting a fragment, based on the assumption that all inputs to replaceState / pushState are appropriately encoded (@sbearcsiro)
+		- Change escapeHash/unescapeHash methods to use encodeURI/decodeURI instead of window.escape/unescape (@sbearcsiro)
+		- Fixed issue #158 (@sbearcsiro)
+		- isEmptyObject should use hasOwnProperty: prevents from always returning true if the Object.prototype is extended (@Alexander Johansson)
+		- Add potential fix for IE8 not returning full hashed url from getLocationHref when hash contains encoded characters (@sbearcsiro)
+		- Match current W3C popState event semantics for HTML4 (@STRML)
+		- Added History.options.html4Mode for easier debugging (@gigafied)
+		- Added History.options.delayInit (Boolean). (@gigafied)
+		- Added error testing and quota relief for sessionStorage.setItem (@jamie-pate)
+		- Fix IE 6 HTTPS warning (@Daniel15)
+		- Fixed bug in html4 pushState function which left History in a busy state (@joelarson4)
+		- Disable session storage if it's present but not working, thanks to @paulschreiber (@sbearcsiro)
+		- Add Lakin Wecker's dojo adapter (@sbearcsiro)
+		- Add dojo 1.8 tests (@sbearcsiro)
+		- Change dojo adapter to not use dojo events, it seems to break other parts of dojo (@sbearcsiro)
+		- Removes stray spaces so that the build script can run. (@billmag)
+		- fixed an issue in Safari's Private Browsing mode where setItem throws an exception (@billmag)
+		- Adds better error handling for the quota exceeded problem seen with the iPad. (@billmag)
+		- Consolidated var in sessionStorage to the top of the function. Re-build compressed and bundled. (@billmag)
+
 - v1.7.1 - October 4 2011
 	- Added a new native adapter which is framework agnostic (can be used with, or without any framework)
 	- Provided bundled files

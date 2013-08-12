@@ -35,9 +35,9 @@
 		 * @param {Element} element
 		 * @return {String} uid
 		 */
-		 uid: function(element){
+		uid: function(element){
 			return element._uid || (element._uid = History.Adapter._uid++);
-		 },
+		},
 
 		/**
 		 * History.Adapter.bind(el,event,callback)
@@ -113,7 +113,7 @@
 		}
 	};
 
-	// Try and Initialise History
+	// Try to Initialise History
 	if ( typeof History.init !== 'undefined' ) {
 		History.init();
 	}

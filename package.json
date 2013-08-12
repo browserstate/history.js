@@ -1,8 +1,8 @@
 {
 	"name": "history.js",
-	"version": "1.7.1-r2",
+	"version": "1.8.0",
 	"description": "History.js gracefully supports the HTML5 History/State APIs (pushState, replaceState, onPopState) in all browsers. Including continued support for data, titles, replaceState. Supports jQuery, MooTools and Prototype.  For HTML5 browsers this means that you can modify the URL directly, without needing to use hashes anymore. For HTML4 browsers it will revert back to using the old onhashchange functionality.",
-	"homepage": "https://github.com/balupton/history.js",
+	"homepage": "https://github.com/browserstate/history.js",
 	"keywords": [
 		"javascript",
 		"html5 history api",
@@ -23,6 +23,11 @@
 			"name": "Benjamin Lupton",
 			"email": "b@lupton.cc",
 			"web": "http://balupton.com"
+		},
+		{
+			"name": "Andreas Bernhard",
+			"email": "andreas@bernhard.im",
+			"web": "http://www.bs-infosys.com"
 		}
 	],
 	"contributors": [
@@ -30,10 +35,15 @@
 			"name": "Benjamin Lupton",
 			"email": "b@lupton.cc",
 			"web": "http://balupton.com"
+		},
+		{
+			"name": "Andreas Bernhard",
+			"email": "andreas@bernhard.im",
+			"web": "http://www.bs-infosys.com"
 		}
 	],
 	"bugs": {
-		"web": "https://github.com/balupton/history.js/issues"
+		"web": "https://github.com/browserstate/history.js/issues"
 	},
 	"licenses": [
 		{
@@ -43,7 +53,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "http://github.com/balupton/history.js.git"
+		"url": "http://github.com/browserstate/history.js.git"
 	},
 	"dependencies": {
 		"buildr": "0.8.x"
