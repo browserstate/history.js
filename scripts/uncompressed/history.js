@@ -497,6 +497,9 @@
 			if ( /[a-z]+\:\/\//.test(url) ) {
 				// Full URL
 			}
+			else if ( url.substring(0,2) === '//' ) {
+				// Full URL (protocol-less)
+			}
 			else if ( firstChar === '/' ) {
 				// Root URL
 				fullUrl = History.getRootUrl()+url.replace(/^\/+/,'');
