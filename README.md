@@ -245,7 +245,7 @@ Thanks! every bit of help really does make a difference!
 #### Debug
 
 - `History.log(...)` <br/> Logs messages to the console, the log element, and fallbacks to alert if neither of those two exist
-- `History.debug(...)` <br/> Same as `History.log` but only runs if `History.debug.enable === true`
+- `History.debug(...)` <br/> Same as `History.log` but only runs if `History.options.debug === true`
 
 
 
