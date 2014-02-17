@@ -297,10 +297,14 @@
 
 					// Append iFrame
 					document.body.appendChild(iframe);
-
-					// Create initial history entry
-					iframe.contentWindow.document.open();
-					iframe.contentWindow.document.close();
+					
+					try {
+						// Create initial history entry
+						iframe.contentWindow.document.open();
+						iframe.contentWindow.document.close();
+					} catch(e) {
+						iframe.setAttribute('src', 'javascript:void((function(){document.open();document.domain="'+ document.domain + '";document.close()})())');
+					}
 
 					// Define some variables that will help in our checker function
 					lastIframeHash = '';
@@ -334,8 +338,13 @@
 								lastIframeHash = iframeHash = documentHash;
 
 								// Create History Entry
-								iframe.contentWindow.document.open();
-								iframe.contentWindow.document.close();
+								try {
+									// Create initial history entry
+									iframe.contentWindow.document.open();
+									iframe.contentWindow.document.close();
+								} catch(e) {
+									iframe.setAttribute('src', 'javascript:void((function(){document.open();document.domain="'+ document.domain + '";document.close()})())');
+								}
 
 								// Update the iframe's hash
 								iframe.contentWindow.document.location.hash = History.escapeHash(documentHash);
