@@ -840,7 +840,8 @@ if (typeof JSON !== 'object') {
 				var lastDocumentHash = '',
 					iframeId, iframe,
 					lastIframeHash, checkerRunning,
-					startedWithHash = Boolean(History.getHash());
+					startedWithHash = Boolean(History.getHash()),
+					domainSet = false;
 
 				// Handle depending on the browser
 				if ( History.isInternetExplorer() ) {
@@ -862,11 +863,18 @@ if (typeof JSON !== 'object') {
 					document.body.appendChild(iframe);
 					
 					try {
-						// Create initial history entry
+						iframe.contentWindow.document;
+					} catch(e) {
+						domainSet = true;
+					}
+					// Create initial history entry
+					if(domainSet) {
+						iframe.setAttribute('src', 'javascript:void((function(){document.open();document.domain="'+ document.domain + '";document.close()})())');
+						
+					} else {
 						iframe.contentWindow.document.open();
 						iframe.contentWindow.document.close();
-					} catch(e) {
-						iframe.setAttribute('src', 'javascript:void((function(){document.open();document.domain="'+ document.domain + '";document.close()})())');
+						
 					}
 
 					// Define some variables that will help in our checker function
@@ -901,12 +909,12 @@ if (typeof JSON !== 'object') {
 								lastIframeHash = iframeHash = documentHash;
 
 								// Create History Entry
-								try {
-									// Create initial history entry
+								if(domainSet) {
+									iframe.setAttribute('src', 'javascript:void((function(){document.open();document.domain="'+ document.domain + '";document.close()})())');
+						
+								} else {
 									iframe.contentWindow.document.open();
 									iframe.contentWindow.document.close();
-								} catch(e) {
-									iframe.setAttribute('src', 'javascript:void((function(){document.open();document.domain="'+ document.domain + '";document.close()})())');
 								}
 
 								// Update the iframe's hash
