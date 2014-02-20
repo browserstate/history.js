@@ -2110,7 +2110,9 @@
 			};
 
 			// For Internet Explorer
-			History.intervalList.push(setInterval(History.onUnload,History.options.storeInterval));
+			if ( History.isInternetExplorer() && History.getInternetExplorerMajorVersion() < 9 ) {
+				History.intervalList.push(setInterval(History.onUnload, History.options.storeInterval));
+			}
 
 			// For Other Browsers
 			History.Adapter.bind(window,'beforeunload',History.onUnload);
