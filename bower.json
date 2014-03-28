@@ -1,4 +1,13 @@
 {
   "name": "history.js",
-  "version": "1.8.0"
+  "version": "1.8.0",
+  "ignore": [
+    "demo/",
+    "test*/",
+    "vendor/",
+    "build*.coffee",
+    "component.json",
+    "History.md",
+    "package.json"
+  ]
 }
