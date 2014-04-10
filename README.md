@@ -301,10 +301,6 @@ Thanks! every bit of help really does make a difference!
 	- `window.onanchorchange`: this is the same as the `onhashchange` event except it does not fire for states
 
 
-## History
-
-[You can discover the history inside the `History.md` file](https://github.com/browserstate/history.js/blob/master/History.md#files)
-
 
 ## License
 
@@ -312,4 +308,4 @@ Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause
 <br/>Copyright &copy;  2014+ [Bevry Pty Ltd](http://bevry.me) <us@bevry.me>
 <br/>Copyright &copy;  2011-2013 [Benjamin Arthur Lupton](http://balupton.com) <b@lupton.cc>
 
-For support see the [Getting Support](https://github.com/browserstate/history.js#get-support) section.
+For support see the [Getting Support](#get-support) section.
