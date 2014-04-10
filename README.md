@@ -309,4 +309,5 @@ Thanks! every bit of help really does make a difference!
 ## License
 
 Licensed under the [New BSD License](http://opensource.org/licenses/BSD-3-Clause)
-<br/>Copyright &copy;  2011+ [Benjamin Arthur Lupton](http://balupton.com) <b@lupton.cc>
+<br/>Copyright &copy;  2014+ [Bevry Pty Ltd](http://bevry.me) <us@bevry.me>
+<br/>Copyright &copy;  2011-2013 [Benjamin Arthur Lupton](http://balupton.com) <b@lupton.cc>
