@@ -929,8 +929,6 @@
 		History.isTraditionalAnchor = function(url_or_hash){
 			// Check
 			var isTraditional = !(/[\/\?]/.test(url_or_hash));
-			// Previous test (/[\/\?\.]/) for tranditional anchor didn't allowed to use Google Analytics campaign tags properly
-			// for example: http://www.test.com/page-1#utm_source=myweb.com shrink to http://www.test.com/utm_source=myweb.com
 
 			// Return
 			return isTraditional;
