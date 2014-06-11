@@ -488,7 +488,7 @@
 
 				// Push the new HTML5 State
 				//History.debug('History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false);
+				History.pushState(currentState.data,currentState.title,currentState.url,false);
 
 				// End onHashChange closure
 				return true;
