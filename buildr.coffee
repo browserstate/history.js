@@ -146,6 +146,7 @@ configs =
 				'history.adapter.jquery.js'
 				'history.html4.js'
 				'history.js'
+				'history.enhance.jquery.js'
 			]
 
 			# Bundling
@@ -166,6 +167,7 @@ configs =
 			scriptsOrder: [
 				'history.adapter.jquery.js'
 				'history.js'
+				'history.enhance.jquery.js'
 			]
 
 			# Bundling
