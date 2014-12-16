@@ -107,7 +107,7 @@
 		console = window.console||undefined, // Prevent a JSLint complain
 		document = window.document, // Make sure we are using the correct document
 		navigator = window.navigator, // Make sure we are using the correct navigator
-		sessionStorage = false, // sessionStorage
+		sessionStorage = window.sessionStorage||false, // sessionStorage
 		setTimeout = window.setTimeout,
 		clearTimeout = window.clearTimeout,
 		setInterval = window.setInterval,
@@ -118,7 +118,6 @@
 		history = window.history; // Old History Object
 
 	try {
-		sessionStorage = window.sessionStorage; // This will throw an exception in some browsers when cookies/localStorage are explicitly disabled (i.e. Chrome)
 		sessionStorage.setItem('TEST', '1');
 		sessionStorage.removeItem('TEST');
 	} catch(e) {
@@ -350,11 +349,11 @@
 		History.getInternetExplorerMajorVersion = function(){
 			var result = History.getInternetExplorerMajorVersion.cached =
 					(typeof History.getInternetExplorerMajorVersion.cached !== 'undefined')
-				?	History.getInternetExplorerMajorVersion.cached
-				:	(function(){
+						?	History.getInternetExplorerMajorVersion.cached
+						:	(function(){
 						var v = 3,
-								div = document.createElement('div'),
-								all = div.getElementsByTagName('i');
+							div = document.createElement('div'),
+							all = div.getElementsByTagName('i');
 						while ( (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->') && all[0] ) {}
 						return (v > 4) ? v : false;
 					})()
@@ -371,10 +370,10 @@
 		 */
 		History.isInternetExplorer = function(){
 			var result =
-				History.isInternetExplorer.cached =
-				(typeof History.isInternetExplorer.cached !== 'undefined')
-					?	History.isInternetExplorer.cached
-					:	Boolean(History.getInternetExplorerMajorVersion())
+					History.isInternetExplorer.cached =
+						(typeof History.isInternetExplorer.cached !== 'undefined')
+							?	History.isInternetExplorer.cached
+							:	Boolean(History.getInternetExplorerMajorVersion())
 				;
 			return result;
 		};
@@ -397,8 +396,8 @@
 				pushState: !Boolean(
 					window.history && window.history.pushState && window.history.replaceState
 					&& !(
-						(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
-						|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
+					(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+					|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
 					)
 				),
 				hashChange: Boolean(
@@ -566,8 +565,8 @@
 		History.getBasePageUrl = function(){
 			// Create
 			var basePageUrl = (History.getLocationHref()).replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
-				return (/[^\/]$/).test(part) ? '' : part;
-			}).replace(/\/+$/,'')+'/';
+					return (/[^\/]$/).test(part) ? '' : part;
+				}).replace(/\/+$/,'')+'/';
 
 			// Return
 			return basePageUrl;
@@ -681,7 +680,7 @@
 
 			if (doc.URL.indexOf('#') == -1 && doc.location.href.indexOf('#') != -1)
 				return doc.location.href;
-			
+
 			return doc.URL || doc.location.href;
 		};
 
@@ -992,7 +991,7 @@
 			var id,parts,url, tmp;
 
 			// Extract
-			
+
 			// If the URL has a #, use the id from before the #
 			if (url_or_hash.indexOf('#') != -1)
 			{
@@ -1002,7 +1001,7 @@
 			{
 				tmp = url_or_hash;
 			}
-			
+
 			parts = /(.*)\&_suid=([0-9]+)$/.exec(tmp);
 			url = parts ? (parts[1]||url_or_hash) : url_or_hash;
 			id = parts ? String(parts[2]||'') : '';
@@ -1202,16 +1201,16 @@
 			// Return State
 			return State;
 		};
-		
+
 		/**
 		 * History.getCurrentIndex()
 		 * Gets the current index
 		 * @return (integer)
-		*/
+		 */
 		History.getCurrentIndex = function(){
 			// Prepare
 			var index = null;
-			
+
 			// No states saved
 			if(History.savedStates.length < 1) {
 				index = 0;
@@ -1365,7 +1364,7 @@
 		History.getHashByUrl = function(url){
 			// Extract the hash
 			var hash = String(url)
-				.replace(/([^#]*)#?([^#]*)#?(.*)/, '$2')
+					.replace(/([^#]*)#?([^#]*)#?(.*)/, '$2')
 				;
 
 			// Unescape hash
@@ -1635,7 +1634,7 @@
 
 			// Apply the New State
 			//History.debug('History.safariStatePoll: trigger');
-			History.Adapter.trigger(window,'popstate');
+			History.Adapter.trigger(window,'popstate-internal');
 
 			// Chain
 			return History;
@@ -1853,6 +1852,7 @@
 				// Return true
 				return true;
 			};
+			History.Adapter.bind(window,'popstate-internal',History.onPopState);
 			History.Adapter.bind(window,'popstate',History.onPopState);
 
 			/**
@@ -1866,7 +1866,6 @@
 			 */
 			History.pushState = function(data,title,url,queue){
 				//History.debug('History.pushState: called', arguments);
-
 				// Check the State
 				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
@@ -1905,7 +1904,7 @@
 					history.pushState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
-					History.Adapter.trigger(window,'popstate');
+					History.Adapter.trigger(window,'popstate-internal');
 				}
 
 				// End pushState closure
@@ -1962,7 +1961,7 @@
 					history.replaceState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
-					History.Adapter.trigger(window,'popstate');
+					History.Adapter.trigger(window,'popstate-internal');
 				}
 
 				// End replaceState closure
@@ -2110,7 +2109,7 @@
 				 * Fix Safari HashChange Issue
 				 */
 
-				// Setup Alias
+					// Setup Alias
 				History.Adapter.bind(window,'hashchange',function(){
 					History.Adapter.trigger(window,'popstate');
 				});
