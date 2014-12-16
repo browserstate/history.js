@@ -2178,6 +2178,11 @@
 
     History.Adapter.bind(window, 'popstate', function (event) {
         var _prevState = prevState;
+        if (_prevState == null) {
+            // safari will trigger popstate on first page load
+            return;
+        }
+        
         var currentState = prevState = History.getState();
 
         var backward = true;
