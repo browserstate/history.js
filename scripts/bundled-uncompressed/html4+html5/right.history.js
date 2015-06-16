@@ -2212,7 +2212,7 @@ if (typeof JSON !== 'object') {
 
 				// Create State
 				if ( !State && create && !History.isTraditionalAnchor(url_or_hash) ) {
-					State = History.createStateObject(null,null,url);
+					State = History.createStateObject(null, document.title, url);
 				}
 			}
 
