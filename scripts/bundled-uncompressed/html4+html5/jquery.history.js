@@ -2044,6 +2044,13 @@ if (typeof JSON !== 'object') {
 		 */
 		History.createStateObject = function(data,title,url){
 			// Hashify
+			
+		// Cleanup for IE in file:// mode – doesn't interfere with other browsers
+		// Without this you get a loop with multiple copies of the URL in the URL
+		if (/^file\:\/\/\/?/i.test(url)) {
+		url = url.substr(url.lastIndexOf("\/")+1);
+		}
+	
 			var State = {
 				'data': data,
 				'title': title,
