@@ -270,7 +270,7 @@ Thanks! every bit of help really does make a difference!
 - `History.options.busyDelay` <br/> How long should we wait between busy events
 - `History.options.debug` <br/> If true will enable debug messages to be logged
 - `History.options.initialTitle` <br/> What is the title of the initial state
-- `History.options.html4Mode` <br/> If true, will force HTMl4 mode (hashtags)
+- `History.options.html4Mode` <br/> If true, will force HTML4 mode (hashtags)
 - `History.options.delayInit` <br/> Want to override default options and call init manually.
 
 
