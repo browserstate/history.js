@@ -40,7 +40,7 @@
 
 	// Check Existence
 	if ( typeof History.init !== 'undefined' ) {
-		throw new Error('History.js Core has already been loaded...');
+		return; //History.js Core has already been loaded.
 	}
 
 	// Initialise History

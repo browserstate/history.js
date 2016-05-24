@@ -22,7 +22,7 @@
 
 	// Check Existence
 	if ( typeof History.initHtml4 !== 'undefined' ) {
-		throw new Error('History.js HTML4 Support has already been loaded...');
+		return; //History.js HTML4 Support has already been loaded.
 	}
 
 

@@ -18,7 +18,7 @@
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
-		throw new Error('History.js Adapter has already been loaded...');
+		return; //History.js Adapter has already been loaded.
 	}
 
 	// Add the Adapter
