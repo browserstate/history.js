@@ -1,3 +1,17 @@
+Memo
+==================
+While there are some [legitimate bugs and differences in state handling even in modern browsers](https://github.com/browserstate/history.js/wiki/The-State-of-the-HTML5-History-API), they are relatively small enough now that you can just use the native HTML5 History API. If you intend to support legacy browsers, then History.js is your bet.
+
+This notice is here as History.js does not receive enough funding to be maintained, so it exists only in legacy condition for legacy browsers. Perhaps it still works for modern browsers, but it could really do with maintenance. Maintenance is very difficult as the library requires manual testing in HTML5 and HTML4 modes, and for each adapter, and for each browser. So that means `2^(# of adapters)^(# of browsers and their versions)` tests that need to be run by a human. Tests need to be run by a human as certain failures require browser interactions, such as navigating from the test suite to a different domain and back again, or clicking the physical back buttons, or checking if the physical back buttons actually work. This takes a lot of time.
+
+Despite History.js being one of the most popular JavaScript libraries there is, and has been used by even fortune 500 companies in its time - the reality of economy and company practices seems to be that companies prefer to fork their own internal versions and fix locally with their own devs rather than fund open-source maintainers what they would pay their own devs to make things better for everyone, including themselves, which would be cheaper - but no, that would require too many tiers of company approval that don't understand the need.
+
+As such, if you are an open-source developer, I'd recommend just working on open-source projects that are paid for by your own consulting work or your own company (e.g. every successful open-source project). As otherwise, when they become popular, you better hope they are easily maintainable and testable, otherwise the cost of maintenance is higher than the free time of the maintainers.
+
+Cheers,
+Benjamin Lupton, founder of Bevry, creator of History.js
+
+
 Welcome to History.js <br/> v1.8b2, June 22 2013
 ==================
 
