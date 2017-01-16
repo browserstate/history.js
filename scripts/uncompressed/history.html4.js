@@ -351,7 +351,7 @@
 
 							// Equalise
 							lastIframeHash = iframeHash;
-							
+
 							// If there is no iframe hash that means we're at the original
 							// iframe state.
 							// And if there was a hash on the original request, the original
@@ -486,9 +486,16 @@
 					return false;
 				}
 
+				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false, true);
 				// Push the new HTML5 State
 				//History.debug('History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false);
+
+				// The code running into this place means that History.onHashChange is called because of
+				// the hashchange event which is triggered by navigation backward or forward , not by
+				// setting document.location.hash
+				// so we can trigger a html5 like popstate event to demonstrate the navigation backward or
+				// forward happends.
+				History.Adapter.trigger(window, 'popstate');
 
 				// End onHashChange closure
 				return true;
@@ -502,9 +509,13 @@
 			 * @param {object} data
 			 * @param {string} title
 			 * @param {string} url
+			 * @param {boolean} mockpopstate, this variable is to demonstrate the call to this function is intended to
+			 *                                do the history setting work which is triggered by backward or forward
+			 *                                navigation. Because the html4 browser don't change the history on
+			 *                                hashchange event.
 			 * @return {true}
 			 */
-			History.pushState = function(data,title,url,queue){
+			History.pushState = function(data,title,url,queue,mockpopstate){
 				//History.debug('History.pushState: called', arguments);
 
 				// We assume that the URL passed in is URI-encoded, but this makes
@@ -569,7 +580,7 @@
 				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
 					History.setHash(newStateHash,false);
 				}
-				
+
 				History.busy(false);
 
 				// End pushState closure
@@ -631,13 +642,13 @@
 					// Store the newState
 					History.storeState(newState);
 					History.expectedStateId = newState.id;
-	
+
 					// Recycle the State
 					History.recycleState(newState);
-	
+
 					// Force update of the title
 					History.setTitle(newState);
-					
+
 					// Update HTML5 State
 					History.saveState(newState);
 

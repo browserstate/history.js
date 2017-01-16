@@ -920,7 +920,7 @@ if (typeof JSON !== 'object') {
 
 							// Equalise
 							lastIframeHash = iframeHash;
-							
+
 							// If there is no iframe hash that means we're at the original
 							// iframe state.
 							// And if there was a hash on the original request, the original
@@ -1055,9 +1055,16 @@ if (typeof JSON !== 'object') {
 					return false;
 				}
 
+				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false, true);
 				// Push the new HTML5 State
 				//History.debug('History.onHashChange: success hashchange');
-				History.pushState(currentState.data,currentState.title,encodeURI(currentState.url),false);
+
+				// The code running into this place means that History.onHashChange is called because of
+				// the hashchange event which is triggered by navigation backward or forward , not by
+				// setting document.location.hash
+				// so we can trigger a html5 like popstate event to demonstrate the navigation backward or
+				// forward happends.
+				History.Adapter.trigger(window, 'popstate');
 
 				// End onHashChange closure
 				return true;
@@ -1071,9 +1078,13 @@ if (typeof JSON !== 'object') {
 			 * @param {object} data
 			 * @param {string} title
 			 * @param {string} url
+			 * @param {boolean} mockpopstate, this variable is to demonstrate the call to this function is intended to
+			 *                                do the history setting work which is triggered by backward or forward
+			 *                                navigation. Because the html4 browser don't change the history on
+			 *                                hashchange event.
 			 * @return {true}
 			 */
-			History.pushState = function(data,title,url,queue){
+			History.pushState = function(data,title,url,queue,mockpopstate){
 				//History.debug('History.pushState: called', arguments);
 
 				// We assume that the URL passed in is URI-encoded, but this makes
@@ -1138,7 +1149,7 @@ if (typeof JSON !== 'object') {
 				if ( !History.isHashEqual(newStateHash, html4Hash) && !History.isHashEqual(newStateHash, History.getShortUrl(History.getLocationHref())) ) {
 					History.setHash(newStateHash,false);
 				}
-				
+
 				History.busy(false);
 
 				// End pushState closure
@@ -1200,13 +1211,13 @@ if (typeof JSON !== 'object') {
 					// Store the newState
 					History.storeState(newState);
 					History.expectedStateId = newState.id;
-	
+
 					// Recycle the State
 					History.recycleState(newState);
-	
+
 					// Force update of the title
 					History.setTitle(newState);
-					
+
 					// Update HTML5 State
 					History.saveState(newState);
 
@@ -1270,7 +1281,7 @@ if (typeof JSON !== 'object') {
 		console = window.console||undefined, // Prevent a JSLint complain
 		document = window.document, // Make sure we are using the correct document
 		navigator = window.navigator, // Make sure we are using the correct navigator
-		sessionStorage = false, // sessionStorage
+		sessionStorage = window.sessionStorage||false, // sessionStorage
 		setTimeout = window.setTimeout,
 		clearTimeout = window.clearTimeout,
 		setInterval = window.setInterval,
@@ -1281,7 +1292,6 @@ if (typeof JSON !== 'object') {
 		history = window.history; // Old History Object
 
 	try {
-		sessionStorage = window.sessionStorage; // This will throw an exception in some browsers when cookies/localStorage are explicitly disabled (i.e. Chrome)
 		sessionStorage.setItem('TEST', '1');
 		sessionStorage.removeItem('TEST');
 	} catch(e) {
@@ -1513,11 +1523,11 @@ if (typeof JSON !== 'object') {
 		History.getInternetExplorerMajorVersion = function(){
 			var result = History.getInternetExplorerMajorVersion.cached =
 					(typeof History.getInternetExplorerMajorVersion.cached !== 'undefined')
-				?	History.getInternetExplorerMajorVersion.cached
-				:	(function(){
+						?	History.getInternetExplorerMajorVersion.cached
+						:	(function(){
 						var v = 3,
-								div = document.createElement('div'),
-								all = div.getElementsByTagName('i');
+							div = document.createElement('div'),
+							all = div.getElementsByTagName('i');
 						while ( (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->') && all[0] ) {}
 						return (v > 4) ? v : false;
 					})()
@@ -1534,10 +1544,10 @@ if (typeof JSON !== 'object') {
 		 */
 		History.isInternetExplorer = function(){
 			var result =
-				History.isInternetExplorer.cached =
-				(typeof History.isInternetExplorer.cached !== 'undefined')
-					?	History.isInternetExplorer.cached
-					:	Boolean(History.getInternetExplorerMajorVersion())
+					History.isInternetExplorer.cached =
+						(typeof History.isInternetExplorer.cached !== 'undefined')
+							?	History.isInternetExplorer.cached
+							:	Boolean(History.getInternetExplorerMajorVersion())
 				;
 			return result;
 		};
@@ -1560,8 +1570,8 @@ if (typeof JSON !== 'object') {
 				pushState: !Boolean(
 					window.history && window.history.pushState && window.history.replaceState
 					&& !(
-						(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
-						|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
+					(/ Mobile\/([1-7][a-z]|(8([abcde]|f(1[0-8]))))/i).test(navigator.userAgent) /* disable for versions of iOS before version 4.3 (8F190) */
+					|| (/AppleWebKit\/5([0-2]|3[0-2])/i).test(navigator.userAgent) /* disable for the mercury iOS browser, or at least older versions of the webkit engine */
 					)
 				),
 				hashChange: Boolean(
@@ -1729,8 +1739,8 @@ if (typeof JSON !== 'object') {
 		History.getBasePageUrl = function(){
 			// Create
 			var basePageUrl = (History.getLocationHref()).replace(/[#\?].*/,'').replace(/[^\/]+$/,function(part,index,string){
-				return (/[^\/]$/).test(part) ? '' : part;
-			}).replace(/\/+$/,'')+'/';
+					return (/[^\/]$/).test(part) ? '' : part;
+				}).replace(/\/+$/,'')+'/';
 
 			// Return
 			return basePageUrl;
@@ -1844,7 +1854,7 @@ if (typeof JSON !== 'object') {
 
 			if (doc.URL.indexOf('#') == -1 && doc.location.href.indexOf('#') != -1)
 				return doc.location.href;
-			
+
 			return doc.URL || doc.location.href;
 		};
 
@@ -2155,7 +2165,7 @@ if (typeof JSON !== 'object') {
 			var id,parts,url, tmp;
 
 			// Extract
-			
+
 			// If the URL has a #, use the id from before the #
 			if (url_or_hash.indexOf('#') != -1)
 			{
@@ -2165,7 +2175,7 @@ if (typeof JSON !== 'object') {
 			{
 				tmp = url_or_hash;
 			}
-			
+
 			parts = /(.*)\&_suid=([0-9]+)$/.exec(tmp);
 			url = parts ? (parts[1]||url_or_hash) : url_or_hash;
 			id = parts ? String(parts[2]||'') : '';
@@ -2365,16 +2375,16 @@ if (typeof JSON !== 'object') {
 			// Return State
 			return State;
 		};
-		
+
 		/**
 		 * History.getCurrentIndex()
 		 * Gets the current index
 		 * @return (integer)
-		*/
+		 */
 		History.getCurrentIndex = function(){
 			// Prepare
 			var index = null;
-			
+
 			// No states saved
 			if(History.savedStates.length < 1) {
 				index = 0;
@@ -2528,7 +2538,7 @@ if (typeof JSON !== 'object') {
 		History.getHashByUrl = function(url){
 			// Extract the hash
 			var hash = String(url)
-				.replace(/([^#]*)#?([^#]*)#?(.*)/, '$2')
+					.replace(/([^#]*)#?([^#]*)#?(.*)/, '$2')
 				;
 
 			// Unescape hash
@@ -2798,7 +2808,7 @@ if (typeof JSON !== 'object') {
 
 			// Apply the New State
 			//History.debug('History.safariStatePoll: trigger');
-			History.Adapter.trigger(window,'popstate');
+			History.Adapter.trigger(window,'popstate-internal');
 
 			// Chain
 			return History;
@@ -3016,6 +3026,7 @@ if (typeof JSON !== 'object') {
 				// Return true
 				return true;
 			};
+			History.Adapter.bind(window,'popstate-internal',History.onPopState);
 			History.Adapter.bind(window,'popstate',History.onPopState);
 
 			/**
@@ -3029,7 +3040,6 @@ if (typeof JSON !== 'object') {
 			 */
 			History.pushState = function(data,title,url,queue){
 				//History.debug('History.pushState: called', arguments);
-
 				// Check the State
 				if ( History.getHashByUrl(url) && History.emulated.pushState ) {
 					throw new Error('History.js does not support states with fragement-identifiers (hashes/anchors).');
@@ -3068,7 +3078,7 @@ if (typeof JSON !== 'object') {
 					history.pushState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
-					History.Adapter.trigger(window,'popstate');
+					History.Adapter.trigger(window,'popstate-internal');
 				}
 
 				// End pushState closure
@@ -3125,7 +3135,7 @@ if (typeof JSON !== 'object') {
 					history.replaceState(newState.id,newState.title,newState.url);
 
 					// Fire HTML5 Event
-					History.Adapter.trigger(window,'popstate');
+					History.Adapter.trigger(window,'popstate-internal');
 				}
 
 				// End replaceState closure
@@ -3273,7 +3283,7 @@ if (typeof JSON !== 'object') {
 				 * Fix Safari HashChange Issue
 				 */
 
-				// Setup Alias
+					// Setup Alias
 				History.Adapter.bind(window,'hashchange',function(){
 					History.Adapter.trigger(window,'popstate');
 				});
