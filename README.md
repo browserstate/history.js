@@ -8,7 +8,7 @@ Despite History.js being one of the most popular JavaScript libraries there is, 
 
 As such, if you are an open-source developer, I'd recommend just working on open-source projects that are paid for by your own consulting work or your own company (e.g. every successful open-source project). As otherwise, when they become popular, you better hope they are easily maintainable and testable, otherwise the cost of maintenance is higher than the free time of the maintainers.
 
-So with all that said, this repo still exists for archival purposes, legacy browsers, and anarachistic maintenance.
+So with all that said, this repo still exists for archival purposes, legacy browsers, and anarachistic issues & fork maintenance.
 
 Cheers,
 Benjamin Lupton, founder of Bevry, creator of History.js
