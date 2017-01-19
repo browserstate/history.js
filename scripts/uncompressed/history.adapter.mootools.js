@@ -13,7 +13,8 @@
 	var
 		History = window.History = window.History||{},
 		MooTools = window.MooTools,
-		Element = window.Element;
+		Element = window.Element,
+		append  = Object.hasOwnProperty('append') ? Object.append : Hash.extend;
 
 	// Check Existence
 	if ( typeof History.Adapter !== 'undefined' ) {
@@ -21,7 +22,8 @@
 	}
 
 	// Make MooTools aware of History.js Events
-	Object.append(Element.NativeEvents,{
+	
+	append(Element.NativeEvents,{
 		'popstate':2,
 		'hashchange':2
 	});
