@@ -359,6 +359,54 @@ configs =
 			# Bundling
 			bundleScriptPath: __dirname+'/scripts/bundled/html5/zepto.history.js'
 		}
+
+
+		# -----------------------------
+		# PROTOTYPE
+
+		{
+			# Options
+			name: 'html4+html5+prototype'
+			watch: options.watch
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: options.compress # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'json2.js'
+				'history.adapter.prototype.js'
+				'history.html4.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html4+html5/prototype.history.js'
+		}
+		{
+			# Options
+			name: 'html5+prototype'
+			watch: options.watch
+
+			# Paths
+			srcPath: __dirname+'/scripts/uncompressed'
+
+			# Compression (without outPath only the generated bundle files are compressed)
+			compressScripts: options.compress # Array or true or false
+
+			# Order
+			scriptsOrder: [
+				'history.adapter.prototype.js'
+				'history.js'
+			]
+
+			# Bundling
+			bundleScriptPath: __dirname+'/scripts/bundled/html5/prototype.history.js'
+		}
+
 	]
 
 # Standard
