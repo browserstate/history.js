@@ -194,17 +194,24 @@
 		History.log = function(){
 			// Prepare
 			var
+                debugExists = !(typeof debug === 'undefined' || typeof debug.log === 'undefined' || typeof debug.log.apply === 'undefined'),
 				consoleExists = !(typeof console === 'undefined' || typeof console.log === 'undefined' || typeof console.log.apply === 'undefined'),
 				textarea = document.getElementById('log'),
 				message,
 				i,n,
 				args,arg
 				;
+            
+            args = Array.prototype.slice.call(arguments);
+			message = args.shift();
+
+	        //Write to Debug( https://github.com/cowboy/javascript-debug) if available
+	        if (debugExists ) {
+			    debug.debug(message,args);
+			}
 
 			// Write to Console
-			if ( consoleExists ) {
-				args = Array.prototype.slice.call(arguments);
-				message = args.shift();
+			if ( consoleExists && !debugExists ) { //let's not write to both the console and debug.log
 				if ( typeof console.debug !== 'undefined' ) {
 					console.debug.apply(console,[message,args]);
 				}
@@ -236,7 +243,7 @@
 				textarea.scrollTop = textarea.scrollHeight - textarea.clientHeight;
 			}
 			// No Textarea, No Console
-			else if ( !consoleExists ) {
+			else if ( !consoleExists && !debugExists ) {
 				alert(message);
 			}
 
