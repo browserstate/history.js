@@ -23,8 +23,15 @@
 		clearInterval = window.clearInterval,
 		JSON = window.JSON,
 		alert = window.alert,
-		History = window.History = window.History||{}, // Public History Object
+		History, // Public History Object
 		history = window.history; // Old History Object
+		
+		
+	if (typeof module !== "undefined" && module.exports) {
+		module.exports = History = {}
+	} else {
+		History = window.History = window.History||{}, 	
+	}
 
 	try {
 		sessionStorage = window.sessionStorage; // This will throw an exception in some browsers when cookies/localStorage are explicitly disabled (i.e. Chrome)
