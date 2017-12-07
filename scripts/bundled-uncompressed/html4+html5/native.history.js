@@ -2596,10 +2596,13 @@ if (typeof JSON !== 'object') {
 
 			// Apply
 			try {
-				document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
+				if(title != "") //Don't update the document title if newState title is empty.
+					document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
 			}
 			catch ( Exception ) { }
-			document.title = title;
+			
+			if(title != "") //Don't update the document title if newState title is empty.
+				document.title = title;
 
 			// Chain
 			return History;
