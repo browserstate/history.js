@@ -1426,12 +1426,12 @@
 
 			// Apply
 			try {
-				if(title != "") //Don't update the document title if newState title is empty.
+				if(title) //Don't update the document title if newState title is empty/undefined.
 					document.getElementsByTagName('title')[0].innerHTML = title.replace('<','&lt;').replace('>','&gt;').replace(' & ',' &amp; ');
 			}
 			catch ( Exception ) { }
 			
-			if(title != "") //Don't update the document title if newState title is empty.
+			if(title) //Don't update the document title if newState title is empty/undefined.
 				document.title = title;
 
 			// Chain
