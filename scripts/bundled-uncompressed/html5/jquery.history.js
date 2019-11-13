@@ -1763,7 +1763,7 @@
 			 */
 			History.onPopState = function(event,extra){
 				// Prepare
-				var stateId = false, newState = false, currentHash, currentState;
+				var stateId = false, newState = false, currentHash, currentState, isInternal = false;
 
 				// Reset the double check
 				History.doubleCheckComplete();
@@ -1798,6 +1798,7 @@
 				if ( stateId ) {
 					// Vanilla: Back/forward button was used
 					newState = History.getStateById(stateId);
+					isInternal = true;
 				}
 				else if ( History.expectedStateId ) {
 					// Vanilla: A new state was pushed, and popstate was called manually
@@ -1824,6 +1825,9 @@
 					History.busy(false);
 					return false;
 				}
+
+				// Store the internal status
+				newState.internal = isInternal;
 
 				// Store the State
 				History.storeState(newState);
