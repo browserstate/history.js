@@ -1,4 +1,6 @@
 {
   "name": "history.js",
-  "version": "1.8.0"
+  "version": "1.8.0",
+  "main": "scripts/uncompressed/history.js",
+  "ignore" : ["demo", "tests.src", "tests", "vendor", ".*", "buildr*", "component.json", "package.json"]
 }
