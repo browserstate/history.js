@@ -1790,7 +1790,11 @@ if (typeof JSON !== 'object') {
 				// We are in a if statement as when pushState is not emulated
 				// The actual url these short urls are relative to can change
 				// So within the same session, we the url may end up somewhere different
-				shortUrl = shortUrl.replace(baseUrl,'');
+
+                // also make sure to remove the trailing slash before removing the baseUrl
+                // from shortUrl, or it will not match the host
+                var baseUrlWithoutTrailingSlash = baseUrl.replace(/\/$/gi, '');
+                shortUrl = shortUrl.replace(baseUrlWithoutTrailingSlash,'');
 			}
 
 			// Trim rootUrl
