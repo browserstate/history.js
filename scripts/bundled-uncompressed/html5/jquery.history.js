@@ -1762,6 +1762,7 @@
 			 * Refresh the Current State
 			 */
 			History.onPopState = function(event,extra){
+				if (History.getLocationHref().indexOf("#")!==-1) return;
 				// Prepare
 				var stateId = false, newState = false, currentHash, currentState;
 
